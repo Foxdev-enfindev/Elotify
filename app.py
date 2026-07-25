@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-# Tentative d'importation de psycopg2 pour Neon.tech (silencieux si non installé en local)
+# Tentative d'importation de psycopg2 pour Neon.tech
 try:
     import psycopg2
     HAS_PSYCOPG2 = True
@@ -15,9 +15,10 @@ except ImportError:
     HAS_PSYCOPG2 = False
 
 app = Flask(__name__)
+# Clé de session Flask (Indispensable pour garder les tokens des utilisateurs)
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "elotify_kpop_local_secret_session_key")
 
-# Identifiants Spotify (Variables d'environnement en ligne ou valeurs par défaut en local)
+# Identifiants Spotify (Variables d'environnement sur Render ou valeurs par défaut)
 CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID", "b969cdabdc8443afb3bc0f494f0513bc")
 CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET", "6c3bc4b35b474028b605d9f358c230d4")
 REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI", "http://127.0.0.1:8888/callback")
@@ -26,14 +27,37 @@ DATABASE_URL = os.environ.get("DATABASE_URL")
 K_FACTOR = 32
 DEFAULT_RATING = 1000
 DERNIER_RESULTAT = ""
-
 LAST_ACTIVITY_TIME = time.time()
-CACHED_USER_PROFILE = None
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-    client_id=CLIENT_ID, client_secret=CLIENT_SECRET, redirect_uri=REDIRECT_URI,
-    scope="playlist-read-private playlist-read-collaborative user-modify-playback-state user-read-playback-state user-read-private"
-))
+# --- GESTION DE L'AUTHENTIFICATION SPOTIFY ---
+
+def create_spotify_oauth():
+    """Crée le gestionnaire d'authentification OAuth pour Spotify."""
+    return SpotifyOAuth(
+        client_id=CLIENT_ID,
+        client_secret=CLIENT_SECRET,
+        redirect_uri=REDIRECT_URI,
+        scope="playlist-read-private playlist-read-collaborative user-modify-playback-state user-read-playback-state user-read-private"
+    )
+
+def get_spotify_client():
+    """Récupère l'instance Spotipy active à partir du token enregistré en session."""
+    token_info = session.get('token_info', None)
+    if not token_info:
+        return None
+    
+    auth_manager = create_spotify_oauth()
+    # Vérifie si le token a expiré et le rafraîchit automatiquement
+    if auth_manager.is_token_expired(token_info):
+        try:
+            token_info = auth_manager.refresh_access_token(token_info['refresh_token'])
+            session['token_info'] = token_info
+        except Exception as e:
+            print(f"⚠️ Impossible de rafraîchir le token : {e}")
+            return None
+
+    return spotipy.Spotify(auth=token_info['access_token'])
+
 
 # --- GESTION DE LA BASE DE DONNÉES / SAUVEGARDES ---
 
@@ -60,7 +84,7 @@ def init_db():
 def load_local_scores():
     playlist_id = session.get('selected_playlist_id', 'generique')
     
-    # 1. Mode Base de données (En ligne sur Render / Neon)
+    # 1. Mode Base de données (Sur Render avec Neon)
     if DATABASE_URL and HAS_PSYCOPG2:
         try:
             conn = psycopg2.connect(DATABASE_URL)
@@ -74,7 +98,7 @@ def load_local_scores():
         except Exception as e:
             print(f"⚠️ Erreur lecture DB : {e}")
 
-    # 2. Mode Fichier JSON (Local)
+    # 2. Mode Fichier JSON (En local)
     filename = f"classement_{playlist_id}.json"
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as f:
@@ -84,7 +108,7 @@ def load_local_scores():
 def save_local_scores(tracks_data):
     playlist_id = session.get('selected_playlist_id', 'generique')
     
-    # 1. Mode Base de données (En ligne sur Render / Neon)
+    # 1. Mode Base de données (Sur Render avec Neon)
     if DATABASE_URL and HAS_PSYCOPG2:
         try:
             conn = psycopg2.connect(DATABASE_URL)
@@ -103,17 +127,18 @@ def save_local_scores(tracks_data):
         except Exception as e:
             print(f"⚠️ Erreur écriture DB : {e}")
 
-    # 2. Mode Fichier JSON (Local)
+    # 2. Mode Fichier JSON (En local)
     filename = f"classement_{playlist_id}.json"
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(tracks_data, f, ensure_ascii=False, indent=4)
 
-# Initialisation de la base de données au démarrage
+# Lancement de l'initialisation de la DB au démarrage
 init_db()
 
-# --- LOGIQUE METIER & SPOTIFY ---
 
-def fetch_and_cache_playlist():
+# --- LOGIQUE MÉTIER ---
+
+def fetch_and_cache_playlist(sp):
     playlist_id = session.get('selected_playlist_id')
     if not playlist_id:
         raise Exception("Aucune playlist sélectionnée.")
@@ -163,65 +188,97 @@ def fetch_and_cache_playlist():
     if tracks: save_local_scores(tracks)
     return tracks
 
-def get_updated_tracks():
+def get_updated_tracks(sp):
     local_scores = load_local_scores()
     if local_scores and len(local_scores) > 5: return local_scores
-    return fetch_and_cache_playlist()
+    return fetch_and_cache_playlist(sp)
 
-def get_user_profile_cached():
-    global CACHED_USER_PROFILE
-    if CACHED_USER_PROFILE is not None: return CACHED_USER_PROFILE
+def get_user_profile_cached(sp):
     user_profile = {"display_name": "Utilisateur", "image": ""}
+    if not sp: return user_profile
     try:
         me = sp.current_user()
         user_profile["display_name"] = me.get("display_name", "Utilisateur")
         if me.get("images"): user_profile["image"] = me["images"][0]["url"]
-        CACHED_USER_PROFILE = user_profile
     except Exception as e:
         print(f"⚠️ Profil indisponible : {e}")
-        return user_profile
-    return CACHED_USER_PROFILE
+    return user_profile
 
 def update_elo(rating_a, rating_b, outcome_a):
     ea = 1 / (1 + 10 ** ((rating_b - rating_a) / 400))
     return round(rating_a + K_FACTOR * (outcome_a - ea)), round(rating_b + K_FACTOR * ((1 - outcome_a) - (1 - ea)))
 
-# Surveillance d'activité uniquement si exécuté localement (pas sur un serveur Web)
 def watch_heartbeat():
     global LAST_ACTIVITY_TIME
     if os.environ.get("RENDER"):
-        return # Désactivé sur Render pour laisser le serveur en ligne
+        return # Désactivé sur Render
     while True:
         time.sleep(1)
         if time.time() - LAST_ACTIVITY_TIME > 6:
             print("🔌 Fermeture automatique (Mode local)...")
-            try: sp.pause_playback()
-            except: pass
             os._exit(0)
 
 threading.Thread(target=watch_heartbeat, daemon=True).start()
 
-# --- ROUTES FLASK ---
+
+# --- ROUTES DE CONNEXION & DE REDIRECTION (OAUTH) ---
+
+@app.route('/login')
+def login():
+    """Redirige l'utilisateur vers la page d'autorisation de Spotify."""
+    auth_manager = create_spotify_oauth()
+    auth_url = auth_manager.get_authorize_url()
+    return redirect(auth_url)
+
+@app.route('/callback')
+def callback():
+    """Récupère le code de réponse envoyé par Spotify après la connexion."""
+    auth_manager = create_spotify_oauth()
+    session.clear()
+    code = request.args.get('code')
+    if code:
+        token_info = auth_manager.get_access_token(code)
+        session['token_info'] = token_info
+        return redirect(url_for('liste_playlists'))
+    return "Erreur lors de la connexion avec Spotify."
+
+@app.route('/logout')
+def logout():
+    """Permet de se déconnecter de l'application."""
+    session.clear()
+    return redirect(url_for('login'))
+
+
+# --- ROUTES PRINCIPALES DE L'APPLICATION ---
 
 @app.route('/')
 def index():
     global LAST_ACTIVITY_TIME
     LAST_ACTIVITY_TIME = time.time()
     
+    sp = get_spotify_client()
+    if not sp:
+        return redirect(url_for('login'))
+        
     if 'selected_playlist_id' not in session:
         return redirect(url_for('liste_playlists'))
         
     global DERNIER_RESULTAT
-    tracks = get_updated_tracks()
+    tracks = get_updated_tracks(sp)
     track_ids = list(tracks.keys())
     if len(track_ids) < 2: return "La playlist ne contient pas assez de morceaux valides."
     id_a, id_b = random.sample(track_ids, 2)
-    return render_template('index.html', track_a=tracks[id_a], track_b=tracks[id_b], dernier_resultat=DERNIER_RESULTAT, user=get_user_profile_cached())
+    return render_template('index.html', track_a=tracks[id_a], track_b=tracks[id_b], dernier_resultat=DERNIER_RESULTAT, user=get_user_profile_cached(sp))
 
 @app.route('/playlists')
 def liste_playlists():
     global LAST_ACTIVITY_TIME
     LAST_ACTIVITY_TIME = time.time()
+    
+    sp = get_spotify_client()
+    if not sp:
+        return redirect(url_for('login'))
+        
     try:
         results = sp.current_user_playlists()
         raw_playlists = results.get('items', [])
@@ -231,7 +288,6 @@ def liste_playlists():
             if not pl: continue
             playlist_id = pl.get('id')
             
-            # Récupération du nombre total de morceaux (Triple sécurité)
             total_tracks = 0
             try:
                 tracks_meta = sp.playlist_items(playlist_id, limit=1)
@@ -240,7 +296,6 @@ def liste_playlists():
                 try: total_tracks = pl.get('tracks', {}).get('total', 0)
                 except: total_tracks = 0
                 
-            # Top 5 pour la bulle au survol
             top5 = []
             try:
                 session_temp = session.get('selected_playlist_id')
@@ -262,7 +317,7 @@ def liste_playlists():
                 "top5": top5
             })
             
-        return render_template('playlists.html', playlists=playlists, user=get_user_profile_cached())
+        return render_template('playlists.html', playlists=playlists, user=get_user_profile_cached(sp))
     except Exception as e:
         return f"Erreur lors de la récupération des playlists : {e}"
 
@@ -270,8 +325,13 @@ def liste_playlists():
 def select_playlist(playlist_id):
     global LAST_ACTIVITY_TIME
     LAST_ACTIVITY_TIME = time.time()
+    
+    sp = get_spotify_client()
+    if not sp:
+        return redirect(url_for('login'))
+        
     session['selected_playlist_id'] = playlist_id
-    try: fetch_and_cache_playlist()
+    try: fetch_and_cache_playlist(sp)
     except: pass
     return redirect(url_for('index'))
 
@@ -280,8 +340,12 @@ def vote():
     global DERNIER_RESULTAT, LAST_ACTIVITY_TIME
     LAST_ACTIVITY_TIME = time.time()
     
+    sp = get_spotify_client()
+    if not sp:
+        return redirect(url_for('login'))
+        
     id_a, id_b, outcome = request.form.get('id_a'), request.form.get('id_b'), float(request.form.get('outcome'))
-    tracks = get_updated_tracks()
+    tracks = get_updated_tracks(sp)
     if id_a in tracks and id_b in tracks:
         track_a, track_b = tracks[id_a], tracks[id_b]
         old_elo_a, old_elo_b = track_a['elo'], track_b['elo']
@@ -300,7 +364,12 @@ def vote():
 def classement():
     global LAST_ACTIVITY_TIME
     LAST_ACTIVITY_TIME = time.time()
-    tracks = get_updated_tracks()
+    
+    sp = get_spotify_client()
+    if not sp:
+        return redirect(url_for('login'))
+        
+    tracks = get_updated_tracks(sp)
     sorted_tracks = sorted(tracks.values(), key=lambda x: x['elo'], reverse=True)
     return render_template('classement.html', tracks=sorted_tracks)
 
@@ -314,23 +383,30 @@ def heartbeat():
 def listen(uri):
     global LAST_ACTIVITY_TIME
     LAST_ACTIVITY_TIME = time.time()
-    try: sp.start_playback(uris=[uri])
-    except: pass
+    
+    sp = get_spotify_client()
+    if sp:
+        try: sp.start_playback(uris=[uri])
+        except: pass
     return '', 204
 
 @app.route('/toggle-pause', methods=['POST'])
 def toggle_pause():
     global LAST_ACTIVITY_TIME
     LAST_ACTIVITY_TIME = time.time()
-    try:
-        playback = sp.current_playback()
-        if playback and playback.get('is_playing'):
-            sp.pause_playback()
-            return jsonify({"status": "paused"})
-        else:
-            sp.start_playback()
-            return jsonify({"status": "playing"})
-    except: return jsonify({"status": "error"}), 500
+    
+    sp = get_spotify_client()
+    if sp:
+        try:
+            playback = sp.current_playback()
+            if playback and playback.get('is_playing'):
+                sp.pause_playback()
+                return jsonify({"status": "paused"})
+            else:
+                sp.start_playback()
+                return jsonify({"status": "playing"})
+        except: pass
+    return jsonify({"status": "error"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
