@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elotify - Choisir une Playlist</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .playlist-grid { display: flex; flex-wrap: wrap; gap: 25px; justify-content: center; margin-top: 40px; }
+        .playlist-card { background-color: #181818; padding: 20px; border-radius: 12px; width: 220px; cursor: pointer; border: 2px solid transparent; transition: all 0.25s ease; text-decoration: none; color: white; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+        .playlist-card:hover { border-color: #1DB954; transform: translateY(-5px); background-color: #202020; box-shadow: 0 12px 32px rgba(29, 185, 84, 0.15); }
+        .playlist-img { width: 100%; height: 220px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
+        .playlist-title { font-weight: bold; font-size: 1.1rem; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+        .playlist-count { color: #b3b3b3; font-size: 0.9rem; text-align: left; }
+
+        /* --- STYLE DU TOOLTIP CORRIGÉ --- */
+        .playlist-tooltip {
+            position: fixed;
+            display: none;
+            background-color: #282828;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #1DB954;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+            z-index: 999999 !important; /* Force le premier plan absolu */
+            width: 260px;
+            pointer-events: none;
+        }
+        .playlist-tooltip h3 { margin: 0 0 10px 0; font-size: 0.95rem; color: #1DB954; text-align: center; letter-spacing: 1px; border-bottom: 1px solid #404040; padding-bottom: 5px; }
+        .tooltip-item { font-size: 0.85rem; padding: 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+        .tooltip-elo { color: #1DB954; font-weight: bold; float: right; margin-left: 10px; }
+        .no-data { color: #b3b3b3; font-style: italic; text-align: center; font-size: 0.85rem; padding: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 SÉLECTIONNEZ UNE PLAYLIST 🎵</h1>
+        
+        <div class="playlist-grid">
+            {% for pl in playlists %}
+            <a href="{{ url_for('select_playlist', playlist_id=pl.id) }}" 
+               class="playlist-card"
+               onmousemove="showTooltip(event, 'tooltip-{{ pl.id }}')"
+               onmouseleave="hideTooltip('tooltip-{{ pl.id }}')">
+                
+                {% if pl.images %}
+                    <img src="{{ pl.images[0].url }}" class="playlist-img" alt="Couverture {{ pl.name }}">
+                {% else %}
+                    <div class="playlist-img" style="background-color: #282828; display:flex; align-items:center; justify-content:center; font-size: 3rem;">🎶</div>
+                {% endif %}
+                <div class="playlist-title">{{ pl.name }}</div>
+                <div class="playlist-count">{{ pl.total_tracks }} morceaux</div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- CONTENEURS DES BULLES PLACÉS EN DEHORS DE LA GRILLE -->
+    {% for pl in playlists %}
+    <div id="tooltip-{{ pl.id }}" class="playlist-tooltip">
+        <h3>⭐ TOP 5 LOCAL ⭐</h3>
+        {% if pl.top5 %}
+            {% for track in pl.top5 %}
+            <div class="tooltip-item">
+                <strong>#{{ loop.index }}</strong> {{ track.name }}
+                <span class="tooltip-elo">{{ track.elo }} pts</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-data">Aucun duel enregistré</div>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <script>
+        function sendHeartbeat() {
+            fetch('/heartbeat', { method: 'POST' }).catch(() => {});
+        }
+        window.onload = function() {
+            setInterval(sendHeartbeat, 1500);
+        };
+
+        function showTooltip(event, tooltipId) {
+            const tooltip = document.getElementById(tooltipId);
+            if (!tooltip) return;
+            
+            tooltip.style.display = 'block';
+            
+            // Calcul basé sur les coordonnées absolues de la fenêtre (clientX/Y)
+            let targetX = event.clientX + 20;
+            let targetY = event.clientY + 20;
+            
+            tooltip.style.left = targetX + 'px';
+            tooltip.style.top = targetY + 'px';
+            
+            // Sécurité anti-débordement des bords de l'écran
+            const tooltipRect = tooltip.getBoundingClientRect();
+            if (targetX + tooltipRect.width > window.innerWidth) {
+                tooltip.style.left = (event.clientX - tooltipRect.width - 20) + 'px';
+            }
+            if (targetY + tooltipRect.height > window.innerHeight) {
+                tooltip.style.top = (event.clientY - tooltipRect.height - 20) + 'px';
+            }
+        }
+
+        function hideTooltip(tooltipId) {
+            const tooltip = document.getElementById(tooltipId);
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

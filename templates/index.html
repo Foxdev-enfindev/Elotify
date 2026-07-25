@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elotify K-Pop - Le Duel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- --- BLOC PROFIL & MENU DÉROULANT --- -->
+    <div class="user-profile-container" id="profileMenuContainer">
+        <div class="profile-trigger" onclick="toggleDropdown(event)">
+            {% if user.image %}
+                <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
+            {% else %}
+                <div class="user-avatar-placeholder">👤</div>
+            {% endif %}
+            <span class="user-name">{{ user.display_name }}</span>
+            <span class="arrow-down">▼</span>
+        </div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
+            <a href="#" onclick="syncPlaylist(event)" id="syncBtn">🔄 Synchroniser cette playlist</a>
+            <hr>
+            <a href="#" class="disabled-link logout-link">🚪 Déconnexion (Bientôt)</a>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if dernier_resultat %}
+            <div class="result-banner">{{ dernier_resultat }}</div>
+        {% endif %}
+
+        <h1>⚔️ ELOTIFY DUEL ⚔️</h1>
+        
+        <div class="duel-zone">
+            
+            <!-- --- CARTE 1 --- -->
+            <div id="card-1" class="track-card active" onmouseenter="debouncedListen('1', '{{ track_a.uri }}')" onmouseleave="clearListenTimeout()">
+                <div class="pochette-wrapper">
+                    <img src="{{ track_a.image_url }}" alt="Pochette {{ track_a.name }}" class="pochette">
+                    <form action="{{ url_for('vote') }}" method="POST" class="vote-form">
+                        <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                        <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                        <input type="hidden" name="outcome" value="1.0">
+                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre"></button>
+                    </form>
+                </div>
+                <div class="track-info">
+                    <span class="badge">TITRE 1</span>
+                    <h2>{{ track_a.name }}</h2>
+                    <h3>{{ track_a.artist }}</h3>
+                    <p class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></p>
+                </div>
+            </div>
+
+            <!-- --- CENTRE --- -->
+            <div class="vs-zone">
+                <div class="vs-circle">VS</div>
+                
+                <button id="play-pause-btn" class="pause-btn" onclick="togglePlayPause()">⏸️ Pause</button>
+                
+                <form action="{{ url_for('vote') }}" method="POST">
+                    <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                    <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                    <input type="hidden" name="outcome" value="0.5">
+                    <button type="submit" class="tie-btn">🤝 Match Nul</button>
+                </form>
+
+                <div class="rank-wrapper">
+                    <a href="{{ url_for('classement') }}" class="nav-btn central-rank-btn" onmouseenter="showTop5()" onmouseleave="hideTop5()">📊 Classement</a>
+                    <div id="top5-tooltip" class="top5-tooltip-box">
+                        <h3>⭐ TOP 5 GLOBAL ⭐</h3>
+                        <div id="top5-list">Chargement...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --- CARTE 2 --- -->
+            <div id="card-2" class="track-card" onmouseenter="debouncedListen('2', '{{ track_b.uri }}')" onmouseleave="clearListenTimeout()">
+                <div class="pochette-wrapper">
+                    <img src="{{ track_b.image_url }}" alt="Pochette {{ track_b.name }}" class="pochette">
+                    <form action="{{ url_for('vote') }}" method="POST" class="vote-form">
+                        <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                        <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                        <input type="hidden" name="outcome" value="0.0">
+                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre"></button>
+                    </form>
+                </div>
+                <div class="track-info">
+                    <span class="badge">TITRE 2</span>
+                    <h2>{{ track_b.name }}</h2>
+                    <h3>{{ track_b.artist }}</h3>
+                    <p class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let currentPlayingCard = null;
+        let listenTimeout = null;
+
+        function debouncedListen(cardNumber, uri) {
+            clearListenTimeout();
+            listenTimeout = setTimeout(() => {
+                const isPaused = document.getElementById('play-pause-btn').classList.contains('is-paused');
+                if (currentPlayingCard === cardNumber) return;
+                
+                currentPlayingCard = cardNumber;
+                fetch('/listen/' + uri);
+                
+                if (!isPaused) {
+                    document.getElementById('card-1').classList.remove('active');
+                    document.getElementById('card-2').classList.remove('active');
+                    document.getElementById('card-' + cardNumber).classList.add('active');
+                }
+            }, 250); 
+        }
+
+        function clearListenTimeout() {
+            if (listenTimeout) clearTimeout(listenTimeout);
+        }
+
+        function togglePlayPause() {
+            const btn = document.getElementById('play-pause-btn');
+            fetch('/toggle-pause', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'paused') {
+                        btn.innerHTML = "▶️ Reprendre";
+                        btn.classList.add('is-paused');
+                        document.getElementById('card-1').classList.remove('active');
+                        document.getElementById('card-2').classList.remove('active');
+                    } else if (data.status === 'playing') {
+                        btn.innerHTML = "⏸️ Pause";
+                        btn.classList.remove('is-paused');
+                        if (!currentPlayingCard) currentPlayingCard = '1';
+                        document.getElementById('card-' + currentPlayingCard).classList.add('active');
+                    }
+                })
+                .catch(err => console.error("Erreur lecture", err));
+        }
+
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            document.getElementById('profileDropdown').classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown.classList.contains('show')) dropdown.classList.remove('show');
+        }
+
+        function syncPlaylist(event) {
+            event.preventDefault();
+            const syncBtn = document.getElementById('syncBtn');
+            syncBtn.innerHTML = "⏳ Synchronisation...";
+            syncBtn.style.pointerEvents = "none";
+            fetch('/api/sync', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        syncBtn.innerHTML = "✅ Synchronisé !";
+                        setTimeout(() => { window.location.reload(); }, 1000);
+                    } else {
+                        alert("Erreur de synchronisation.");
+                        syncBtn.innerHTML = "🔄 Synchroniser la playlist";
+                        syncBtn.style.pointerEvents = "auto";
+                    }
+                })
+                .catch(() => {
+                    alert("Erreur serveur.");
+                    syncBtn.innerHTML = "🔄 Synchroniser la playlist";
+                    syncBtn.style.pointerEvents = "auto";
+                });
+        }
+
+        function sendHeartbeat() {
+            fetch('/heartbeat', { method: 'POST' }).catch(() => {});
+        }
+
+        window.onload = function() {
+            currentPlayingCard = '1';
+            fetch('/listen/{{ track_a.uri }}');
+            setInterval(sendHeartbeat, 1500);
+        };
+
+        function showTop5() {
+            const tooltip = document.getElementById('top5-tooltip');
+            const listContainer = document.getElementById('top5-list');
+            tooltip.classList.add('visible');
+            fetch('/api/top5')
+                .then(response => response.json())
+                .then(data => {
+                    listContainer.innerHTML = "";
+                    data.forEach((track, index) => {
+                        const item = document.createElement('div');
+                        item.className = 'top5-item';
+                        item.innerHTML = "<strong>#" + (index + 1) + "</strong> " + track.name + " <span class='top5-elo'>" + track.elo + " pts</span>";
+                        listContainer.appendChild(item);
+                    });
+                })
+                .catch(() => { listContainer.innerText = "Données indisponibles"; });
+        }
+
+        function hideTop5() { document.getElementById('top5-tooltip').classList.remove('visible'); }
+    </script>
+</body>
+</html>

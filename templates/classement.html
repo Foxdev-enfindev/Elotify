@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elotify K-Pop - Classement</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container ranking-container">
+        
+        <div style="margin-bottom: 25px;">
+            <a href="{{ url_for('index') }}" class="nav-btn">⚔️ Retour aux Duels</a>
+        </div>
+
+        <h1>📊 CLASSEMENT GENERAL 📊</h1>
+
+        <div class="ranking-list">
+            {% for track in tracks %}
+            <div class="ranking-item">
+                <div class="rank-number">#{{ loop.index }}</div>
+                {% if track.image_url %}
+                    <img src="{{ track.image_url }}" alt="Pochette" class="rank-img">
+                {% else %}
+                    <div class="rank-img" style="background-color: #535353; display: flex; align-items: center; justify-content: center;">🎵</div>
+                {% endif %}
+                <div class="rank-details">
+                    <span class="rank-name">{{ track.name }}</span>
+                    <span class="rank-artist">{{ track.artist }}</span>
+                </div>
+                <div class="rank-elo">{{ track.elo }} pts</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function sendHeartbeat() {
+            fetch('/heartbeat', { method: 'POST' }).catch(() => {});
+        }
+
+        // Lance le battement de cœur dès le chargement du classement
+        window.onload = function() {
+            setInterval(sendHeartbeat, 1500);
+        };
+    </script>
+</body>
+</html>
