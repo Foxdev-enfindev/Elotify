@@ -232,20 +232,22 @@ def login():
 
 @app.route('/callback')
 def callback():
+    """Récupère le code de réponse envoyé par Spotify après la connexion."""
     auth_manager = create_spotify_oauth()
     session.clear()
+    
     code = request.args.get('code')
     if code:
         try:
-            token_info = auth_manager.get_access_token(code)
+            # On passe explicitement le code sans laisser Spotipy deviner l'URL de retour
+            token_info = auth_manager.get_access_token(code, check_cache=False)
             session['token_info'] = token_info
             return redirect(url_for('liste_playlists'))
         except Exception as e:
             print(f"❌ Erreur lors de l'obtention du token : {e}")
             return f"Erreur de connexion : {e}"
-    return "Code d'autorisation manquant."
-
-@app.route('/logout')
+            
+    return "Code d'autorisation manquant."@app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('login'))
