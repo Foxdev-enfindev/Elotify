@@ -7,19 +7,26 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-app = Flask(__name__)
-# Clé requise pour activer le stockage des variables 'session' de Flask
-app.secret_key = "elotify_kpop_local_secret_session_key"
+# Tentative d'importation de psycopg2 pour Neon.tech (silencieux si non installé en local)
+try:
+    import psycopg2
+    HAS_PSYCOPG2 = True
+except ImportError:
+    HAS_PSYCOPG2 = False
 
-CLIENT_ID = "b969cdabdc8443afb3bc0f494f0513bc"
-CLIENT_SECRET = "6c3bc4b35b474028b605d9f358c230d4"
-REDIRECT_URI = "http://127.0.0.1:8888/callback"
+app = Flask(__name__)
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "elotify_kpop_local_secret_session_key")
+
+# Identifiants Spotify (Variables d'environnement en ligne ou valeurs par défaut en local)
+CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID", "b969cdabdc8443afb3bc0f494f0513bc")
+CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET", "6c3bc4b35b474028b605d9f358c230d4")
+REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI", "http://127.0.0.1:8888/callback")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
 K_FACTOR = 32
 DEFAULT_RATING = 1000
 DERNIER_RESULTAT = ""
 
-# Verrous d'activité temporelle pour l'exécution sous .vbs
 LAST_ACTIVITY_TIME = time.time()
 CACHED_USER_PROFILE = None
 
@@ -28,56 +35,131 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     scope="playlist-read-private playlist-read-collaborative user-modify-playback-state user-read-playback-state user-read-private"
 ))
 
-def get_playlist_data_file():
-    """Génère un nom de fichier JSON unique basé sur la playlist active en session."""
-    playlist_id = session.get('selected_playlist_id')
-    if playlist_id:
-        return f"classement_{playlist_id}.json"
-    return "classement_generique.json"
+# --- GESTION DE LA BASE DE DONNÉES / SAUVEGARDES ---
+
+def init_db():
+    """Crée la table des scores dans Neon si connecté à la DB."""
+    if not DATABASE_URL or not HAS_PSYCOPG2:
+        return
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS playlist_scores (
+                playlist_id TEXT PRIMARY KEY,
+                scores_json TEXT NOT NULL
+            );
+        """)
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("⚡ Connexion à la base de données Neon réussie !")
+    except Exception as e:
+        print(f"⚠️ Erreur initialisation DB : {e}")
 
 def load_local_scores():
-    filename = get_playlist_data_file()
+    playlist_id = session.get('selected_playlist_id', 'generique')
+    
+    # 1. Mode Base de données (En ligne sur Render / Neon)
+    if DATABASE_URL and HAS_PSYCOPG2:
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            cur = conn.cursor()
+            cur.execute("SELECT scores_json FROM playlist_scores WHERE playlist_id = %s;", (playlist_id,))
+            row = cur.fetchone()
+            cur.close()
+            conn.close()
+            if row:
+                return json.loads(row[0])
+        except Exception as e:
+            print(f"⚠️ Erreur lecture DB : {e}")
+
+    # 2. Mode Fichier JSON (Local)
+    filename = f"classement_{playlist_id}.json"
     if os.path.exists(filename):
-        with open(filename, 'r', encoding='utf-8') as f: return json.load(f)
+        with open(filename, 'r', encoding='utf-8') as f:
+            return json.load(f)
     return {}
 
 def save_local_scores(tracks_data):
-    filename = get_playlist_data_file()
-    with open(filename, 'w', encoding='utf-8') as f: json.dump(tracks_data, f, ensure_ascii=False, indent=4)
+    playlist_id = session.get('selected_playlist_id', 'generique')
+    
+    # 1. Mode Base de données (En ligne sur Render / Neon)
+    if DATABASE_URL and HAS_PSYCOPG2:
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            cur = conn.cursor()
+            scores_json = json.dumps(tracks_data, ensure_ascii=False)
+            cur.execute("""
+                INSERT INTO playlist_scores (playlist_id, scores_json)
+                VALUES (%s, %s)
+                ON CONFLICT (playlist_id) 
+                DO UPDATE SET scores_json = EXCLUDED.scores_json;
+            """, (playlist_id, scores_json))
+            conn.commit()
+            cur.close()
+            conn.close()
+            return
+        except Exception as e:
+            print(f"⚠️ Erreur écriture DB : {e}")
+
+    # 2. Mode Fichier JSON (Local)
+    filename = f"classement_{playlist_id}.json"
+    with open(filename, 'w', encoding='utf-8') as f:
+        json.dump(tracks_data, f, ensure_ascii=False, indent=4)
+
+# Initialisation de la base de données au démarrage
+init_db()
+
+# --- LOGIQUE METIER & SPOTIFY ---
 
 def fetch_and_cache_playlist():
     playlist_id = session.get('selected_playlist_id')
     if not playlist_id:
         raise Exception("Aucune playlist sélectionnée.")
 
-    print(f"🔄 Tentative de synchronisation avec la playlist {playlist_id}...")
+    print(f"🔄 Synchronisation de la playlist {playlist_id}...")
     local_scores = load_local_scores()
     tracks = {}
     offset = 0
     limit = 100
     while True:
-        try: results = sp.playlist_items(playlist_id, limit=limit, offset=offset)
+        try:
+            results = sp.playlist_items(playlist_id, limit=limit, offset=offset)
         except Exception as e:
             print(f"❌ Erreur API Spotify : {e}")
             if local_scores: return local_scores
             raise Exception("Impossible de contacter Spotify.")
+            
         if not results or 'items' not in results: break
         items = results['items']
         if len(items) == 0: break
+        
         for item in items:
             if not item or 'item' not in item or not item['item']: continue
             track = item['item']
             track_id = track.get('id')
             if not track_id: continue
+            
             current_elo = local_scores[track_id]['elo'] if track_id in local_scores else DEFAULT_RATING
             artists = track.get('artists')
             artist_name = artists[0].get('name', 'Artiste inconnu') if artists else 'Artiste inconnu'
             album = track.get('album', {})
             images = album.get('images', [])
             image_url = images[1]['url'] if len(images) > 1 else (images[0]['url'] if images else '')
-            tracks[track_id] = {"id": track_id, "name": track.get('name', 'Titre inconnu'), "artist": artist_name, "uri": track.get('uri'), "image_url": image_url, "elo": current_elo}
+            
+            tracks[track_id] = {
+                "id": track_id,
+                "name": track.get('name', 'Titre inconnu'),
+                "artist": artist_name,
+                "uri": track.get('uri'),
+                "image_url": image_url,
+                "elo": current_elo
+            }
+            
         if not results.get('next'): break
         offset += limit
+        
     if tracks: save_local_scores(tracks)
     return tracks
 
@@ -91,13 +173,12 @@ def get_user_profile_cached():
     if CACHED_USER_PROFILE is not None: return CACHED_USER_PROFILE
     user_profile = {"display_name": "Utilisateur", "image": ""}
     try:
-        print("👤 Récupération initiale du profil utilisateur...")
         me = sp.current_user()
         user_profile["display_name"] = me.get("display_name", "Utilisateur")
         if me.get("images"): user_profile["image"] = me["images"][0]["url"]
         CACHED_USER_PROFILE = user_profile
     except Exception as e:
-        print(f"⚠️ Impossible de récupérer le profil : {e}")
+        print(f"⚠️ Profil indisponible : {e}")
         return user_profile
     return CACHED_USER_PROFILE
 
@@ -105,24 +186,28 @@ def update_elo(rating_a, rating_b, outcome_a):
     ea = 1 / (1 + 10 ** ((rating_b - rating_a) / 400))
     return round(rating_a + K_FACTOR * (outcome_a - ea)), round(rating_b + K_FACTOR * ((1 - outcome_a) - (1 - ea)))
 
+# Surveillance d'activité uniquement si exécuté localement (pas sur un serveur Web)
 def watch_heartbeat():
     global LAST_ACTIVITY_TIME
+    if os.environ.get("RENDER"):
+        return # Désactivé sur Render pour laisser le serveur en ligne
     while True:
         time.sleep(1)
         if time.time() - LAST_ACTIVITY_TIME > 6:
-            print("🔌 Aucun navigateur détecté depuis 6 secondes. Fermeture de sécurité...")
+            print("🔌 Fermeture automatique (Mode local)...")
             try: sp.pause_playback()
             except: pass
             os._exit(0)
 
 threading.Thread(target=watch_heartbeat, daemon=True).start()
 
+# --- ROUTES FLASK ---
+
 @app.route('/')
 def index():
     global LAST_ACTIVITY_TIME
     LAST_ACTIVITY_TIME = time.time()
     
-    # Redirige vers la sélection si aucune playlist n'est en mémoire
     if 'selected_playlist_id' not in session:
         return redirect(url_for('liste_playlists'))
         
@@ -131,8 +216,7 @@ def index():
     track_ids = list(tracks.keys())
     if len(track_ids) < 2: return "La playlist ne contient pas assez de morceaux valides."
     id_a, id_b = random.sample(track_ids, 2)
-    user_profile = get_user_profile_cached()
-    return render_template('index.html', track_a=tracks[id_a], track_b=tracks[id_b], dernier_resultat=DERNIER_RESULTAT, user=user_profile)
+    return render_template('index.html', track_a=tracks[id_a], track_b=tracks[id_b], dernier_resultat=DERNIER_RESULTAT, user=get_user_profile_cached())
 
 @app.route('/playlists')
 def liste_playlists():
@@ -147,30 +231,28 @@ def liste_playlists():
             if not pl: continue
             playlist_id = pl.get('id')
             
-            # Système de calcul triple sécurité pour obtenir le nombre réel de morceaux
+            # Récupération du nombre total de morceaux (Triple sécurité)
             total_tracks = 0
             try:
-                # Étape 1 : Appel léger et officiel avec limit=1 (valide pour l'API)
                 tracks_meta = sp.playlist_items(playlist_id, limit=1)
                 total_tracks = tracks_meta.get('total', 0)
             except:
-                try:
-                    # Étape 2 : Lecture directe dans les données de la liste en cas d'échec
-                    total_tracks = pl.get('tracks', {}).get('total', 0)
-                except:
-                    total_tracks = 0
+                try: total_tracks = pl.get('tracks', {}).get('total', 0)
+                except: total_tracks = 0
                 
-            # Récupération du Top 5 local s'il existe pour la bulle flottante
+            # Top 5 pour la bulle au survol
             top5 = []
-            filename = f"classement_{playlist_id}.json"
-            if os.path.exists(filename):
-                try:
-                    with open(filename, 'r', encoding='utf-8') as f:
-                        data = json.load(f)
-                        sorted_tracks = sorted(data.values(), key=lambda x: x['elo'], reverse=True)
-                        top5 = sorted_tracks[:5]
-                except:
-                    pass
+            try:
+                session_temp = session.get('selected_playlist_id')
+                session['selected_playlist_id'] = playlist_id
+                data = load_local_scores()
+                if session_temp: session['selected_playlist_id'] = session_temp
+                else: session.pop('selected_playlist_id', None)
+                
+                if data:
+                    sorted_tracks = sorted(data.values(), key=lambda x: x['elo'], reverse=True)
+                    top5 = sorted_tracks[:5]
+            except: pass
                     
             playlists.append({
                 "id": playlist_id,
@@ -188,24 +270,10 @@ def liste_playlists():
 def select_playlist(playlist_id):
     global LAST_ACTIVITY_TIME
     LAST_ACTIVITY_TIME = time.time()
-    
     session['selected_playlist_id'] = playlist_id
     try: fetch_and_cache_playlist()
     except: pass
     return redirect(url_for('index'))
-
-@app.route('/api/sync', methods=['POST'])
-def api_sync():
-    try:
-        fetch_and_cache_playlist()
-        return jsonify({"status": "success"})
-    except Exception as e: return jsonify({"status": "error", "message": str(e)}), 500
-
-@app.route('/heartbeat', methods=['POST'])
-def heartbeat():
-    global LAST_ACTIVITY_TIME
-    LAST_ACTIVITY_TIME = time.time()
-    return '', 204
 
 @app.route('/vote', methods=['POST'])
 def vote():
@@ -236,10 +304,11 @@ def classement():
     sorted_tracks = sorted(tracks.values(), key=lambda x: x['elo'], reverse=True)
     return render_template('classement.html', tracks=sorted_tracks)
 
-@app.route('/api/top5')
-def api_top5():
-    tracks = get_updated_tracks()
-    return jsonify(sorted(tracks.values(), key=lambda x: x['elo'], reverse=True)[:5])
+@app.route('/heartbeat', methods=['POST'])
+def heartbeat():
+    global LAST_ACTIVITY_TIME
+    LAST_ACTIVITY_TIME = time.time()
+    return '', 204
 
 @app.route('/listen/<uri>', methods=['GET', 'POST'])
 def listen(uri):
@@ -264,4 +333,5 @@ def toggle_pause():
     except: return jsonify({"status": "error"}), 500
 
 if __name__ == '__main__':
-    app.run(debug=False, port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
