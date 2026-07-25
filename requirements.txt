@@ -1,0 +1,4 @@
+Flask
+spotipy
+gunicorn
+psycopg2-binary
