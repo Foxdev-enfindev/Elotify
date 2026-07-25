@@ -3,181 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elotify - Match musical</title>
-    <!-- Lien vers votre fichier CSS dans le dossier static -->
+    <title>Elotify K-Pop - Le Duel</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    
-    <!-- Style dédié pour le bouton de contrôle de lecture -->
-    <style>
-        .controls-container {
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .btn-control {
-            background-color: #282828;
-            color: #ffffff;
-            border: 1px solid #1db954;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s ease;
-        }
-
-        .btn-control:hover {
-            background-color: #1db954;
-            color: #000000;
-        }
-    </style>
 </head>
 <body>
 
-    <header>
-        <h1>Elotify</h1>
-        <p>Choisissez le meilleur titre !</p>
-    </header>
-
-    {% if dernier_resultat %}
-        <div class="resultat-precedent">
-            {{ dernier_resultat }}
+    <!-- --- BLOC PROFIL & MENU DÉROULANT --- -->
+    <div class="user-profile-container" id="profileMenuContainer">
+        <div class="profile-trigger" onclick="toggleDropdown(event)">
+            {% if user.image %}
+                <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
+            {% else %}
+                <div class="user-avatar-placeholder">👤</div>
+            {% endif %}
+            <span class="user-name">{{ user.display_name }}</span>
+            <span class="arrow-down">▼</span>
         </div>
-    {% endif %}
-
-    <!-- BOUTON DE PAUSE / LECTURE -->
-    <div class="controls-container">
-        <button id="btn-toggle-pause" class="btn-control" onclick="togglePause()">
-            <span id="pause-icon">⏸️</span> <span id="pause-text">Mettre en pause</span>
-        </button>
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
+            <a href="#" onclick="syncPlaylist(event)" id="syncBtn">🔄 Synchroniser cette playlist</a>
+            <hr>
+            <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
+        </div>
     </div>
 
-    <div class="match-container">
+    <div class="container">
+        {% if dernier_resultat %}
+            <div class="result-banner">{{ dernier_resultat }}</div>
+        {% endif %}
+
+        <h1>⚔️ ELOTIFY DUEL ⚔️</h1>
         
-        <!-- CARTE TITRE A -->
-        <form id="form-vote-a" action="{{ url_for('vote') }}" method="POST" style="width: 100%;">
-            <input type="hidden" name="id_a" value="{{ track_a.id }}">
-            <input type="hidden" name="id_b" value="{{ track_b.id }}">
-            <input type="hidden" name="outcome" value="1.0">
+        <div class="duel-zone">
             
-            <div id="card-track-a" class="track-card">
-                <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="track-image">
-                <div class="track-info-wrapper">
-                    <p class="track-title">{{ track_a.name }}</p>
-                    <p class="track-artist">{{ track_a.artist }}</p>
-                    <div><span class="track-elo">{{ track_a.elo }} Elo</span></div>
-                    <span class="touch-hint">1 tap : Écouter | 2 taps : Voter</span>
+            <!-- --- CARTE 1 --- -->
+            <div id="card-1" class="track-card active">
+                <div class="pochette-wrapper" onclick="handleCardClick('1', '{{ track_a.uri }}', 'form-card-1')">
+                    <img src="{{ track_a.image_url }}" alt="Pochette {{ track_a.name }}" class="pochette">
+                    <form id="form-card-1" action="{{ url_for('vote') }}" method="POST" class="vote-form">
+                        <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                        <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                        <input type="hidden" name="outcome" value="1.0">
+                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre" onclick="event.stopPropagation()"></button>
+                    </form>
+                </div>
+                <div class="track-info">
+                    <span class="badge">TITRE 1</span>
+                    <h2>{{ track_a.name }}</h2>
+                    <h3>{{ track_a.artist }}</h3>
+                    <p class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></p>
                 </div>
             </div>
-        </form>
 
-        <div class="vs-badge">VS</div>
+            <!-- --- CENTRE --- -->
+            <div class="vs-zone">
+                <div class="vs-circle">VS</div>
+                
+                <button id="play-pause-btn" class="pause-btn" onclick="togglePlayPause()">⏸️ Pause</button>
+                
+                <form action="{{ url_for('vote') }}" method="POST">
+                    <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                    <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                    <input type="hidden" name="outcome" value="0.5">
+                    <button type="submit" class="tie-btn">🤝 Match Nul</button>
+                </form>
 
-        <!-- CARTE TITRE B -->
-        <form id="form-vote-b" action="{{ url_for('vote') }}" method="POST" style="width: 100%;">
-            <input type="hidden" name="id_a" value="{{ track_a.id }}">
-            <input type="hidden" name="id_b" value="{{ track_b.id }}">
-            <input type="hidden" name="outcome" value="0.0">
-            
-            <div id="card-track-b" class="track-card">
-                <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="track-image">
-                <div class="track-info-wrapper">
-                    <p class="track-title">{{ track_b.name }}</p>
-                    <p class="track-artist">{{ track_b.artist }}</p>
-                    <div><span class="track-elo">{{ track_b.elo }} Elo</span></div>
-                    <span class="touch-hint">1 tap : Écouter | 2 taps : Voter</span>
+                <div class="rank-wrapper">
+                    <a href="{{ url_for('classement') }}" class="nav-btn central-rank-btn" onmouseenter="showTop5()" onmouseleave="hideTop5()">📊 Classement</a>
+                    <div id="top5-tooltip" class="top5-tooltip-box">
+                        <h3>⭐ TOP 5 GLOBAL ⭐</h3>
+                        <div id="top5-list">Chargement...</div>
+                    </div>
                 </div>
             </div>
-        </form>
 
+            <!-- --- CARTE 2 --- -->
+            <div id="card-2" class="track-card">
+                <div class="pochette-wrapper" onclick="handleCardClick('2', '{{ track_b.uri }}', 'form-card-2')">
+                    <img src="{{ track_b.image_url }}" alt="Pochette {{ track_b.name }}" class="pochette">
+                    <form id="form-card-2" action="{{ url_for('vote') }}" method="POST" class="vote-form">
+                        <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                        <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                        <input type="hidden" name="outcome" value="0.0">
+                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre" onclick="event.stopPropagation()"></button>
+                    </form>
+                </div>
+                <div class="track-info">
+                    <span class="badge">TITRE 2</span>
+                    <h2>{{ track_b.name }}</h2>
+                    <h3>{{ track_b.artist }}</h3>
+                    <p class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></p>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <div class="nav-links">
-        <a href="{{ url_for('liste_playlists') }}" class="btn-nav">📋 Playlists</a>
-        <a href="{{ url_for('classement') }}" class="btn-nav">🏆 Classement</a>
-    </div>
-
-    <!-- SCRIPT GESTION DUAL-DEVICE & LECTURE AUTOMATIQUE -->
     <script>
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        let isPaused = false;
+        let currentPlayingCard = '1';
+        let listenTimeout = null;
 
-        function playTrack(card, trackUri) {
-            document.querySelectorAll('.track-card').forEach(c => c.classList.remove('playing'));
-            card.classList.add('playing');
-            
-            // Re-initialise le bouton pause
-            isPaused = false;
-            document.getElementById('pause-icon').textContent = '⏸️';
-            document.getElementById('pause-text').textContent = 'Mettre en pause';
+        function playCard(cardNumber, uri) {
+            const isPaused = document.getElementById('play-pause-btn').classList.contains('is-paused');
+            currentPlayingCard = cardNumber;
+            fetch('/listen/' + uri, { method: 'POST' });
 
-            fetch('/listen/' + encodeURIComponent(trackUri), { method: 'POST' });
+            if (!isPaused) {
+                document.getElementById('card-1').classList.remove('active');
+                document.getElementById('card-2').classList.remove('active');
+                document.getElementById('card-' + cardNumber).classList.add('active');
+            }
         }
 
-        function togglePause() {
+        function handleCardClick(cardNumber, uri, formId) {
+            const card = document.getElementById('card-' + cardNumber);
+            if (isTouchDevice) {
+                if (!card.classList.contains('active')) {
+                    playCard(cardNumber, uri);
+                } else {
+                    document.getElementById(formId).submit();
+                }
+            } else {
+                document.getElementById(formId).submit();
+            }
+        }
+
+        // Survol PC avec debouncer
+        document.getElementById('card-1').addEventListener('mouseenter', () => {
+            if (!isTouchDevice) {
+                clearTimeout(listenTimeout);
+                listenTimeout = setTimeout(() => playCard('1', '{{ track_a.uri }}'), 200);
+            }
+        });
+
+        document.getElementById('card-2').addEventListener('mouseenter', () => {
+            if (!isTouchDevice) {
+                clearTimeout(listenTimeout);
+                listenTimeout = setTimeout(() => playCard('2', '{{ track_b.uri }}'), 200);
+            }
+        });
+
+        function togglePlayPause() {
+            const btn = document.getElementById('play-pause-btn');
             fetch('/toggle-pause', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
-                    const icon = document.getElementById('pause-icon');
-                    const text = document.getElementById('pause-text');
                     if (data.status === 'paused') {
-                        isPaused = true;
-                        icon.textContent = '▶️';
-                        text.textContent = 'Reprendre la lecture';
+                        btn.innerHTML = "▶️ Reprendre";
+                        btn.classList.add('is-paused');
+                        document.getElementById('card-1').classList.remove('active');
+                        document.getElementById('card-2').classList.remove('active');
                     } else if (data.status === 'playing') {
-                        isPaused = false;
-                        icon.textContent = '⏸️';
-                        text.textContent = 'Mettre en pause';
+                        btn.innerHTML = "⏸️ Pause";
+                        btn.classList.remove('is-paused');
+                        if (!currentPlayingCard) currentPlayingCard = '1';
+                        document.getElementById('card-' + currentPlayingCard).classList.add('active');
                     }
                 })
-                .catch(err => console.error("Erreur toggle pause:", err));
+                .catch(err => console.error("Erreur lecture", err));
         }
 
-        function setupTrackCard(cardId, trackUri, formId) {
-            const card = document.getElementById(cardId);
-            const form = document.getElementById(formId);
-
-            if (!card || !form) return;
-
-            if (isTouchDevice) {
-                // --- COMPORTEMENT MOBILE (TACTILE) ---
-                card.addEventListener('click', function (e) {
-                    if (!card.classList.contains('playing')) {
-                        // 1er tap : On bloque le vote et on lance le morceau
-                        e.preventDefault();
-                        playTrack(card, trackUri);
-                    } else {
-                        // 2ème tap : On valide le vote
-                        form.submit();
-                    }
-                });
-            } else {
-                // --- COMPORTEMENT PC (SOURIS) ---
-                card.addEventListener('mouseenter', function () {
-                    playTrack(card, trackUri);
-                });
-
-                card.addEventListener('click', function () {
-                    form.submit();
-                });
-            }
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            document.getElementById('profileDropdown').classList.toggle('show');
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const cardA = document.getElementById('card-track-a');
-            const trackUriA = '{{ track_a.uri }}';
+        window.onclick = function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && dropdown.classList.contains('show')) dropdown.classList.remove('show');
+        }
 
-            setupTrackCard('card-track-a', trackUriA, 'form-vote-a');
-            setupTrackCard('card-track-b', '{{ track_b.uri }}', 'form-vote-b');
+        function showTop5() {
+            const tooltip = document.getElementById('top5-tooltip');
+            const listContainer = document.getElementById('top5-list');
+            tooltip.classList.add('visible');
+            fetch('/api/top5')
+                .then(response => response.json())
+                .then(data => {
+                    listContainer.innerHTML = "";
+                    data.forEach((track, index) => {
+                        const item = document.createElement('div');
+                        item.className = 'top5-item';
+                        item.innerHTML = "<strong>#" + (index + 1) + "</strong> " + track.name + " <span class='top5-elo'>" + track.elo + " pts</span>";
+                        listContainer.appendChild(item);
+                    });
+                })
+                .catch(() => { listContainer.innerText = "Données indisponibles"; });
+        }
 
-            // --- LECTURE AUTOMATIQUE DU PREMIER TITRE EN ARRIVANT ---
-            if (cardA && trackUriA) {
-                playTrack(cardA, trackUriA);
-            }
-        });
+        function hideTop5() { document.getElementById('top5-tooltip').classList.remove('visible'); }
+
+        window.onload = function() {
+            playCard('1', '{{ track_a.uri }}');
+        };
     </script>
 </body>
 </html>
