@@ -4,39 +4,42 @@ body {
     background-color: #121212;
     color: #ffffff;
     margin: 0;
-    padding: 20px;
+    padding: 20px 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
+    box-sizing: border-box;
 }
 
 header {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 h1 {
     color: #1db954; /* Vert Spotify */
-    margin-bottom: 5px;
+    margin: 0 0 5px 0;
+    font-size: 2em;
 }
 
 .resultat-precedent {
     background-color: #282828;
-    padding: 10px 20px;
+    padding: 10px 16px;
     border-radius: 20px;
-    font-size: 0.9em;
+    font-size: 0.85em;
     color: #b3b3b3;
     margin-bottom: 20px;
+    text-align: center;
+    max-width: 90%;
 }
 
-/* --- GRILLE DES CARTES DE MATCH --- */
+/* --- DUEL & CARTES (index.html) --- */
 .match-container {
     display: flex;
-    gap: 30px;
+    gap: 20px;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
     max-width: 900px;
     width: 100%;
 }
@@ -45,9 +48,9 @@ h1 {
     font-size: 1.5em;
     font-weight: bold;
     color: #1db954;
+    text-align: center;
 }
 
-/* --- STYLES DES CARTES --- */
 .track-card {
     background-color: #181818;
     border-radius: 12px;
@@ -60,6 +63,7 @@ h1 {
     border: 3px solid transparent;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
 }
 
 .track-image {
@@ -67,13 +71,13 @@ h1 {
     height: 260px;
     object-fit: cover;
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 12px;
 }
 
 .track-title {
     font-size: 1.1em;
     font-weight: bold;
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -82,7 +86,7 @@ h1 {
 .track-artist {
     font-size: 0.9em;
     color: #b3b3b3;
-    margin: 0 0 12px 0;
+    margin: 0 0 10px 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -98,15 +102,14 @@ h1 {
     font-weight: bold;
 }
 
-/* Indication tactile mobile */
 .touch-hint {
     display: none;
     font-size: 0.75em;
-    color: #888;
-    margin-top: 10px;
+    color: #1db954;
+    margin-top: 8px;
+    font-weight: 500;
 }
 
-/* --- SURVOL SOURIS (PC SEULEMENT) --- */
 @media (hover: hover) and (pointer: fine) {
     .track-card:hover {
         transform: translateY(-6px);
@@ -115,33 +118,158 @@ h1 {
     }
 }
 
-/* --- ÉTAT 'EN ÉCOUTE / SÉLECTIONNÉ' (MOBILE ET PC) --- */
 .track-card.playing {
     border-color: #1db954 !important;
     box-shadow: 0 0 20px rgba(29, 185, 84, 0.5);
-    transform: scale(1.03);
+    transform: scale(1.02);
     background-color: #242424;
 }
 
-/* Affichage de l'indication uniquement sur tactile */
-@media (hover: none) {
-    .touch-hint {
-        display: block;
-    }
+/* --- GRILLE DE PLAYLISTS (playlists.html) --- */
+.playlists-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+    width: 100%;
+    max-width: 900px;
 }
 
-/* --- NAVIGATION / BOUTONS --- */
-.nav-links {
-    margin-top: 40px;
+.playlist-card {
+    background-color: #181818;
+    border-radius: 10px;
+    padding: 15px;
+    text-decoration: none;
+    color: #fff;
+    transition: background-color 0.2s ease, transform 0.2s ease;
     display: flex;
-    gap: 15px;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.playlist-card:hover {
+    background-color: #282828;
+    transform: translateY(-4px);
+}
+
+.playlist-img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+.playlist-title {
+    font-size: 1em;
+    font-weight: bold;
+    margin: 0 0 4px 0;
+    text-align: center;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.playlist-count {
+    font-size: 0.8em;
+    color: #b3b3b3;
+    margin-bottom: 8px;
+}
+
+/* --- TABLEAU DU CLASSEMENT (classement.html) --- */
+.table-container {
+    width: 100%;
+    max-width: 800px;
+    background-color: #181818;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.ranking-table th {
+    background-color: #282828;
+    color: #1db954;
+    padding: 12px 16px;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ranking-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #282828;
+    vertical-align: middle;
+}
+
+.ranking-table tr:last-child td {
+    border-bottom: none;
+}
+
+.ranking-table tr:hover {
+    background-color: #202020;
+}
+
+.rank-number {
+    font-weight: bold;
+    width: 30px;
+    text-align: center;
+    color: #b3b3b3;
+}
+
+.top-1 .rank-number { color: #ffd700; font-size: 1.1em; } /* Or */
+.top-2 .rank-number { color: #c0c0c0; } /* Argent */
+.top-3 .rank-number { color: #cd7f32; } /* Bronze */
+
+.ranking-img {
+    width: 45px;
+    height: 45px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.ranking-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.ranking-title {
+    font-weight: bold;
+    font-size: 0.95em;
+    color: #fff;
+}
+
+.ranking-artist {
+    font-size: 0.8em;
+    color: #b3b3b3;
+}
+
+.ranking-elo {
+    font-weight: bold;
+    color: #1db954;
+    text-align: right;
+    white-space: nowrap;
+}
+
+/* --- BOUTONS NAVIGATION --- */
+.nav-links {
+    margin-top: 30px;
+    display: flex;
+    gap: 12px;
 }
 
 .btn-nav {
     color: #ffffff;
     background-color: #282828;
     text-decoration: none;
-    padding: 10px 20px;
+    padding: 10px 18px;
     border-radius: 20px;
     font-size: 0.9em;
     transition: background-color 0.2s ease;
@@ -150,4 +278,76 @@ h1 {
 .btn-nav:hover {
     background-color: #3e3e3e;
     color: #1db954;
+}
+
+/* =======================================================
+   ADAPTATION MOBILE (ÉCRANS < 600px)
+   ======================================================= */
+@media (max-width: 600px) {
+    body { padding: 10px 12px; }
+    h1 { font-size: 1.6em; }
+
+    /* Match (Duel) */
+    .match-container { flex-direction: column; gap: 10px; }
+    .track-card {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        text-align: left;
+        padding: 10px;
+        gap: 12px;
+    }
+    .track-image { width: 90px; height: 90px; min-width: 90px; margin-bottom: 0; }
+    .track-info-wrapper { display: flex; flex-direction: column; width: 100%; overflow: hidden; }
+    .vs-badge { font-size: 1em; margin: 2px 0; opacity: 0.7; }
+    .touch-hint { display: block; }
+
+    /* Playlists sur Mobile : Liste horizontale compacte */
+    .playlists-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    .playlist-card {
+        flex-direction: row;
+        gap: 12px;
+        padding: 10px;
+        text-align: left;
+    }
+    .playlist-img {
+        width: 65px;
+        height: 65px;
+        min-width: 65px;
+        margin-bottom: 0;
+    }
+    .playlist-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .playlist-title { text-align: left; font-size: 0.95em; }
+
+    /* Classement sur Mobile : Tableau ultra lisible */
+    .ranking-table td, .ranking-table th {
+        padding: 8px 10px;
+    }
+    .ranking-img {
+        width: 38px;
+        height: 38px;
+    }
+    .ranking-title { font-size: 0.88em; }
+    .ranking-artist { font-size: 0.75em; }
+    .ranking-elo { font-size: 0.85em; }
+
+    .nav-links {
+        margin-top: 20px;
+        width: 100%;
+        justify-content: center;
+    }
+    .btn-nav {
+        flex: 1;
+        text-align: center;
+        padding: 10px 8px;
+        font-size: 0.85em;
+    }
 }

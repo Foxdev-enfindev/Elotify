@@ -4,8 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elotify - Match musical</title>
-    <!-- Lien vers votre fichier CSS externe -->
+    <!-- Lien vers votre fichier CSS dans le dossier static -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Style dédié pour le bouton de contrôle de lecture -->
+    <style>
+        .controls-container {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .btn-control {
+            background-color: #282828;
+            color: #ffffff;
+            border: 1px solid #1db954;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-control:hover {
+            background-color: #1db954;
+            color: #000000;
+        }
+    </style>
 </head>
 <body>
 
@@ -20,50 +48,93 @@
         </div>
     {% endif %}
 
+    <!-- BOUTON DE PAUSE / LECTURE -->
+    <div class="controls-container">
+        <button id="btn-toggle-pause" class="btn-control" onclick="togglePause()">
+            <span id="pause-icon">⏸️</span> <span id="pause-text">Mettre en pause</span>
+        </button>
+    </div>
+
     <div class="match-container">
         
         <!-- CARTE TITRE A -->
-        <form id="form-vote-a" action="{{ url_for('vote') }}" method="POST">
+        <form id="form-vote-a" action="{{ url_for('vote') }}" method="POST" style="width: 100%;">
             <input type="hidden" name="id_a" value="{{ track_a.id }}">
             <input type="hidden" name="id_b" value="{{ track_b.id }}">
             <input type="hidden" name="outcome" value="1.0">
             
             <div id="card-track-a" class="track-card">
                 <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="track-image">
-                <p class="track-title">{{ track_a.name }}</p>
-                <p class="track-artist">{{ track_a.artist }}</p>
-                <span class="track-elo">{{ track_a.elo }} Elo</span>
-                <span class="touch-hint">1 tap : Écouter | 2 taps : Voter</span>
+                <div class="track-info-wrapper">
+                    <p class="track-title">{{ track_a.name }}</p>
+                    <p class="track-artist">{{ track_a.artist }}</p>
+                    <div><span class="track-elo">{{ track_a.elo }} Elo</span></div>
+                    <span class="touch-hint">1 tap : Écouter | 2 taps : Voter</span>
+                </div>
             </div>
         </form>
 
         <div class="vs-badge">VS</div>
 
         <!-- CARTE TITRE B -->
-        <form id="form-vote-b" action="{{ url_for('vote') }}" method="POST">
+        <form id="form-vote-b" action="{{ url_for('vote') }}" method="POST" style="width: 100%;">
             <input type="hidden" name="id_a" value="{{ track_a.id }}">
             <input type="hidden" name="id_b" value="{{ track_b.id }}">
             <input type="hidden" name="outcome" value="0.0">
             
             <div id="card-track-b" class="track-card">
                 <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="track-image">
-                <p class="track-title">{{ track_b.name }}</p>
-                <p class="track-artist">{{ track_b.artist }}</p>
-                <span class="track-elo">{{ track_b.elo }} Elo</span>
-                <span class="touch-hint">1 tap : Écouter | 2 taps : Voter</span>
+                <div class="track-info-wrapper">
+                    <p class="track-title">{{ track_b.name }}</p>
+                    <p class="track-artist">{{ track_b.artist }}</p>
+                    <div><span class="track-elo">{{ track_b.elo }} Elo</span></div>
+                    <span class="touch-hint">1 tap : Écouter | 2 taps : Voter</span>
+                </div>
             </div>
         </form>
 
     </div>
 
     <div class="nav-links">
-        <a href="{{ url_for('liste_playlists') }}" class="btn-nav">📋 Mes Playlists</a>
-        <a href="{{ url_for('classement') }}" class="btn-nav">🏆 Voir le classement</a>
+        <a href="{{ url_for('liste_playlists') }}" class="btn-nav">📋 Playlists</a>
+        <a href="{{ url_for('classement') }}" class="btn-nav">🏆 Classement</a>
     </div>
 
-    <!-- SCRIPT GESTION DUAL-DEVICE (PC SOURIS / MOBILE TACTILE) -->
+    <!-- SCRIPT GESTION DUAL-DEVICE & LECTURE AUTOMATIQUE -->
     <script>
         const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        let isPaused = false;
+
+        function playTrack(card, trackUri) {
+            document.querySelectorAll('.track-card').forEach(c => c.classList.remove('playing'));
+            card.classList.add('playing');
+            
+            // Re-initialise le bouton pause
+            isPaused = false;
+            document.getElementById('pause-icon').textContent = '⏸️';
+            document.getElementById('pause-text').textContent = 'Mettre en pause';
+
+            fetch('/listen/' + encodeURIComponent(trackUri), { method: 'POST' });
+        }
+
+        function togglePause() {
+            fetch('/toggle-pause', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    const icon = document.getElementById('pause-icon');
+                    const text = document.getElementById('pause-text');
+                    if (data.status === 'paused') {
+                        isPaused = true;
+                        icon.textContent = '▶️';
+                        text.textContent = 'Reprendre la lecture';
+                    } else if (data.status === 'playing') {
+                        isPaused = false;
+                        icon.textContent = '⏸️';
+                        text.textContent = 'Mettre en pause';
+                    }
+                })
+                .catch(err => console.error("Erreur toggle pause:", err));
+        }
 
         function setupTrackCard(cardId, trackUri, formId) {
             const card = document.getElementById(cardId);
@@ -75,13 +146,9 @@
                 // --- COMPORTEMENT MOBILE (TACTILE) ---
                 card.addEventListener('click', function (e) {
                     if (!card.classList.contains('playing')) {
-                        // 1er tap : On bloque le vote et on lance l'extrait
+                        // 1er tap : On bloque le vote et on lance le morceau
                         e.preventDefault();
-                        
-                        document.querySelectorAll('.track-card').forEach(c => c.classList.remove('playing'));
-                        card.classList.add('playing');
-                        
-                        fetch('/listen/' + encodeURIComponent(trackUri), { method: 'POST' });
+                        playTrack(card, trackUri);
                     } else {
                         // 2ème tap : On valide le vote
                         form.submit();
@@ -90,9 +157,7 @@
             } else {
                 // --- COMPORTEMENT PC (SOURIS) ---
                 card.addEventListener('mouseenter', function () {
-                    document.querySelectorAll('.track-card').forEach(c => c.classList.remove('playing'));
-                    card.classList.add('playing');
-                    fetch('/listen/' + encodeURIComponent(trackUri), { method: 'POST' });
+                    playTrack(card, trackUri);
                 });
 
                 card.addEventListener('click', function () {
@@ -102,8 +167,16 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            setupTrackCard('card-track-a', '{{ track_a.uri }}', 'form-vote-a');
+            const cardA = document.getElementById('card-track-a');
+            const trackUriA = '{{ track_a.uri }}';
+
+            setupTrackCard('card-track-a', trackUriA, 'form-vote-a');
             setupTrackCard('card-track-b', '{{ track_b.uri }}', 'form-vote-b');
+
+            // --- LECTURE AUTOMATIQUE DU PREMIER TITRE EN ARRIVANT ---
+            if (cardA && trackUriA) {
+                playTrack(cardA, trackUriA);
+            }
         });
     </script>
 </body>

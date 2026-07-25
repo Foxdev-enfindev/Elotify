@@ -3,46 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elotify K-Pop - Classement</title>
+    <title>Elotify - Classement</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container ranking-container">
-        
-        <div style="margin-bottom: 25px;">
-            <a href="{{ url_for('index') }}" class="nav-btn">⚔️ Retour aux Duels</a>
-        </div>
 
-        <h1>📊 CLASSEMENT GENERAL 📊</h1>
+    <header>
+        <h1>Classement Elo</h1>
+        <p>Les meilleurs morceaux de votre playlist</p>
+    </header>
 
-        <div class="ranking-list">
-            {% for track in tracks %}
-            <div class="ranking-item">
-                <div class="rank-number">#{{ loop.index }}</div>
-                {% if track.image_url %}
-                    <img src="{{ track.image_url }}" alt="Pochette" class="rank-img">
-                {% else %}
-                    <div class="rank-img" style="background-color: #535353; display: flex; align-items: center; justify-content: center;">🎵</div>
-                {% endif %}
-                <div class="rank-details">
-                    <span class="rank-name">{{ track.name }}</span>
-                    <span class="rank-artist">{{ track.artist }}</span>
-                </div>
-                <div class="rank-elo">{{ track.elo }} pts</div>
-            </div>
-            {% endfor %}
-        </div>
+    <div class="table-container">
+        <table class="ranking-table">
+            <thead>
+                <tr>
+                    <th style="width: 30px;">#</th>
+                    <th style="width: 50px;"></th>
+                    <th>Titre</th>
+                    <th style="text-align: right;">Elo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for track in tracks %}
+                    <tr class="{% if loop.index == 1 %}top-1{% elif loop.index == 2 %}top-2{% elif loop.index == 3 %}top-3{% endif %}">
+                        <td class="rank-number">{{ loop.index }}</td>
+                        <td>
+                            {% if track.image_url %}
+                                <img src="{{ track.image_url }}" alt="{{ track.name }}" class="ranking-img">
+                            {% else %}
+                                <div class="ranking-img" style="background:#282828; display:flex; align-items:center; justify-content:center;">🎵</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="ranking-details">
+                                <span class="ranking-title">{{ track.name }}</span>
+                                <span class="ranking-artist">{{ track.artist }}</span>
+                            </div>
+                        </td>
+                        <td class="ranking-elo">{{ track.elo }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
-    <script>
-        function sendHeartbeat() {
-            fetch('/heartbeat', { method: 'POST' }).catch(() => {});
-        }
+    <div class="nav-links">
+        <a href="{{ url_for('index') }}" class="btn-nav">⚔️ Continuer à voter</a>
+        <a href="{{ url_for('liste_playlists') }}" class="btn-nav">📋 Playlists</a>
+    </div>
 
-        // Lance le battement de cœur dès le chargement du classement
-        window.onload = function() {
-            setInterval(sendHeartbeat, 1500);
-        };
-    </script>
 </body>
 </html>
