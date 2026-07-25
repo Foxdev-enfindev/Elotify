@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify, s
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
-# Tentative d'importation de psycopg2 pour Neon.tech
+# Tentative d'importation de psycopg2 pour Neon.tech (silencieux si absent en local)
 try:
     import psycopg2
     HAS_PSYCOPG2 = True
@@ -15,13 +15,13 @@ except ImportError:
     HAS_PSYCOPG2 = False
 
 app = Flask(__name__)
-# Clé de session Flask (Indispensable pour garder les tokens des utilisateurs)
+# Clé de session Flask
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", "elotify_kpop_local_secret_session_key")
 
-# Identifiants Spotify (Variables d'environnement sur Render ou valeurs par défaut)
+# Configuration des accès API Spotify & Base de données
 CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID", "b969cdabdc8443afb3bc0f494f0513bc")
 CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET", "6c3bc4b35b474028b605d9f358c230d4")
-REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI", "http://127.0.0.1:8888/callback")
+REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI", "https://elotify.onrender.com/callback")
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 K_FACTOR = 32
@@ -32,28 +32,29 @@ LAST_ACTIVITY_TIME = time.time()
 # --- GESTION DE L'AUTHENTIFICATION SPOTIFY ---
 
 def create_spotify_oauth():
-    """Crée le gestionnaire d'authentification OAuth pour Spotify."""
+    """Crée le gestionnaire OAuth Spotipy."""
     return SpotifyOAuth(
         client_id=CLIENT_ID,
         client_secret=CLIENT_SECRET,
         redirect_uri=REDIRECT_URI,
-        scope="playlist-read-private playlist-read-collaborative user-modify-playback-state user-read-playback-state user-read-private"
+        scope="playlist-read-private playlist-read-collaborative user-modify-playback-state user-read-playback-state user-read-private",
+        show_dialog=True  # Force Spotify à afficher l'écran d'autorisation / choix de compte
     )
 
 def get_spotify_client():
-    """Récupère l'instance Spotipy active à partir du token enregistré en session."""
+    """Récupère l'instance Spotipy associée au token enregistre en session."""
     token_info = session.get('token_info', None)
     if not token_info:
         return None
     
     auth_manager = create_spotify_oauth()
-    # Vérifie si le token a expiré et le rafraîchit automatiquement
     if auth_manager.is_token_expired(token_info):
         try:
             token_info = auth_manager.refresh_access_token(token_info['refresh_token'])
             session['token_info'] = token_info
         except Exception as e:
-            print(f"⚠️ Impossible de rafraîchir le token : {e}")
+            print(f"⚠️ Erreur de rafraîchissement du token : {e}")
+            session.clear()
             return None
 
     return spotipy.Spotify(auth=token_info['access_token'])
@@ -62,7 +63,7 @@ def get_spotify_client():
 # --- GESTION DE LA BASE DE DONNÉES / SAUVEGARDES ---
 
 def init_db():
-    """Crée la table des scores dans Neon si connecté à la DB."""
+    """Crée la table des scores dans Neon si connecté."""
     if not DATABASE_URL or not HAS_PSYCOPG2:
         return
     try:
@@ -84,7 +85,7 @@ def init_db():
 def load_local_scores():
     playlist_id = session.get('selected_playlist_id', 'generique')
     
-    # 1. Mode Base de données (Sur Render avec Neon)
+    # 1. Mode Base de données (Render / Neon)
     if DATABASE_URL and HAS_PSYCOPG2:
         try:
             conn = psycopg2.connect(DATABASE_URL)
@@ -98,7 +99,7 @@ def load_local_scores():
         except Exception as e:
             print(f"⚠️ Erreur lecture DB : {e}")
 
-    # 2. Mode Fichier JSON (En local)
+    # 2. Mode Fichier JSON (Local)
     filename = f"classement_{playlist_id}.json"
     if os.path.exists(filename):
         with open(filename, 'r', encoding='utf-8') as f:
@@ -108,7 +109,7 @@ def load_local_scores():
 def save_local_scores(tracks_data):
     playlist_id = session.get('selected_playlist_id', 'generique')
     
-    # 1. Mode Base de données (Sur Render avec Neon)
+    # 1. Mode Base de données (Render / Neon)
     if DATABASE_URL and HAS_PSYCOPG2:
         try:
             conn = psycopg2.connect(DATABASE_URL)
@@ -127,16 +128,16 @@ def save_local_scores(tracks_data):
         except Exception as e:
             print(f"⚠️ Erreur écriture DB : {e}")
 
-    # 2. Mode Fichier JSON (En local)
+    # 2. Mode Fichier JSON (Local)
     filename = f"classement_{playlist_id}.json"
     with open(filename, 'w', encoding='utf-8') as f:
         json.dump(tracks_data, f, ensure_ascii=False, indent=4)
 
-# Lancement de l'initialisation de la DB au démarrage
+# Initialisation DB
 init_db()
 
 
-# --- LOGIQUE MÉTIER ---
+# --- LOGIQUE MÉTIER & CALCULS ELO ---
 
 def fetch_and_cache_playlist(sp):
     playlist_id = session.get('selected_playlist_id')
@@ -152,9 +153,9 @@ def fetch_and_cache_playlist(sp):
         try:
             results = sp.playlist_tracks(playlist_id, limit=limit, offset=offset)
         except Exception as e:
-            print(f"❌ Erreur API Spotify : {e}")
+            print(f"❌ Erreur API Spotify lors de la récupération des titres : {e}")
             if local_scores: return local_scores
-            raise Exception("Impossible de contacter Spotify.")
+            raise e
             
         if not results or 'items' not in results: break
         items = results['items']
@@ -211,7 +212,7 @@ def update_elo(rating_a, rating_b, outcome_a):
 def watch_heartbeat():
     global LAST_ACTIVITY_TIME
     if os.environ.get("RENDER"):
-        return # Désactivé sur Render
+        return
     while True:
         time.sleep(1)
         if time.time() - LAST_ACTIVITY_TIME > 6:
@@ -221,35 +222,36 @@ def watch_heartbeat():
 threading.Thread(target=watch_heartbeat, daemon=True).start()
 
 
-# --- ROUTES DE CONNEXION & DE REDIRECTION (OAUTH) ---
+# --- ROUTES D'AUTHENTIFICATION (SPOTIFY OAUTH) ---
 
 @app.route('/login')
 def login():
-    """Redirige l'utilisateur vers la page d'autorisation de Spotify."""
     auth_manager = create_spotify_oauth()
     auth_url = auth_manager.get_authorize_url()
     return redirect(auth_url)
 
 @app.route('/callback')
 def callback():
-    """Récupère le code de réponse envoyé par Spotify après la connexion."""
     auth_manager = create_spotify_oauth()
     session.clear()
     code = request.args.get('code')
     if code:
-        token_info = auth_manager.get_access_token(code)
-        session['token_info'] = token_info
-        return redirect(url_for('liste_playlists'))
-    return "Erreur lors de la connexion avec Spotify."
+        try:
+            token_info = auth_manager.get_access_token(code)
+            session['token_info'] = token_info
+            return redirect(url_for('liste_playlists'))
+        except Exception as e:
+            print(f"❌ Erreur lors de l'obtention du token : {e}")
+            return f"Erreur de connexion : {e}"
+    return "Code d'autorisation manquant."
 
 @app.route('/logout')
 def logout():
-    """Permet de se déconnecter de l'application."""
     session.clear()
     return redirect(url_for('login'))
 
 
-# --- ROUTES PRINCIPALES DE L'APPLICATION ---
+# --- ROUTES PRINCIPALES ---
 
 @app.route('/')
 def index():
@@ -264,7 +266,13 @@ def index():
         return redirect(url_for('liste_playlists'))
         
     global DERNIER_RESULTAT
-    tracks = get_updated_tracks(sp)
+    try:
+        tracks = get_updated_tracks(sp)
+    except Exception as e:
+        print(f"⚠️ Erreur accès playlist : {e}")
+        session.clear()
+        return redirect(url_for('login'))
+
     track_ids = list(tracks.keys())
     if len(track_ids) < 2: return "La playlist ne contient pas assez de morceaux valides."
     id_a, id_b = random.sample(track_ids, 2)
@@ -319,7 +327,9 @@ def liste_playlists():
             
         return render_template('playlists.html', playlists=playlists, user=get_user_profile_cached(sp))
     except Exception as e:
-        return f"Erreur lors de la récupération des playlists : {e}"
+        print(f"⚠️ Erreur liste_playlists (403/Token) : {e}")
+        session.clear()
+        return redirect(url_for('login'))
 
 @app.route('/select-playlist/<playlist_id>')
 def select_playlist(playlist_id):
@@ -331,8 +341,10 @@ def select_playlist(playlist_id):
         return redirect(url_for('login'))
         
     session['selected_playlist_id'] = playlist_id
-    try: fetch_and_cache_playlist(sp)
-    except: pass
+    try: 
+        fetch_and_cache_playlist(sp)
+    except Exception as e:
+        print(f"⚠️ Erreur lors de la sélection : {e}")
     return redirect(url_for('index'))
 
 @app.route('/vote', methods=['POST'])
