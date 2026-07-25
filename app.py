@@ -150,7 +150,7 @@ def fetch_and_cache_playlist(sp):
     limit = 100
     while True:
         try:
-            results = sp.playlist_items(playlist_id, limit=limit, offset=offset)
+            results = sp.playlist_tracks(playlist_id, limit=limit, offset=offset)
         except Exception as e:
             print(f"❌ Erreur API Spotify : {e}")
             if local_scores: return local_scores
@@ -290,7 +290,7 @@ def liste_playlists():
             
             total_tracks = 0
             try:
-                tracks_meta = sp.playlist_items(playlist_id, limit=1)
+                tracks_meta = sp.playlist_tracks(playlist_id, limit=1)
                 total_tracks = tracks_meta.get('total', 0)
             except:
                 try: total_tracks = pl.get('tracks', {}).get('total', 0)
