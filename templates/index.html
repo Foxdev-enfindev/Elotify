@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elotify K-Pop - Le Duel</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Favicon -->
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
@@ -109,7 +110,15 @@
         function playCard(cardNumber, uri) {
             const isPaused = document.getElementById('play-pause-btn').classList.contains('is-paused');
             currentPlayingCard = cardNumber;
-            fetch('/listen/' + uri, { method: 'POST' }).catch(() => {});
+            
+            fetch('/listen/' + uri, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.warning) {
+                        alert("⚠️ " + data.warning);
+                    }
+                })
+                .catch(() => {});
 
             if (!isPaused) {
                 document.getElementById('card-1').classList.remove('active');
@@ -145,7 +154,7 @@
             }
         }
 
-        // --- SURVOL PC OPTIMISÉ (sans relance intempestive) ---
+        // --- SURVOL PC OPTIMISÉ (sans relance si déjà actif) ---
         document.getElementById('card-1').addEventListener('mouseenter', () => {
             if (!isTouchDevice) {
                 const card1 = document.getElementById('card-1');
@@ -171,6 +180,10 @@
             fetch('/toggle-pause', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
+                    if (data.warning) {
+                        alert("⚠️ " + data.warning);
+                        return;
+                    }
                     if (data.status === 'paused') {
                         btn.innerHTML = "▶️ Reprendre";
                         btn.classList.add('is-paused');
