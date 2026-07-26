@@ -1,13 +1,14 @@
 import os
 import time
 import random
-import psycopg2
 import threading
+import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_session import Session
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
+from spotipy.exceptions import SpotifyException
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify')
@@ -17,9 +18,8 @@ app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_PERMANENT"] = False
 Session(app)
 
-# Variables globales & Cache d'inactivité
+# Variable globale pour l'inactivité
 LAST_ACTIVITY_TIME = time.time()
-USER_PROFILE_CACHE = {"data": None, "timestamp": 0}
 
 # --- BASE DE DONNÉES NEON POSTGRESQL ---
 DATABASE_URL = os.environ.get('DATABASE_URL')
@@ -53,7 +53,7 @@ def init_db():
     except Exception as e:
         print(f"⚠️ Erreur initialisation BDD Neon : {e}")
 
-# Initialisation au démarrage
+# Initialisation BDD au démarrage
 init_db()
 
 # --- CONFIGURATION SPOTIFY OAUTH ---
@@ -79,10 +79,13 @@ def get_spotify_client():
     return spotipy.Spotify(auth=token_info['access_token'])
 
 def get_user_profile_cached(sp):
-    global USER_PROFILE_CACHE
+    """Récupère le profil et le met en cache individuellement dans la session de l'utilisateur."""
     now = time.time()
-    if USER_PROFILE_CACHE["data"] and (now - USER_PROFILE_CACHE["timestamp"] < 600):
-        return USER_PROFILE_CACHE["data"]
+    cached_profile = session.get('user_profile')
+    cached_time = session.get('user_profile_timestamp', 0)
+    
+    if cached_profile and (now - cached_time < 600):
+        return cached_profile
     
     try:
         user_info = sp.current_user()
@@ -93,12 +96,14 @@ def get_user_profile_cached(sp):
             'display_name': user_info.get('display_name', 'Utilisateur'),
             'image': image_url
         }
-        USER_PROFILE_CACHE["data"] = profile
-        USER_PROFILE_CACHE["timestamp"] = now
+        
+        session['user_profile'] = profile
+        session['user_profile_timestamp'] = now
+        session.modified = True
         return profile
     except Exception as e:
         print(f"⚠️ Erreur récupération profil : {e}")
-        return None
+        return session.get('user_profile')
 
 # --- GESTION DU SCORE ELO & BDD ---
 def calculate_elo(elo_a, elo_b, outcome_a, k=32):
@@ -142,7 +147,7 @@ def load_local_scores():
         return session.get('local_scores_fallback', {})
 
 def _save_to_db_async(playlist_id, scores_to_update):
-    """Fonction exécutée dans un thread séparé pour ne pas bloquer l'utilisateur."""
+    """Effectue l'écriture dans Neon de façon asynchrone (en arrière-plan)."""
     if not DATABASE_URL or not playlist_id:
         return
 
@@ -176,7 +181,14 @@ def save_local_scores(scores_to_update):
     if not playlist_id:
         return
 
-    # Lancement de la sauvegarde Neon dans un thread séparé (zéro latence pour le vote)
+    if not DATABASE_URL:
+        fallback = session.get('local_scores_fallback', {})
+        fallback.update(scores_to_update)
+        session['local_scores_fallback'] = fallback
+        session.modified = True
+        return
+
+    # Exécution dans un thread séparé pour supprimer toute latence lors du vote
     thread = threading.Thread(target=_save_to_db_async, args=(playlist_id, scores_to_update))
     thread.daemon = True
     thread.start()
@@ -201,8 +213,6 @@ def callback():
 @app.route('/logout')
 def logout():
     session.clear()
-    global USER_PROFILE_CACHE
-    USER_PROFILE_CACHE = {"data": None, "timestamp": 0}
     return redirect(url_for('login'))
 
 # --- ROUTE SELECTION PLAYLIST ---
@@ -271,6 +281,7 @@ def index():
             offset = 0
             limit = 100
 
+            # Pagination complète pour charger l'intégralité des titres
             while True:
                 results = sp.playlist_tracks(playlist_id, limit=limit, offset=offset)
                 items = results.get('items', []) if isinstance(results, dict) else []
@@ -362,7 +373,6 @@ def vote():
     delta_a = new_elo_a - elo_a
     delta_b = new_elo_b - elo_b
 
-    # Préparation des données mises à jour
     updated_scores = {
         id_a: {
             'name': track_a['name'],
@@ -378,10 +388,10 @@ def vote():
         }
     }
 
-    # Sauvegarde Neon / BDD
+    # Sauvegarde asynchrone (instantané pour l'utilisateur)
     save_local_scores(updated_scores)
 
-    # Mise à jour synchrone du cache de session
+    # Mise à jour immédiate du cache de session
     for t in session.get('tracks_cache', []):
         if t['id'] == id_a:
             t['elo'] = new_elo_a
@@ -410,6 +420,11 @@ def listen(track_uri):
     try:
         sp.start_playback(uris=[track_uri])
         return jsonify({"status": "playing", "uri": track_uri})
+    except SpotifyException as e:
+        if e.http_status == 404:
+            print("⚠️ Aucun lecteur Spotify actif trouvé.")
+            return jsonify({"warning": "Ouvre Spotify sur ton appareil pour écouter l'extrait."}), 200
+        return jsonify({"error": str(e)}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -426,6 +441,11 @@ def toggle_pause():
         else:
             sp.start_playback()
             return jsonify({"status": "playing"})
+    except SpotifyException as e:
+        if e.http_status == 404:
+            print("⚠️ Aucun lecteur Spotify actif trouvé.")
+            return jsonify({"warning": "Ouvre Spotify sur ton appareil pour contrôler la lecture."}), 200
+        return jsonify({"error": str(e)}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
