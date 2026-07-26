@@ -101,12 +101,14 @@
                     <p class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></p>
                 </div>
             </div>
-            <!-- BOUTON QUITTER EN BAS DE LA ZONE -->
-            <div class="quit-wrapper">
-                <button id="quit-btn" class="quit-btn" onclick="handleQuit()">🚪 Quitter</button>
-            </div>
 
+        </div><!-- FIN DE DUEL-ZONE -->
+
+        <!-- BOUTON QUITTER BIEN CENTRÉ SOUS LE DUEL -->
+        <div class="quit-wrapper">
+            <button id="quit-btn" class="quit-btn" onclick="handleQuit()">🚪 Quitter</button>
         </div>
+
     </div>
 
     <script>
@@ -238,19 +240,16 @@
         function hideTop5() { document.getElementById('top5-tooltip').classList.remove('visible'); }
 
         function handleQuit() {
-    	// 1. Met en pause la lecture Spotify
-	    fetch('/toggle-pause', { method: 'POST' })
-	        .finally(() => {
-	            // 2. Essaie de fermer la page
-	            window.close();
+            fetch('/toggle-pause', { method: 'POST' })
+                .finally(() => {
+                    window.close();
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('liste_playlists') }}";
+                    }, 300);
+                });
+        }
 
-	            // 3. Si la fermeture est bloquée par le navigateur, redirige vers la liste des playlists
-	            setTimeout(() => {
-	                window.location.href = "{{ url_for('liste_playlists') }}";
-	            }, 300);
-        });
-}
-	window.onload = function() {
+        window.onload = function() {
             playCard('1', '{{ track_a.uri }}');
         };
     </script>
