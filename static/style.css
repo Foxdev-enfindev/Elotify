@@ -474,80 +474,79 @@ h1 {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* =======================================================
-   ADAPTATION MOBILE UNIQUEMENT (Écrans < 768px)
-   Ne touche à rien sur PC !
+   ADAPTATION MOBILE COMPACTE (Écrans < 768px)
    ======================================================= */
 @media (max-width: 768px) {
-    /* Empêche le défilement vertical global */
+    /* Le scroll reste AUTORISÉ par défaut pour le classement et les playlists */
     html, body {
         height: 100%;
-        overflow: hidden;
+        overflow-y: auto;
     }
 
     body {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        padding: 10px;
+        padding: 10px 8px;
         box-sizing: border-box;
     }
 
     /* En-tête compact */
     h1 {
-        font-size: 1.2rem;
-        margin: 5px 0;
+        font-size: 1.3rem;
+        margin: 5px 0 10px 0;
     }
 
     .result-banner {
-        padding: 4px 8px;
+        padding: 6px 10px;
         font-size: 0.8rem;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
     }
 
-    /* La zone principale occupe tout l'espace restant */
     .container {
-        height: 100%;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: flex-start;
+        height: auto;
     }
 
-    /* Passage en colonne vertical */
+    /* Zone de duel resserrée */
     .duel-zone {
+        display: flex;
         flex-direction: column;
-        flex: 1;
-        justify-content: space-around;
-        gap: 8px;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
     }
 
-    /* Cartes de titre plus compactes */
+    /* Cartes de titres horizontales compactes */
     .track-card {
-        flex-direction: row; /* Pochette à gauche, texte à droite */
+        width: 100%;
+        max-width: 100%;
+        flex-direction: row;
         align-items: center;
-        padding: 8px;
+        padding: 10px;
         gap: 12px;
-        max-height: 28vh; /* Limite la hauteur pour tenir sur l'écran */
+        box-sizing: border-box;
     }
 
     .pochette-wrapper {
-        width: 70px;
-        height: 70px;
+        width: 75px;
+        height: 75px;
         flex-shrink: 0;
     }
 
     .pochette {
-        width: 70px;
-        height: 70px;
+        width: 75px;
+        height: 75px;
         border-radius: 8px;
     }
 
     .track-info {
         text-align: left;
         overflow: hidden;
+        flex: 1;
     }
 
     .track-info h2 {
-        font-size: 0.95rem;
+        font-size: 1rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -555,7 +554,7 @@ h1 {
     }
 
     .track-info h3 {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -563,7 +562,7 @@ h1 {
     }
 
     .elo-display {
-        font-size: 0.75rem;
+        font-size: 0.8rem;
         margin-top: 4px;
     }
 
@@ -572,39 +571,51 @@ h1 {
         padding: 2px 6px;
     }
 
-    /* Zone centrale "VS" et boutons réorganisée en ligne */
+    /* FIX DU VS ET DES BOUTONS CENTRAUX */
     .vs-zone {
+        display: flex;
         flex-direction: row;
-        justify-content: space-between;
+        justify-content: center;
         align-items: center;
-        gap: 6px;
-        padding: 4px 0;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+        margin: 4px 0;
     }
 
+    /* Fix du rond VS (pour qu'il reste parfaitement rond et fixe) */
     .vs-circle {
-        width: 32px;
-        height: 32px;
-        font-size: 0.8rem;
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        min-height: 42px !important;
+        border-radius: 50% !important;
+        font-size: 0.9rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+        flex-shrink: 0 !important;
     }
 
-    /* Boutons Pause, Match Nul et Classement plus compacts sur mobile */
     .pause-btn, .tie-btn, .central-rank-btn {
-        padding: 6px 10px;
-        font-size: 0.75rem;
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        border-radius: 20px;
     }
 
-    /* Menu profil en haut à droite */
+    /* Profil compact en haut à droite */
     .user-profile-container {
-        top: 8px;
-        right: 8px;
+        top: 8px !important;
+        right: 8px !important;
     }
 
     .user-avatar, .user-avatar-placeholder {
-        width: 28px;
-        height: 28px;
+        width: 32px !important;
+        height: 32px !important;
     }
 
     .user-name {
-        display: none; /* Cache le nom complet sur mobile pour gagner de la place */
+        display: none;
     }
 }
