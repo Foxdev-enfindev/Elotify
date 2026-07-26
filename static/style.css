@@ -747,11 +747,10 @@ h1 {
     }
 }
 /* =======================================================
-   FIX PAGE CLASSEMENT : DESIGN NÉON & ALIGNEMENTS PARFAITS
+   8. FIX PAGE CLASSEMENT (HTML COMPATIBLE)
    ======================================================= */
 
-/* Déblocage du scroll sur la page classement */
-body.ranking-body, 
+/* Permet le défilement uniquement sur la page classement */
 body:has(.ranking-container) {
     overflow-y: auto !important;
     height: auto !important;
@@ -763,15 +762,13 @@ body:has(.ranking-container) {
     max-width: 800px;
     margin: 0 auto;
     padding: 10px 14px;
-    padding-top: 55px !important;
+    padding-top: 55px !important; /* Marge sous le profil */
     padding-bottom: 40px !important;
     box-sizing: border-box;
 }
 
-/* 1. TRANSFORMATION DU LIEN EN VRAI BOUTON NÉON */
-.ranking-container a[href*="index"],
-.ranking-container a[href*="/"],
-.back-btn {
+/* 1. VRAI BOUTON NÉON POUR "RETOUR AUX DUELS" */
+.nav-btn {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
@@ -784,18 +781,17 @@ body:has(.ranking-container) {
     font-weight: 600 !important;
     font-size: 0.85rem !important;
     text-decoration: none !important;
-    margin: 0 auto 15px auto !important;
     transition: all 0.2s ease;
     box-shadow: 0 0 8px var(--neon-green-glow);
 }
 
-.ranking-container a:hover {
+.nav-btn:hover {
     background: var(--neon-green) !important;
     color: #000 !important;
 }
 
-/* 2. STRUCTURE DU TABLEAU / LISTE */
-.ranking-list, .ranking-table {
+/* 2. STRUCTURE ET CONTENEUR DE LA LISTE */
+.ranking-list {
     width: 100%;
     background: var(--card-bg);
     border-radius: 16px;
@@ -804,7 +800,7 @@ body:has(.ranking-container) {
     border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.ranking-item, .ranking-row, tr {
+.ranking-item {
     display: flex !important;
     align-items: center !important;
     padding: 10px 12px !important;
@@ -813,12 +809,12 @@ body:has(.ranking-container) {
     box-sizing: border-box;
 }
 
-.ranking-item:last-child, .ranking-row:last-child {
+.ranking-item:last-child {
     border-bottom: none !important;
 }
 
-/* Positonnier du Rang (#1, #2...) */
-.rank-number, .ranking-rank {
+/* Rang (#1, #2...) */
+.rank-number {
     font-size: 0.95rem;
     font-weight: 800;
     color: var(--text-muted);
@@ -833,7 +829,7 @@ body:has(.ranking-container) {
 .ranking-item:nth-child(3) .rank-number { color: #cd7f32; }
 
 /* Pochettes verrouillées à 50px */
-.ranking-item img, .ranking-cover {
+.rank-img {
     width: 50px !important;
     height: 50px !important;
     min-width: 50px !important;
@@ -843,42 +839,51 @@ body:has(.ranking-container) {
     flex-shrink: 0;
 }
 
-/* 3. ALIGNEMENT DU TITRE & ARTISTE SUR 2 LIGNES */
-.track-info-cell, .ranking-info {
+.rank-img-placeholder {
+    background: #282828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+/* 3. BLOC TEXTE (TITRE + ARTISTE SUR 2 LIGNES) */
+.rank-details {
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     flex: 1 !important; /* Prend tout l'espace central disponible */
-    min-width: 0 !important; /* Force la troncation si le texte dépasse */
+    min-width: 0 !important; /* Force la troncation si le texte est long */
 }
 
-.track-info-cell h2, .track-info-cell strong, .track-title {
+.rank-name {
     font-size: 0.9rem !important;
     font-weight: 700 !important;
     color: #ffffff !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    margin: 0 0 2px 0 !important;
+    margin-bottom: 2px !important;
+    display: block !important;
 }
 
-.track-info-cell h3, .track-info-cell span, .track-artist {
+.rank-artist {
     font-size: 0.78rem !important;
     font-weight: 400 !important;
     color: var(--text-muted) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    margin: 0 !important;
+    display: block !important;
 }
 
-/* 4. ALIGNEMENT DU SCORE À DROITE */
-.score-cell, .ranking-elo, .elo-score {
+/* 4. SCORE ELO PARFAITEMENT ALIGNÉ À DROITE */
+.rank-elo {
     font-size: 0.9rem !important;
     font-weight: 700 !important;
     color: var(--neon-green) !important;
     text-align: right !important;
-    margin-left: auto !important; /* Colle le score complètement à droite */
+    margin-left: auto !important; /* Pousse les points tout à droite */
     flex-shrink: 0 !important;
     white-space: nowrap !important;
 }
