@@ -272,22 +272,18 @@ def liste_playlists():
             if not pl: 
                 continue
             
-            # Récupération sécurisée du nombre de morceaux (teste plusieurs emplacements possibles)
-            tracks_info = pl.get('tracks', {})
-            if isinstance(tracks_info, dict):
-                total_tracks = tracks_info.get('total', 0)
-            else:
-                total_tracks = 0
-            
-            # Alternative si total était à 0
-            if total_tracks == 0 and 'total_tracks' in pl:
-                total_tracks = pl.get('total_tracks', 0)
-                    
+            # Diagnostic : inspection directe de la structure
+            total = 0
+            if 'tracks' in pl and isinstance(pl['tracks'], dict):
+                total = pl['tracks'].get('total', 0)
+            elif 'total' in pl:
+                total = pl.get('total', 0)
+
             playlists.append({
                 "id": pl.get('id'),
                 "name": pl.get('name', 'Playlist sans nom'),
                 "images": pl.get('images', []),
-                "total_tracks": total_tracks
+                "total_tracks": total
             })
             
         return render_template('playlists.html', playlists=playlists, user=get_user_profile_cached(sp))
