@@ -473,7 +473,7 @@ h1 {
     .result-banner {
         padding: 6px 10px;
         font-size: 0.75rem;
-        margin: 0 auto 6px auto !important;
+        margin: 0 auto 15px auto !important;
         width: 100%;
         text-align: center;
         white-space: normal !important;
