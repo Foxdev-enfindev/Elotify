@@ -466,7 +466,7 @@ h1 {
 
     h1 {
         font-size: 1.25rem;
-        margin: 12px 0 8px 0 !important; 
+        margin: 20px 0 8px 0 !important; 
         text-align: center;
     }
 
@@ -488,7 +488,7 @@ h1 {
         align-items: center;
         justify-content: flex-start;
         width: 100%;
-        margin-top: 25px !important; /* On descend le bloc de cartes sous le titre */
+        margin-top: 40px !important; /* On descend le bloc de cartes sous le titre */
     }
 
     .track-card {
