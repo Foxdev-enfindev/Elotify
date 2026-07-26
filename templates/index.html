@@ -9,6 +9,7 @@
 <body>
 
     <!-- --- BLOC PROFIL & MENU DÉROULANT --- -->
+    {% if user %}
     <div class="user-profile-container" id="profileMenuContainer">
         <div class="profile-trigger" onclick="toggleDropdown(event)">
             {% if user.image %}
@@ -21,11 +22,11 @@
         </div>
         <div class="profile-dropdown" id="profileDropdown">
             <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
-            <a href="#" onclick="syncPlaylist(event)" id="syncBtn">🔄 Synchroniser cette playlist</a>
             <hr>
             <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
         </div>
     </div>
+    {% endif %}
 
     <div class="container">
         {% if dernier_resultat %}
@@ -38,13 +39,13 @@
             
             <!-- --- CARTE 1 --- -->
             <div id="card-1" class="track-card active">
-                <div class="pochette-wrapper" onclick="handleCardClick('1', '{{ track_a.uri }}', 'form-card-1')">
+                <div class="pochette-wrapper" onclick="handleCardClick('1', '{{ track_a.uri }}', 'form-card-1', event)">
                     <img src="{{ track_a.image_url }}" alt="Pochette {{ track_a.name }}" class="pochette">
                     <form id="form-card-1" action="{{ url_for('vote') }}" method="POST" class="vote-form">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
                         <input type="hidden" name="id_b" value="{{ track_b.id }}">
                         <input type="hidden" name="outcome" value="1.0">
-                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre" onclick="event.stopPropagation()"></button>
+                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre" onclick="handleVoteClick('1', 'form-card-1', event)"></button>
                     </form>
                 </div>
                 <div class="track-info">
@@ -79,13 +80,13 @@
 
             <!-- --- CARTE 2 --- -->
             <div id="card-2" class="track-card">
-                <div class="pochette-wrapper" onclick="handleCardClick('2', '{{ track_b.uri }}', 'form-card-2')">
+                <div class="pochette-wrapper" onclick="handleCardClick('2', '{{ track_b.uri }}', 'form-card-2', event)">
                     <img src="{{ track_b.image_url }}" alt="Pochette {{ track_b.name }}" class="pochette">
                     <form id="form-card-2" action="{{ url_for('vote') }}" method="POST" class="vote-form">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
                         <input type="hidden" name="id_b" value="{{ track_b.id }}">
                         <input type="hidden" name="outcome" value="0.0">
-                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre" onclick="event.stopPropagation()"></button>
+                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre" onclick="handleVoteClick('2', 'form-card-2', event)"></button>
                     </form>
                 </div>
                 <div class="track-info">
@@ -107,7 +108,7 @@
         function playCard(cardNumber, uri) {
             const isPaused = document.getElementById('play-pause-btn').classList.contains('is-paused');
             currentPlayingCard = cardNumber;
-            fetch('/listen/' + uri, { method: 'POST' });
+            fetch('/listen/' + uri, { method: 'POST' }).catch(() => {});
 
             if (!isPaused) {
                 document.getElementById('card-1').classList.remove('active');
@@ -116,16 +117,30 @@
             }
         }
 
-        function handleCardClick(cardNumber, uri, formId) {
+        // Clic / Tap sur la carte
+        function handleCardClick(cardNumber, uri, formId, event) {
             const card = document.getElementById('card-' + cardNumber);
+            
+            // Sur mobile / écran tactile
             if (isTouchDevice) {
                 if (!card.classList.contains('active')) {
+                    event.preventDefault();
+                    event.stopPropagation();
                     playCard(cardNumber, uri);
                 } else {
                     document.getElementById(formId).submit();
                 }
-            } else {
-                document.getElementById(formId).submit();
+            }
+        }
+
+        // Clic direct sur le bouton overlay (Vote direct PC)
+        function handleVoteClick(cardNumber, formId, event) {
+            const card = document.getElementById('card-' + cardNumber);
+            if (isTouchDevice && !card.classList.contains('active')) {
+                event.preventDefault();
+                event.stopPropagation();
+                const uri = cardNumber === '1' ? '{{ track_a.uri }}' : '{{ track_b.uri }}';
+                playCard(cardNumber, uri);
             }
         }
 
@@ -166,7 +181,8 @@
 
         function toggleDropdown(event) {
             event.stopPropagation();
-            document.getElementById('profileDropdown').classList.toggle('show');
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
         }
 
         window.onclick = function(event) {

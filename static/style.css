@@ -477,7 +477,9 @@ h1 {
    ADAPTATION MOBILE PROGRESSIVE
    ======================================================= */
 @media (max-width: 768px) {
-    body { padding-top: 60px; }
+    body { 
+        padding-top: 50px; 
+    }
     
     .user-profile-container {
         top: 10px !important;
@@ -485,7 +487,7 @@ h1 {
     }
     
     h1 {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
         margin-bottom: 20px;
     }
 
@@ -497,22 +499,22 @@ h1 {
 
     .track-card {
         width: 100%;
-        max-width: 340px;
+        max-width: 320px;
         padding: 15px;
     }
 
     .vs-zone {
-        order: 2;
+        order: 2; /* Place la zone VS au milieu des deux cartes */
         width: 100%;
         max-width: 280px;
     }
 
     .vs-circle {
-        margin-top: 10px !important;
-        margin-bottom: 15px !important;
-        width: 80px !important;
-        height: 80px !important;
-        font-size: 1.5rem;
+        margin-top: 5px !important;
+        margin-bottom: 12px !important;
+        width: 70px !important;
+        height: 70px !important;
+        font-size: 1.3rem;
     }
 
     #card-2 {
