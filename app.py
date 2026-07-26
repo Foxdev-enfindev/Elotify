@@ -203,8 +203,8 @@ def index():
 
     track_a, track_b = random.sample(tracks, 2)
 
-    elo_a = scores.get(track_a['id'], {}).get('elo', 1500)
-    elo_b = scores.get(track_b['id'], {}).get('elo', 1500)
+    elo_a = scores.get(track_a['id'], {}).get('elo', 1000)
+    elo_b = scores.get(track_b['id'], {}).get('elo', 1000)
 
     track_a['elo'] = elo_a
     track_b['elo'] = elo_b
@@ -237,8 +237,8 @@ def vote():
 
     scores = load_local_scores()
 
-    elo_a = scores.get(id_a, {}).get('elo', 1500)
-    elo_b = scores.get(id_b, {}).get('elo', 1500)
+    elo_a = scores.get(id_a, {}).get('elo', 1000)
+    elo_b = scores.get(id_b, {}).get('elo', 1000)
 
     new_elo_a, new_elo_b = calculate_elo(elo_a, elo_b, outcome)
 
