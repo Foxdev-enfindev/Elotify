@@ -474,64 +474,137 @@ h1 {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* =======================================================
-   ADAPTATION MOBILE PROGRESSIVE
+   ADAPTATION MOBILE UNIQUEMENT (Écrans < 768px)
+   Ne touche à rien sur PC !
    ======================================================= */
 @media (max-width: 768px) {
-    body { 
-        padding-top: 50px; 
-    }
-    
-    .user-profile-container {
-        top: 10px !important;
-        right: 10px !important;
-    }
-    
-    h1 {
-        font-size: 1.6rem;
-        margin-bottom: 20px;
+    /* Empêche le défilement vertical global */
+    html, body {
+        height: 100%;
+        overflow: hidden;
     }
 
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+
+    /* En-tête compact */
+    h1 {
+        font-size: 1.2rem;
+        margin: 5px 0;
+    }
+
+    .result-banner {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+        margin-bottom: 5px;
+    }
+
+    /* La zone principale occupe tout l'espace restant */
+    .container {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* Passage en colonne vertical */
     .duel-zone {
         flex-direction: column;
-        align-items: center;
-        gap: 15px;
+        flex: 1;
+        justify-content: space-around;
+        gap: 8px;
     }
 
+    /* Cartes de titre plus compactes */
     .track-card {
-        width: 100%;
-        max-width: 320px;
-        padding: 15px;
+        flex-direction: row; /* Pochette à gauche, texte à droite */
+        align-items: center;
+        padding: 8px;
+        gap: 12px;
+        max-height: 28vh; /* Limite la hauteur pour tenir sur l'écran */
     }
 
+    .pochette-wrapper {
+        width: 70px;
+        height: 70px;
+        flex-shrink: 0;
+    }
+
+    .pochette {
+        width: 70px;
+        height: 70px;
+        border-radius: 8px;
+    }
+
+    .track-info {
+        text-align: left;
+        overflow: hidden;
+    }
+
+    .track-info h2 {
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 2px 0;
+    }
+
+    .track-info h3 {
+        font-size: 0.8rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0;
+    }
+
+    .elo-display {
+        font-size: 0.75rem;
+        margin-top: 4px;
+    }
+
+    .badge {
+        font-size: 0.65rem;
+        padding: 2px 6px;
+    }
+
+    /* Zone centrale "VS" et boutons réorganisée en ligne */
     .vs-zone {
-        order: 2; /* Place la zone VS au milieu des deux cartes */
-        width: 100%;
-        max-width: 280px;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 0;
     }
 
     .vs-circle {
-        margin-top: 5px !important;
-        margin-bottom: 12px !important;
-        width: 70px !important;
-        height: 70px !important;
-        font-size: 1.3rem;
+        width: 32px;
+        height: 32px;
+        font-size: 0.8rem;
     }
 
-    #card-2 {
-        order: 3;
+    /* Boutons Pause, Match Nul et Classement plus compacts sur mobile */
+    .pause-btn, .tie-btn, .central-rank-btn {
+        padding: 6px 10px;
+        font-size: 0.75rem;
     }
 
-    .ranking-item {
-        padding: 10px;
+    /* Menu profil en haut à droite */
+    .user-profile-container {
+        top: 8px;
+        right: 8px;
     }
 
-    .rank-img {
-        width: 40px !important;
-        height: 40px !important;
-        margin-right: 10px;
+    .user-avatar, .user-avatar-placeholder {
+        width: 28px;
+        height: 28px;
     }
 
-    .rank-name { font-size: 0.95rem; }
-    .rank-artist { font-size: 0.8rem; }
-    .rank-elo { font-size: 0.9rem; padding: 4px 10px; }
+    .user-name {
+        display: none; /* Cache le nom complet sur mobile pour gagner de la place */
+    }
 }
