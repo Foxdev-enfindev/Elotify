@@ -920,3 +920,46 @@ body:has(.ranking-container) {
     flex-shrink: 0 !important;
     white-space: nowrap !important;
 }
+
+/* =======================================================
+   BOUTON QUITTER (TOUTES PLATFORMES & ORIENTATIONS)
+   ======================================================= */
+.quit-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.quit-btn {
+    background: #181818 !important;
+    color: #ff5555 !important;
+    border: 1px solid #ff5555 !important;
+    padding: 8px 20px !important;
+    border-radius: 20px !important;
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 8px rgba(255, 85, 85, 0.2);
+}
+
+.quit-btn:hover {
+    background: #ff5555 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 12px rgba(255, 85, 85, 0.5);
+}
+
+/* Ajustement spécifique mobile portrait */
+@media screen and (max-width: 900px) and (orientation: portrait) {
+    .quit-wrapper {
+        margin-top: 8px !important;
+        margin-bottom: 4px !important;
+    }
+    
+    .quit-btn {
+        padding: 5px 14px !important;
+        font-size: 0.75rem !important;
+    }
+}
