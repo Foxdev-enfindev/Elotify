@@ -534,44 +534,63 @@ h1 {
         margin-top: 4px;
     }
 
-    /* ZONE CENTRALE : GROS VS A GAUCHE + 3 BOUTONS EMPILES A DROITE */
+  /* ===================================================
+       ZONE CENTRALE : VS A GAUCHE + 3 BOUTONS EMPILES A DROITE
+       =================================================== */
     .vs-zone {
-        display: flex !important;
-        flex-direction: row !important;
-        justify-content: space-around;
+        display: grid !important;
+        grid-template-columns: auto 1fr !important; /* VS à gauche, colonne de boutons à droite */
+        grid-template-areas: 
+            "vs pause"
+            "vs tie"
+            "vs rank" !important;
         align-items: center;
+        justify-items: center;
         width: 100%;
-        padding: 6px 10px;
+        gap: 6px 12px !important;
+        padding: 4px 10px;
         box-sizing: border-box;
     }
 
-    /* Gros rond VS à 64px */
+    /* Le gros rond VS prend toute la hauteur des 3 lignes à gauche */
     .vs-circle {
-        width: 64px !important;
-        height: 64px !important;
-        min-width: 64px !important;
-        min-height: 64px !important;
-        font-size: 1.3rem !important;
+        grid-area: vs !important;
+        width: 68px !important;
+        height: 68px !important;
+        min-width: 68px !important;
+        min-height: 68px !important;
+        font-size: 1.4rem !important;
         font-weight: 900 !important;
         border-radius: 50% !important;
         margin: 0 !important;
-        flex-shrink: 0 !important;
     }
 
-    /* Sub-column pour empiler les 3 boutons d'action */
-    .vs-zone > button,
-    .vs-zone > form,
+    /* Assignation de chaque bouton à sa ligne sur la droite */
+    .vs-zone > #play-pause-btn {
+        grid-area: pause !important;
+        width: 100% !important;
+        max-width: 180px !important;
+    }
+
+    .vs-zone > form {
+        grid-area: tie !important;
+        width: 100% !important;
+        max-width: 180px !important;
+    }
+
     .vs-zone > .rank-wrapper {
-        display: block !important;
-        width: 150px;
+        grid-area: rank !important;
+        width: 100% !important;
+        max-width: 180px !important;
+        position: static !important;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
         width: 100% !important;
-        padding: 6px 10px !important;
-        font-size: 0.75rem !important;
+        padding: 7px 12px !important;
+        font-size: 0.8rem !important;
         border-radius: 14px !important;
-        margin: 2px 0 !important;
+        margin: 0 !important;
         text-align: center;
         box-sizing: border-box;
     }
