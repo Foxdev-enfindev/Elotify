@@ -448,7 +448,7 @@ h1 {
 
     body {
         padding: 8px 12px;
-        padding-top: 45px !important;
+        padding-top: 55px !important;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -505,7 +505,7 @@ h1 {
         align-items: center;
         justify-content: flex-start;
         width: 100%;
-        margin-top: 40px !important; /* On descend le bloc de cartes sous le titre */
+        margin-top: 30px !important; /* On descend le bloc de cartes sous le titre */
     }
 
     .track-card {
