@@ -96,7 +96,7 @@
                 </div>
                 <div class="track-info">
                     <span class="badge">TITRE 2</span>
-                    <h2>{{ track_b.name }}</h2>
+                    2<h2>{{ track_b.name }}</h2>
                     <h3>{{ track_b.artist }}</h3>
                     <p class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></p>
                 </div>
@@ -104,7 +104,7 @@
 
         </div><!-- FIN DE DUEL-ZONE -->
 
-        <!-- BOUTON QUITTER BIEN CENTRÉ SOUS LE DUEL -->
+        <!-- BOUTON QUITTER CENTRÉ EN BAS -->
         <div class="quit-wrapper">
             <button id="quit-btn" class="quit-btn" onclick="handleQuit()">🚪 Quitter</button>
         </div>
@@ -140,7 +140,6 @@
         function handleCardClick(cardNumber, uri, formId, event) {
             const card = document.getElementById('card-' + cardNumber);
             
-            // Sur mobile / écran tactile
             if (isTouchDevice) {
                 if (!card.classList.contains('active')) {
                     event.preventDefault();
@@ -163,7 +162,7 @@
             }
         }
 
-        // --- SURVOL PC OPTIMISÉ (sans relance si déjà actif) ---
+        // --- SURVOL PC OPTIMISÉ ---
         document.getElementById('card-1').addEventListener('mouseenter', () => {
             if (!isTouchDevice) {
                 const card1 = document.getElementById('card-1');
@@ -244,7 +243,7 @@
                 .finally(() => {
                     window.close();
                     setTimeout(() => {
-                        window.location.href = "{{ url_for('liste_playlists') }}";
+                        window.location.replace("about:blank");
                     }, 300);
                 });
         }

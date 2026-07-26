@@ -2,7 +2,7 @@ import os
 import time
 import random
 import threading
-from datetime import timedelta  # <-- NOUVEAU : Pour gérer la durée de la session
+from datetime import timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
@@ -16,8 +16,8 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_secur
 
 # --- CONFIGURATION SESSION CÔTÉ SERVEUR ---
 app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_PERMANENT"] = True  # <-- CORRECTION : Conserve la session après la fermeture du navigateur
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)  # <-- NOUVEAU : La session dure 30 jours
+app.config["SESSION_PERMANENT"] = True
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
 Session(app)
 
 # Variable globale pour l'inactivité
@@ -206,12 +206,9 @@ def login():
 def callback():
     sp_oauth = get_spotify_oauth()
     
-    # CORRECTION : On sauvegarde l'ID de la playlist AVANT de nettoyer la session
     saved_playlist_id = session.get('selected_playlist_id')
-    
     session.clear()
     
-    # On restaure l'ID de la playlist
     if saved_playlist_id:
         session['selected_playlist_id'] = saved_playlist_id
         session.permanent = True
@@ -220,7 +217,6 @@ def callback():
     token_info = sp_oauth.get_access_token(code)
     
     if token_info:
-        # Si on a déjà une playlist en mémoire, on retourne direct au duel !
         if saved_playlist_id:
             return redirect(url_for('index'))
         return redirect(url_for('liste_playlists'))
@@ -267,15 +263,15 @@ def liste_playlists():
         return render_template('playlists.html', playlists=playlists, user=get_user_profile_cached(sp))
     except Exception as e:
         print(f"⚠️ Erreur liste_playlists : {e}")
-        # On ne clear plus la session entière en cas d'erreur ici, on redirige juste
         return redirect(url_for('login'))
 
 @app.route('/select_playlist/<playlist_id>')
 def select_playlist(playlist_id):
-    session.permanent = True # <-- NOUVEAU : On force le navigateur à garder le cookie
+    session.permanent = True
     session['selected_playlist_id'] = playlist_id
     session.pop('tracks_cache', None)
-    return redirect(url_for('index'))
+    # Écrase l'entrée dans l'historique de navigation du navigateur
+    return '<script>window.location.replace("/");</script>'
 
 # --- ROUTE PRINCIPALE (DUEL) ---
 @app.route('/')

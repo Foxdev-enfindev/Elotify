@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elotify - Choisir une Playlist</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Elotify K-Pop - Choix de la Playlist</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
@@ -22,36 +22,40 @@
             <span class="arrow-down">▼</span>
         </div>
         <div class="profile-dropdown" id="profileDropdown">
+            <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
+            <hr>
             <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
         </div>
     </div>
     {% endif %}
 
-    <!-- Utilisation de playlists-container pour appliquer la marge sous le profil -->
-    <div class="playlists-container">
-        <h1>🎵 SÉLECTIONNEZ UNE PLAYLIST 🎵</h1>
-        
-        <div class="playlists-grid playlist-grid">
+    <div class="container">
+        <h1>🎵 CHOISIS TA PLAYLIST 🎵</h1>
+        <p class="subtitle">Sélectionne une playlist pour démarrer les duels Elo</p>
+
+        <div class="playlists-grid">
             {% for pl in playlists %}
-            <a href="{{ url_for('select_playlist', playlist_id=pl.id) }}" class="playlist-card">
-                <div class="playlist-cover-wrapper">
-                    {% if pl.images %}
-                        <img src="{{ pl.images[0].url }}" class="playlist-cover" alt="Couverture {{ pl.name }}">
-                    {% else %}
-                        <div class="playlist-cover-placeholder">🎶</div>
-                    {% endif %}
-                </div>
-                
+            <div class="playlist-card" onclick="selectPlaylist('{{ pl.id }}')">
+                {% if pl.images and pl.images[0].url %}
+                    <img src="{{ pl.images[0].url }}" alt="{{ pl.name }}" class="playlist-cover">
+                {% else %}
+                    <div class="playlist-cover playlist-placeholder">🎵</div>
+                {% endif %}
                 <div class="playlist-info">
                     <h3>{{ pl.name }}</h3>
                     <p>{{ pl.total_tracks }} titres</p>
                 </div>
-            </a>
+            </div>
             {% endfor %}
         </div>
     </div>
 
     <script>
+        // Remplace la page actuelle dans l'historique du navigateur au lieu d'ajouter une étape
+        function selectPlaylist(playlistId) {
+            window.location.replace("/select_playlist/" + playlistId);
+        }
+
         function toggleDropdown(event) {
             event.stopPropagation();
             const dropdown = document.getElementById('profileDropdown');
