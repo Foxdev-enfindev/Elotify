@@ -3,54 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elotify - Classement</title>
+    <title>Elotify K-Pop - Classement</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <header>
-        <h1>Classement Elo</h1>
-        <p>Les meilleurs morceaux de votre playlist</p>
-    </header>
+    <!-- --- BLOC PROFIL & MENU DÉROULANT --- -->
+    {% if user %}
+    <div class="user-profile-container" id="profileMenuContainer">
+        <div class="profile-trigger" onclick="toggleDropdown(event)">
+            {% if user.image %}
+                <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
+            {% else %}
+                <div class="user-avatar-placeholder">👤</div>
+            {% endif %}
+            <span class="user-name">{{ user.display_name }}</span>
+            <span class="arrow-down">▼</span>
+        </div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
+            <hr>
+            <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
+        </div>
+    </div>
+    {% endif %}
 
-    <div class="table-container">
-        <table class="ranking-table">
-            <thead>
-                <tr>
-                    <th style="width: 30px;">#</th>
-                    <th style="width: 50px;"></th>
-                    <th>Titre</th>
-                    <th style="text-align: right;">Elo</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for track in tracks %}
-                    <tr class="{% if loop.index == 1 %}top-1{% elif loop.index == 2 %}top-2{% elif loop.index == 3 %}top-3{% endif %}">
-                        <td class="rank-number">{{ loop.index }}</td>
-                        <td>
-                            {% if track.image_url %}
-                                <img src="{{ track.image_url }}" alt="{{ track.name }}" class="ranking-img">
-                            {% else %}
-                                <div class="ranking-img" style="background:#282828; display:flex; align-items:center; justify-content:center;">🎵</div>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="ranking-details">
-                                <span class="ranking-title">{{ track.name }}</span>
-                                <span class="ranking-artist">{{ track.artist }}</span>
-                            </div>
-                        </td>
-                        <td class="ranking-elo">{{ track.elo }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div class="container ranking-container">
+        
+        <div style="margin-bottom: 25px; text-align: left;">
+            <a href="{{ url_for('index') }}" class="nav-btn">⚔️ Retour aux Duels</a>
+        </div>
+
+        <h1>📊 CLASSEMENT GÉNÉRAL 📊</h1>
+
+        <div class="ranking-list">
+            {% for track in tracks %}
+            <div class="ranking-item">
+                <div class="rank-number">#{{ loop.index }}</div>
+                
+                {% if track.image_url %}
+                    <img src="{{ track.image_url }}" alt="Pochette" class="rank-img">
+                {% else %}
+                    <div class="rank-img rank-img-placeholder">🎵</div>
+                {% endif %}
+                
+                <div class="rank-details">
+                    <span class="rank-name">{{ track.name }}</span>
+                    <span class="rank-artist">{{ track.artist }}</span>
+                </div>
+                
+                <div class="rank-elo">{{ track.elo }} pts</div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
 
-    <div class="nav-links">
-        <a href="{{ url_for('index') }}" class="btn-nav">⚔️ Continuer à voter</a>
-        <a href="{{ url_for('liste_playlists') }}" class="btn-nav">📋 Playlists</a>
-    </div>
+    <script>
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
+        }
 
+        window.onclick = function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        }
+    </script>
 </body>
 </html>

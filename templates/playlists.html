@@ -3,37 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elotify - Vos Playlists</title>
+    <title>Elotify - Choisir une Playlist</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-    <header>
-        <h1>Mes Playlists</h1>
-        <p>Sélectionnez une playlist pour lancer les duels</p>
-    </header>
+    <!-- --- BLOC PROFIL & MENU DÉROULANT --- -->
+    {% if user %}
+    <div class="user-profile-container" id="profileMenuContainer">
+        <div class="profile-trigger" onclick="toggleDropdown(event)">
+            {% if user.image %}
+                <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
+            {% else %}
+                <div class="user-avatar-placeholder">👤</div>
+            {% endif %}
+            <span class="user-name">{{ user.display_name }}</span>
+            <span class="arrow-down">▼</span>
+        </div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
+        </div>
+    </div>
+    {% endif %}
 
-    <div class="playlists-grid">
-        {% for pl in playlists %}
+    <div class="container">
+        <h1>🎵 SÉLECTIONNEZ UNE PLAYLIST 🎵</h1>
+        
+        <div class="playlist-grid">
+            {% for pl in playlists %}
             <a href="{{ url_for('select_playlist', playlist_id=pl.id) }}" class="playlist-card">
+                
                 {% if pl.images %}
-                    <img src="{{ pl.images[0].url }}" alt="{{ pl.name }}" class="playlist-img">
+                    <img src="{{ pl.images[0].url }}" class="playlist-img" alt="Couverture {{ pl.name }}">
                 {% else %}
-                    <div class="playlist-img" style="background:#282828; display:flex; align-items:center; justify-content:center; color:#888;">🎵</div>
+                    <div class="playlist-img playlist-img-placeholder">🎶</div>
                 {% endif %}
                 
-                <div class="playlist-info">
-                    <p class="playlist-title">{{ pl.name }}</p>
-                    <span class="playlist-count">{{ pl.total_tracks }} titres</span>
-                </div>
+                <div class="playlist-title">{{ pl.name }}</div>
+                <div class="playlist-count">{{ pl.total_tracks }} titres</div>
             </a>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 
-    <div class="nav-links">
-        <a href="{{ url_for('index') }}" class="btn-nav">⚔️ Retour au Match</a>
-        <a href="{{ url_for('logout') }}" class="btn-nav" style="color: #ff5555;">Déconnexion</a>
-    </div>
+    <script>
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
+        }
 
+        window.onclick = function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        }
+    </script>
 </body>
 </html>

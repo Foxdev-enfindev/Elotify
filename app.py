@@ -242,6 +242,9 @@ def vote():
 
     new_elo_a, new_elo_b = calculate_elo(elo_a, elo_b, outcome)
 
+    delta_a = new_elo_a - elo_a
+    delta_b = new_elo_b - elo_b
+
     scores[id_a] = {
         'name': track_a['name'],
         'artist': track_a['artist'],
@@ -257,8 +260,16 @@ def vote():
 
     save_local_scores(scores)
 
-    winner_name = track_a['name'] if outcome == 1.0 else track_b['name']
-    session['dernier_resultat'] = f"Victoire de : {winner_name} !"
+    # Formatage de la bannière avec le delta Elo
+    sign_a = f"+{delta_a}" if delta_a > 0 else f"{delta_a}"
+    sign_b = f"+{delta_b}" if delta_b > 0 else f"{delta_b}"
+
+    if outcome == 1.0:
+        session['dernier_resultat'] = f"Victoire de : {track_a['name']} ({sign_a} pts) contre {track_b['name']} ({sign_b} pts) !"
+    elif outcome == 0.0:
+        session['dernier_resultat'] = f"Victoire de : {track_b['name']} ({sign_b} pts) contre {track_a['name']} ({sign_a} pts) !"
+    else:
+        session['dernier_resultat'] = f"Match nul entre {track_a['name']} ({sign_a} pts) et {track_b['name']} ({sign_b} pts) !"
 
     return redirect(url_for('index'))
 

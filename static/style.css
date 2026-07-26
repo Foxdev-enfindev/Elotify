@@ -1,3 +1,6 @@
+/* =======================================================
+   BASE & LAYOUT GENERAL
+   ======================================================= */
 body {
     background-color: #121212;
     color: #FFFFFF;
@@ -58,7 +61,9 @@ h1 {
     animation: fadeIn 0.5s ease;
 }
 
-/* --- STRUCTURE DU DUEL --- */
+/* =======================================================
+   STRUCTURE DU DUEL (INDEX)
+   ======================================================= */
 .duel-zone {
     display: flex;
     justify-content: space-around;
@@ -70,12 +75,15 @@ h1 {
 .track-card {
     background-color: #181818;
     border-radius: 12px;
-    padding: 25px;
+    padding: 20px;
     width: 320px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     border: 2px solid transparent;
     transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.2s ease, border-color 0.2s ease;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .track-card:hover {
@@ -91,9 +99,9 @@ h1 {
 
 .pochette-wrapper {
     position: relative;
-    width: 300px;
-    height: 300px;
-    margin: 0 auto 20px auto;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    margin: 0 0 15px 0;
     border-radius: 8px;
     overflow: hidden;
     cursor: pointer;
@@ -102,9 +110,9 @@ h1 {
 .pochette {
     width: 100% !important;
     height: 100% !important;
-    max-width: 300px !important;
-    max-height: 300px !important;
     object-fit: cover;
+    display: block;
+    border-radius: 8px;
     transition: transform 0.3s ease;
 }
 
@@ -124,6 +132,11 @@ h1 {
 .pochette-wrapper:hover .pochette { transform: scale(1.05); }
 .pochette-wrapper:hover .vote-btn-overlay { background: rgba(0, 0, 0, 0.2); }
 
+.track-info {
+    width: 100%;
+    text-align: center;
+}
+
 .track-info h2 {
     font-size: 1.3rem;
     margin: 10px 0 5px 0;
@@ -137,7 +150,9 @@ h1 {
 .elo-display { font-size: 0.9rem; color: #A7A7A7; }
 .elo-display strong { color: #FFFFFF; }
 
-/* --- ZONE CENTRALE --- */
+/* =======================================================
+   ZONE CENTRALE (VS, BOUTONS PAUSE & MATCH NUL)
+   ======================================================= */
 .vs-zone {
     display: flex;
     flex-direction: column;
@@ -234,22 +249,180 @@ h1 {
 .top5-item strong { color: #1DB954; margin-right: 5px; }
 .top5-elo { float: right; color: #888; font-weight: bold; }
 
-/* --- CLASSEMENT VIEW --- */
-.ranking-container { max-width: 800px !important; text-align: center; }
-.ranking-list { margin-top: 30px; background-color: #181818; border-radius: 12px; padding: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.6); }
-.ranking-item { display: flex; align-items: center; padding: 12px 20px; border-bottom: 1px solid #282828; }
-.ranking-item:last-child { border-bottom: none; }
-.ranking-item:hover { background-color: #232323; }
-.rank-number { font-size: 1.1rem; font-weight: bold; color: #1DB954; width: 50px; text-align: left; }
-.rank-img { width: 50px; height: 50px; border-radius: 4px; object-fit: cover; margin-right: 20px; }
-.rank-details { flex-grow: 1; text-align: left; display: flex; flex-direction: column; }
-.rank-name { font-weight: bold; font-size: 1.05rem; color: #FFFFFF; }
-.rank-artist { font-size: 0.85rem; color: #B3B3B3; margin-top: 2px; }
-.rank-elo { font-weight: bold; font-size: 1.1rem; color: #FFFFFF; background-color: #282828; padding: 6px 14px; border-radius: 15px; }
+/* =======================================================
+   CLASSEMENT VIEW (CLASSEMENT.HTML)
+   ======================================================= */
+.ranking-container { 
+    max-width: 800px !important; 
+    margin: 0 auto;
+    padding-top: 40px;
+}
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+.ranking-list { 
+    margin-top: 25px; 
+    background-color: #181818; 
+    border-radius: 12px; 
+    padding: 10px; 
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6); 
+}
 
-/* --- PROFIL MENU (HAUT DROITE) --- */
+.ranking-item { 
+    display: flex; 
+    align-items: center; 
+    padding: 12px 20px; 
+    border-bottom: 1px solid #282828; 
+}
+
+.ranking-item:last-child { 
+    border-bottom: none; 
+}
+
+.ranking-item:hover { 
+    background-color: #232323; 
+}
+
+.rank-number { 
+    font-size: 1.1rem; 
+    font-weight: bold; 
+    color: #1DB954; 
+    width: 45px; 
+    text-align: left; 
+    flex-shrink: 0;
+}
+
+.rank-img { 
+    width: 50px !important; 
+    height: 50px !important; 
+    max-width: 50px !important;
+    max-height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    border-radius: 6px; 
+    object-fit: cover; 
+    margin-right: 20px; 
+    flex-shrink: 0;
+}
+
+.rank-img-placeholder {
+    background-color: #282828; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.rank-details { 
+    flex-grow: 1; 
+    text-align: left; 
+    display: flex; 
+    flex-direction: column; 
+    overflow: hidden;
+}
+
+.rank-name { 
+    font-weight: bold; 
+    font-size: 1.05rem; 
+    color: #FFFFFF; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rank-artist { 
+    font-size: 0.85rem; 
+    color: #B3B3B3; 
+    margin-top: 2px; 
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.rank-elo { 
+    font-weight: bold; 
+    font-size: 1rem; 
+    color: #1DB954; 
+    background-color: #282828; 
+    padding: 6px 14px; 
+    border-radius: 15px; 
+    flex-shrink: 0;
+    margin-left: 15px;
+}
+
+/* =======================================================
+   PLAYLISTS VIEW (PLAYLISTS.HTML)
+   ======================================================= */
+.playlist-grid { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 25px; 
+    justify-content: center; 
+    margin-top: 30px; 
+}
+
+.playlist-card { 
+    background-color: #181818; 
+    padding: 18px; 
+    border-radius: 12px; 
+    width: 220px !important; 
+    box-sizing: border-box;
+    cursor: pointer; 
+    border: 2px solid transparent; 
+    transition: all 0.25s ease; 
+    text-decoration: none; 
+    color: white; 
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4); 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.playlist-card:hover { 
+    border-color: #1DB954; 
+    transform: translateY(-5px); 
+    background-color: #202020; 
+    box-shadow: 0 12px 32px rgba(29, 185, 84, 0.15); 
+}
+
+.playlist-img { 
+    width: 184px !important; 
+    height: 184px !important; 
+    max-width: 184px !important;
+    max-height: 184px !important;
+    object-fit: cover; 
+    border-radius: 8px; 
+    margin-bottom: 12px; 
+}
+
+.playlist-img-placeholder {
+    background-color: #282828; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-size: 3rem;
+}
+
+.playlist-title { 
+    width: 100%;
+    font-weight: bold; 
+    font-size: 1.05rem; 
+    margin-bottom: 4px; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+    text-align: left; 
+    color: #FFFFFF;
+}
+
+.playlist-count { 
+    width: 100%;
+    color: #b3b3b3; 
+    font-size: 0.85rem; 
+    text-align: left; 
+}
+
+/* =======================================================
+   PROFIL MENU (HAUT DROITE)
+   ======================================================= */
 .user-profile-container {
     position: absolute !important;
     top: 20px !important;
@@ -298,8 +471,10 @@ h1 {
 .profile-dropdown a.disabled-link:hover { background-color: transparent; color: #727272; }
 .profile-dropdown a.logout-link { color: #e91429; }
 
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
 /* =======================================================
-   ADAPTATION MOBILE PROGRESSIVE (SANS DÉTURPATION)
+   ADAPTATION MOBILE PROGRESSIVE
    ======================================================= */
 @media (max-width: 768px) {
     body { padding-top: 60px; }
@@ -326,14 +501,8 @@ h1 {
         padding: 15px;
     }
 
-    .pochette-wrapper {
-        width: 220px;
-        height: 220px;
-        margin-bottom: 12px;
-    }
-
     .vs-zone {
-        order: 2; /* Repositionne la zone VS au centre entre les 2 cartes */
+        order: 2;
         width: 100%;
         max-width: 280px;
     }
@@ -355,8 +524,8 @@ h1 {
     }
 
     .rank-img {
-        width: 40px;
-        height: 40px;
+        width: 40px !important;
+        height: 40px !important;
         margin-right: 10px;
     }
 
