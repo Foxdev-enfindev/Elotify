@@ -165,9 +165,8 @@ def index():
         try:
             raw_items = []
             offset = 0
-            limit = 100  # Maximum autorisé par page par Spotify
+            limit = 100
 
-            # --- PAGINATION : Boucle jusqu'à avoir récupéré TOUS les morceaux ---
             while True:
                 results = sp.playlist_tracks(playlist_id, limit=limit, offset=offset)
                 items = results.get('items', []) if isinstance(results, dict) else []
@@ -177,7 +176,6 @@ def index():
                     
                 raw_items.extend(items)
                 
-                # Si on a récupéré moins que la limite, c'est qu'on a atteint la fin
                 if len(items) < limit:
                     break
                     
@@ -193,15 +191,17 @@ def index():
                 if isinstance(track, dict) and track.get('id'):
                     album = track.get('album', {})
                     images = album.get('images', []) if isinstance(album, dict) else []
-                    image_url = images[0]['url'] if images else ''
+                    # On prend l'image la plus petite (ou la normale) pour alléger
+                    image_url = images[-1]['url'] if images else (images[0]['url'] if images else '')
                     
                     artists = track.get('artists', [])
                     artist_name = ", ".join([a.get('name', '') for a in artists if isinstance(a, dict)])
                     
+                    # Structure ultra-légère pour limiter au maximum la taille du cookie
                     tracks.append({
-                        'id': track.get('id'),
-                        'name': track.get('name', 'Titre inconnu'),
-                        'artist': artist_name or 'Artiste inconnu',
+                        'id': track['id'],
+                        'name': track.get('name', 'Titre inconnu')[:50], # Tronque le nom si trop long
+                        'artist': artist_name[:40],
                         'uri': track.get('uri', ''),
                         'image_url': image_url
                     })
