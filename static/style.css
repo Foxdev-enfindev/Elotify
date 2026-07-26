@@ -929,7 +929,7 @@ body:has(.ranking-container) {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
-    margin-top: 50px !important;
+    margin-top: 20px !important;
     margin-bottom: 15px !important;
     clear: both !important; /* Casse tout alignement horizontal résiduel */
 }
@@ -940,7 +940,7 @@ body:has(.ranking-container) {
     border: 1px solid #ff5555 !important;
     padding: 8px 22px !important;
     border-radius: 20px !important;
-    font-size: 1.25rem !important;
+    font-size: 0.85rem !important;
     font-weight: 700 !important;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -955,12 +955,12 @@ body:has(.ranking-container) {
 /* Ajustement spécifique mobile portrait */
 @media screen and (max-width: 900px) and (orientation: portrait) {
     .quit-wrapper {
-        margin-top: 8px !important;
+        margin-top: 15px !important;
         margin-bottom: 4px !important;
     }
     
     .quit-btn {
         padding: 5px 14px !important;
-        font-size: 0.75rem !important;
+        font-size: 0.95rem !important;
     }
 }
