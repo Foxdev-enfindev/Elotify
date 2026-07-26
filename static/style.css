@@ -438,7 +438,7 @@ h1 {
 
 
 /* =======================================================
-   6. MOBILE PORTRAIT (< 900px vertical) - ÉQUILIBRE SUR MESURE
+   6. MOBILE PORTRAIT (< 900px vertical) - LE 100% PERFECT
    ======================================================= */
 @media screen and (max-width: 900px) and (orientation: portrait) {
     html, body {
@@ -448,7 +448,7 @@ h1 {
 
     body {
         padding: 8px 12px;
-        padding-top: 45px !important; /* Espace sous le profil */
+        padding-top: 45px !important;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -464,17 +464,16 @@ h1 {
         height: 100%;
     }
 
-    /* Marge ajoutée sous le titre pour le décoller du haut */
     h1 {
         font-size: 1.25rem;
-        margin: 15px 0 10px 0 !important; 
+        margin: 12px 0 8px 0 !important; 
         text-align: center;
     }
 
     .result-banner {
         padding: 6px 10px;
         font-size: 0.75rem;
-        margin: 0 auto 10px auto !important;
+        margin: 0 auto 6px auto !important;
         width: 100%;
         text-align: center;
         white-space: normal !important;
@@ -482,17 +481,16 @@ h1 {
         box-sizing: border-box;
     }
 
-    /* DUEL : Espacement fixe et maîtrisé entre les éléments */
+    /* DUEL : Pousse légèrement l'ensemble vers le bas pour équilibrer */
     .duel-zone {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: flex-start;
         width: 100%;
-        margin-top: 5px;
+        margin-top: 25px !important; /* On descend le bloc de cartes sous le titre */
     }
 
-    /* CARTES : Remises à une taille très confortable (85px) */
     .track-card {
         width: 100%;
         max-width: 100%;
@@ -537,7 +535,7 @@ h1 {
         margin-top: 4px;
     }
 
-    /* ZONE CENTRALE : Marges haut/bas contrôlées pour aérer sans déborder */
+    /* ZONE CENTRALE */
     .vs-zone {
         display: grid !important;
         grid-template-columns: auto 1fr !important;
@@ -549,7 +547,7 @@ h1 {
         justify-items: center;
         width: 100%;
         gap: 6px 12px !important;
-        margin: 18px 0 !important; /* Aère l'espace entre Carte 1, VS, et Carte 2 */
+        margin: 18px 0 !important;
         padding: 0 10px !important;
         box-sizing: border-box;
     }
@@ -634,6 +632,7 @@ h1 {
         display: none;
     }
 }
+
 /* =======================================================
    7. MOBILE PAYSAGE (< 1000px horizontal)
    ======================================================= */
