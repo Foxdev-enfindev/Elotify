@@ -751,11 +751,12 @@ h1 {
    ======================================================= */
 
 /* Permet le défilement uniquement sur la page classement */
+html:has(.ranking-container), 
 body:has(.ranking-container) {
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     height: auto !important;
-    min-height: 100vh;
-}
+    min-height: 100% !important;}
 
 .ranking-container {
     width: 100%;
