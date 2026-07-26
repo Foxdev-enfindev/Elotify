@@ -27,21 +27,25 @@
     </div>
     {% endif %}
 
-    <div class="container">
+    <!-- Utilisation de playlists-container pour appliquer la marge sous le profil -->
+    <div class="playlists-container">
         <h1>🎵 SÉLECTIONNEZ UNE PLAYLIST 🎵</h1>
         
-        <div class="playlist-grid">
+        <div class="playlists-grid">
             {% for pl in playlists %}
             <a href="{{ url_for('select_playlist', playlist_id=pl.id) }}" class="playlist-card">
+                <div class="playlist-cover-wrapper">
+                    {% if pl.images %}
+                        <img src="{{ pl.images[0].url }}" class="playlist-cover" alt="Couverture {{ pl.name }}">
+                    {% else %}
+                        <div class="playlist-cover-placeholder">🎶</div>
+                    {% endif %}
+                </div>
                 
-                {% if pl.images %}
-                    <img src="{{ pl.images[0].url }}" class="playlist-img" alt="Couverture {{ pl.name }}">
-                {% else %}
-                    <div class="playlist-img playlist-img-placeholder">🎶</div>
-                {% endif %}
-                
-                <div class="playlist-title">{{ pl.name }}</div>
-                <div class="playlist-count">{{ pl.total_tracks }} titres</div>
+                <div class="playlist-info">
+                    <h3>{{ pl.name }}</h3>
+                    <p>{{ pl.total_tracks }} titres</p>
+                </div>
             </a>
             {% endfor %}
         </div>
