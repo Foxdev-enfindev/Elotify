@@ -747,10 +747,10 @@ h1 {
     }
 }
 /* =======================================================
-   FIX PAGE CLASSEMENT (SCROLL + DESIGN COMPACT MOBILE)
+   FIX PAGE CLASSEMENT : DESIGN NÉON & ALIGNEMENTS PARFAITS
    ======================================================= */
 
-/* 1. Autorise le défilement sur la page classement */
+/* Déblocage du scroll sur la page classement */
 body.ranking-body, 
 body:has(.ranking-container) {
     overflow-y: auto !important;
@@ -758,92 +758,127 @@ body:has(.ranking-container) {
     min-height: 100vh;
 }
 
-/* 2. Style global du classement */
 .ranking-container {
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
-    padding: 10px;
-    padding-top: 55px !important; /* Dégage le haut sous le profil */
-    padding-bottom: 30px !important;
+    padding: 10px 14px;
+    padding-top: 55px !important;
+    padding-bottom: 40px !important;
     box-sizing: border-box;
 }
 
-/* Style du lien retour */
+/* 1. TRANSFORMATION DU LIEN EN VRAI BOUTON NÉON */
 .ranking-container a[href*="index"],
-.ranking-container a[href*="/"] {
-    color: #a855f7;
-    text-decoration: underline;
-    font-size: 0.9rem;
-    display: inline-block;
-    margin-bottom: 10px;
+.ranking-container a[href*="/"],
+.back-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #181818 !important;
+    color: var(--neon-green) !important;
+    border: 1px solid var(--neon-green) !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    text-decoration: none !important;
+    margin: 0 auto 15px auto !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 8px var(--neon-green-glow);
 }
 
-.ranking-container h1 {
-    margin-bottom: 15px !important;
+.ranking-container a:hover {
+    background: var(--neon-green) !important;
+    color: #000 !important;
 }
 
-/* Limite la taille des pochettes à 50px maximum ! */
-.ranking-container img {
+/* 2. STRUCTURE DU TABLEAU / LISTE */
+.ranking-list, .ranking-table {
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ranking-item, .ranking-row, tr {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 12px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    gap: 12px !important;
+    box-sizing: border-box;
+}
+
+.ranking-item:last-child, .ranking-row:last-child {
+    border-bottom: none !important;
+}
+
+/* Positonnier du Rang (#1, #2...) */
+.rank-number, .ranking-rank {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    min-width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+/* Podium Couleurs */
+.ranking-item:nth-child(1) .rank-number { color: #ffd700; font-size: 1.1rem; }
+.ranking-item:nth-child(2) .rank-number { color: #c0c0c0; }
+.ranking-item:nth-child(3) .rank-number { color: #cd7f32; }
+
+/* Pochettes verrouillées à 50px */
+.ranking-item img, .ranking-cover {
     width: 50px !important;
     height: 50px !important;
-    max-width: 50px !important;
-    max-height: 50px !important;
-    border-radius: 6px;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
 }
 
-/* Structure en tableau ou liste propre */
-.ranking-table, .ranking-list {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--card-bg);
-    border-radius: 12px;
-    overflow: hidden;
+/* 3. ALIGNEMENT DU TITRE & ARTISTE SUR 2 LIGNES */
+.track-info-cell, .ranking-info {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    flex: 1 !important; /* Prend tout l'espace central disponible */
+    min-width: 0 !important; /* Force la troncation si le texte dépasse */
 }
 
-.ranking-table tr, .ranking-item {
-    display: flex;
-    align-items: center;
-    padding: 8px 10px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    gap: 10px;
+.track-info-cell h2, .track-info-cell strong, .track-title {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin: 0 0 2px 0 !important;
 }
 
-.ranking-table td, .ranking-table th {
-    padding: 0;
-    border: none;
+.track-info-cell h3, .track-info-cell span, .track-artist {
+    font-size: 0.78rem !important;
+    font-weight: 400 !important;
+    color: var(--text-muted) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin: 0 !important;
 }
 
-/* Ajustements textes compacts */
-.ranking-info, .track-details {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    flex: 1;
+/* 4. ALIGNEMENT DU SCORE À DROITE */
+.score-cell, .ranking-elo, .elo-score {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: var(--neon-green) !important;
+    text-align: right !important;
+    margin-left: auto !important; /* Colle le score complètement à droite */
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
 }
-
-.ranking-info h2, .ranking-title, .track-details strong {
-    font-size: 0.9rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: #fff;
-}
-
-.ranking-info h3, .ranking-artist, .track-details span {
-    font-size: 0.75rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: var(--text-muted);
-}
-
-.ranking-elo, .score-tag {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--neon-green);
-    margin-left: auto;
-    flex-shrink: 0;
-}s
