@@ -438,7 +438,7 @@ h1 {
 
 
 /* =======================================================
-   6. MOBILE PORTRAIT (< 900px vertical)
+   6. MOBILE PORTRAIT (< 900px vertical) - OPTIMISÉ
    ======================================================= */
 @media screen and (max-width: 900px) and (orientation: portrait) {
     html, body {
@@ -447,9 +447,9 @@ h1 {
     }
 
     body {
-        padding: 12px;
-        padding-top: 65px !important; /* Descend l'en-tête sous le menu profil */
-        padding-bottom: 25px !important; /* Laisse de l'espace sous la 2e carte */
+        padding: 6px 12px;
+        padding-top: 45px !important; /* Marge haute minimale pour le profil */
+        padding-bottom: 6px !important;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -464,24 +464,24 @@ h1 {
     }
 
     h1 {
-        font-size: 1.35rem;
-        margin: 10px 0 12px 0 !important; /* Descend le titre */
+        font-size: 1.2rem;
+        margin: 0 0 4px 0 !important;
         text-align: center;
     }
 
     .result-banner {
-        padding: 8px 14px;
-        font-size: 0.8rem;
-        margin: 0 auto 12px auto !important;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        margin: 0 auto 4px auto !important;
         width: 100%;
         max-width: 100% !important;
         text-align: center;
         white-space: normal !important;
-        line-height: 1.25;
+        line-height: 1.2;
         box-sizing: border-box;
     }
 
-    /* DUEL : Équilibre vertical sur tout l'écran */
+    /* DUEL : Espacement resserré au strict minimum */
     .duel-zone {
         display: flex;
         flex-direction: column;
@@ -489,22 +489,22 @@ h1 {
         justify-content: space-between;
         flex: 1;
         width: 100%;
-        gap: 12px;
+        gap: 2px !important; /* Réduit l'espace mort au centre */
     }
 
-    /* CARTES AGRANDIES POUR REMPLIR L'ESPACE */
+    /* CARTES GRANDES CONSERVÉES */
     .track-card {
         width: 100%;
         max-width: 100%;
         flex-direction: row;
         align-items: center;
-        padding: 16px 14px; /* Carte plus haute */
-        gap: 14px;
+        padding: 10px 12px;
+        gap: 12px;
         box-sizing: border-box;
     }
 
     .pochette-wrapper {
-        width: 95px; /* Pochette plus grande */
+        width: 95px; /* On garde la grande taille de pochette */
         height: 95px;
         margin-bottom: 0;
         flex-shrink: 0;
@@ -513,19 +513,19 @@ h1 {
     .pochette {
         width: 95px;
         height: 95px;
-        border-radius: 10px;
+        border-radius: 8px;
     }
 
     .track-info h2 {
-        font-size: 1.1rem; /* Titre du morceau plus lisible */
+        font-size: 1.05rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        margin: 3px 0;
+        margin: 2px 0;
     }
 
     .track-info h3 {
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -533,11 +533,11 @@ h1 {
     }
 
     .elo-display {
-        font-size: 0.85rem;
-        margin-top: 6px;
+        font-size: 0.8rem;
+        margin-top: 3px;
     }
 
-    /* ZONE CENTRALE : GRID VS À GAUCHE + BOUTONS À DROITE */
+    /* ZONE CENTRALE ULTRA COMPACTE EN HAUTEUR */
     .vs-zone {
         display: grid !important;
         grid-template-columns: auto 1fr !important;
@@ -548,18 +548,18 @@ h1 {
         align-items: center;
         justify-items: center;
         width: 100%;
-        gap: 8px 16px !important;
-        padding: 6px 10px;
+        gap: 2px 10px !important; /* Minimise le vide vertical entre les boutons */
+        padding: 0 10px !important;
         box-sizing: border-box;
     }
 
     .vs-circle {
         grid-area: vs !important;
-        width: 72px !important; /* Légèrement plus imposant */
-        height: 72px !important;
-        min-width: 72px !important;
-        min-height: 72px !important;
-        font-size: 1.45rem !important;
+        width: 64px !important;
+        height: 64px !important;
+        min-width: 64px !important;
+        min-height: 64px !important;
+        font-size: 1.3rem !important;
         font-weight: 900 !important;
         border-radius: 50% !important;
         margin: 0 !important;
@@ -568,27 +568,27 @@ h1 {
     .vs-zone > #play-pause-btn {
         grid-area: pause !important;
         width: 100% !important;
-        max-width: 190px !important;
+        max-width: 170px !important;
     }
 
     .vs-zone > form {
         grid-area: tie !important;
         width: 100% !important;
-        max-width: 190px !important;
+        max-width: 170px !important;
     }
 
     .vs-zone > .rank-wrapper {
         grid-area: rank !important;
         width: 100% !important;
-        max-width: 190px !important;
+        max-width: 170px !important;
         position: static !important;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
         width: 100% !important;
-        padding: 8px 12px !important;
-        font-size: 0.8rem !important;
-        border-radius: 16px !important;
+        padding: 5px 10px !important; /* Hauteur des boutons resserrée */
+        font-size: 0.75rem !important;
+        border-radius: 12px !important;
         margin: 0 !important;
         text-align: center;
         box-sizing: border-box;
@@ -620,13 +620,13 @@ h1 {
     }
 
     .user-profile-container {
-        top: 10px !important;
-        right: 12px !important;
+        top: 6px !important;
+        right: 10px !important;
     }
 
     .user-avatar, .user-avatar-placeholder {
-        width: 30px !important;
-        height: 30px !important;
+        width: 28px !important;
+        height: 28px !important;
     }
 
     .user-name {
