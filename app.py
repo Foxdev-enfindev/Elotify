@@ -161,40 +161,58 @@ def index():
 
     scores = load_local_scores()
 
-    # Si la session ou la DB ne contient pas la liste des titres
+    # Si les titres ne sont pas encore en cache dans la session
     if 'tracks_cache' not in session or not session['tracks_cache']:
         try:
             results = sp.playlist_tracks(playlist_id)
-            items = results.get('items', [])
+            
+            # Gestion multi-structure pour récupérer les éléments
+            if isinstance(results, dict):
+                items = results.get('items', [])
+            elif isinstance(results, list):
+                items = results
+            else:
+                items = []
+
             tracks = []
             
             for item in items:
-                track = item.get('track')
-                if track and track.get('id'):
-                    image_url = track['album']['images'][0]['url'] if track['album']['images'] else ''
-                    artist_name = ", ".join([a['name'] for a in track['artists']])
+                if not item:
+                    continue
+                
+                # Selon la réponse, le titre est soit sous 'track', soit directement dans 'item'
+                track = item.get('track', item)
+                
+                if isinstance(track, dict) and track.get('id'):
+                    # Extraction sécurisée de l'image
+                    album = track.get('album', {})
+                    images = album.get('images', []) if isinstance(album, dict) else []
+                    image_url = images[0]['url'] if images else ''
+                    
+                    # Extraction des artistes
+                    artists = track.get('artists', [])
+                    artist_name = ", ".join([a.get('name', '') for a in artists if isinstance(a, dict)])
                     
                     tracks.append({
-                        'id': track['id'],
-                        'name': track['name'],
-                        'artist': artist_name,
-                        'uri': track['uri'],
+                        'id': track.get('id'),
+                        'name': track.get('name', 'Titre inconnu'),
+                        'artist': artist_name or 'Artiste inconnu',
+                        'uri': track.get('uri', ''),
                         'image_url': image_url
                     })
                     
             session['tracks_cache'] = tracks
         except Exception as e:
-            print(f"⚠️ Erreur chargement titres : {e}")
+            print(f"⚠️ Erreur chargement titres playlist : {e}")
             return redirect(url_for('liste_playlists'))
 
     tracks = session.get('tracks_cache', [])
     if len(tracks) < 2:
-        return "La playlist sélectionnée ne contient pas assez de morceaux pour réaliser un match.", 400
+        return f"La playlist sélectionnée ne contient pas assez de morceaux valides (morceaux trouvés: {len(tracks)}) pour réaliser un match.", 400
 
-    # Sélection aléatoire de 2 titres différents
+    # Sélection aléatoire de 2 titres
     track_a, track_b = random.sample(tracks, 2)
 
-    # Récupération de l'Elo (par défaut 1500)
     elo_a = scores.get(track_a['id'], {}).get('elo', 1500)
     elo_b = scores.get(track_b['id'], {}).get('elo', 1500)
 
