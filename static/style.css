@@ -922,23 +922,25 @@ body:has(.ranking-container) {
 }
 
 /* =======================================================
-   BOUTON QUITTER (TOUTES PLATFORMES & ORIENTATIONS)
+   BOUTON QUITTER : CENTRAGE FORCÉ SUR DEKTOP ET MOBILE
    ======================================================= */
 .quit-wrapper {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 15px;
-    margin-bottom: 10px;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-top: 25px !important;
+    margin-bottom: 15px !important;
+    clear: both !important; /* Casse tout alignement horizontal résiduel */
 }
 
 .quit-btn {
     background: #181818 !important;
     color: #ff5555 !important;
     border: 1px solid #ff5555 !important;
-    padding: 8px 20px !important;
+    padding: 8px 22px !important;
     border-radius: 20px !important;
-    font-size: 0.8rem !important;
+    font-size: 0.85rem !important;
     font-weight: 700 !important;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -948,9 +950,8 @@ body:has(.ranking-container) {
 .quit-btn:hover {
     background: #ff5555 !important;
     color: #ffffff !important;
-    box-shadow: 0 0 12px rgba(255, 85, 85, 0.5);
+    box-shadow: 0 0 14px rgba(255, 85, 85, 0.6);
 }
-
 /* Ajustement spécifique mobile portrait */
 @media screen and (max-width: 900px) and (orientation: portrait) {
     .quit-wrapper {
