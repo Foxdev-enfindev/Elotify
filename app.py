@@ -2,6 +2,7 @@ import os
 import time
 import random
 import psycopg2
+import threading
 from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_session import Session
@@ -140,21 +141,16 @@ def load_local_scores():
         print(f"⚠️ Erreur chargement BDD Neon : {e}")
         return session.get('local_scores_fallback', {})
 
-def save_local_scores(scores):
-    playlist_id = session.get('selected_playlist_id')
-    if not playlist_id:
-        return
-
-    if not DATABASE_URL:
-        session['local_scores_fallback'] = scores
-        session.modified = True
+def _save_to_db_async(playlist_id, scores_to_update):
+    """Fonction exécutée dans un thread séparé pour ne pas bloquer l'utilisateur."""
+    if not DATABASE_URL or not playlist_id:
         return
 
     try:
         conn = get_db_connection()
         cur = conn.cursor()
         
-        for track_id, data in scores.items():
+        for track_id, data in scores_to_update.items():
             cur.execute("""
                 INSERT INTO tracks_scores (playlist_id, track_id, name, artist, image_url, elo)
                 VALUES (%s, %s, %s, %s, %s, %s)
@@ -173,7 +169,17 @@ def save_local_scores(scores):
         cur.close()
         conn.close()
     except Exception as e:
-        print(f"⚠️ Erreur sauvegarde BDD Neon : {e}")
+        print(f"⚠️ Erreur sauvegarde asynchrone BDD Neon : {e}")
+
+def save_local_scores(scores_to_update):
+    playlist_id = session.get('selected_playlist_id')
+    if not playlist_id:
+        return
+
+    # Lancement de la sauvegarde Neon dans un thread séparé (zéro latence pour le vote)
+    thread = threading.Thread(target=_save_to_db_async, args=(playlist_id, scores_to_update))
+    thread.daemon = True
+    thread.start()
 
 # --- ROUTES AUTHENTIFICATION ---
 @app.route('/login')
