@@ -165,33 +165,16 @@ def index():
         try:
             results = sp.playlist_tracks(playlist_id)
             
-            # --- DEBUG : Inspection de la structure des titres ---
-            print("\n=== DEBUG PLAYLIST_TRACKS ===")
-            print(f"Type de results: {type(results)}")
-            if isinstance(results, dict):
-                print(f"Clés disponibles: {list(results.keys())}")
-                if 'items' in results:
-                    print(f"Nombre d'items sous 'items': {len(results['items'])}")
-                    if len(results['items']) > 0:
-                        print(f"Structure 1er item: {results['items'][0].keys()}")
-            print("=============================\n")
-
-            # Extraction multi-cas
-            items = []
-            if isinstance(results, dict):
-                if 'items' in results:
-                    items = results['items']
-                elif 'tracks' in results and isinstance(results['tracks'], dict):
-                    items = results['tracks'].get('items', [])
-            elif isinstance(results, list):
-                items = results
-
+            # Extraction des éléments de la playlist
+            items = results.get('items', []) if isinstance(results, dict) else []
             tracks = []
-            for item in items:
-                if not item:
+
+            for el in items:
+                if not el:
                     continue
                 
-                track = item.get('track') if isinstance(item, dict) and 'track' in item else item
+                # C'est la clé 'item' (ou 'track' en secours) qui contient le morceau
+                track = el.get('item') or el.get('track')
                 
                 if isinstance(track, dict) and track.get('id'):
                     album = track.get('album', {})
