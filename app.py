@@ -237,6 +237,7 @@ def vote():
 
     scores = load_local_scores()
 
+    # On repart bien sur 1000 par défaut
     elo_a = scores.get(id_a, {}).get('elo', 1000)
     elo_b = scores.get(id_b, {}).get('elo', 1000)
 
@@ -245,6 +246,7 @@ def vote():
     delta_a = new_elo_a - elo_a
     delta_b = new_elo_b - elo_b
 
+    # 1. Sauvegarde dans la base / dictionnaire local
     scores[id_a] = {
         'name': track_a['name'],
         'artist': track_a['artist'],
@@ -260,7 +262,15 @@ def vote():
 
     save_local_scores(scores)
 
-    # Formatage de la bannière avec le delta Elo
+    # 2. MIS À JOUR DU CACHE DE SESSION (indispensable pour l'affichage immédiat)
+    for t in session['tracks_cache']:
+        if t['id'] == id_a:
+            t['elo'] = new_elo_a
+        elif t['id'] == id_b:
+            t['elo'] = new_elo_b
+    session.modified = True  # Notifie Flask que la session a changé
+
+    # 3. Formatage du message de résultat
     sign_a = f"+{delta_a}" if delta_a > 0 else f"{delta_a}"
     sign_b = f"+{delta_b}" if delta_b > 0 else f"{delta_b}"
 
@@ -272,7 +282,6 @@ def vote():
         session['dernier_resultat'] = f"Match nul entre {track_a['name']} ({sign_a} pts) et {track_b['name']} ({sign_b} pts) !"
 
     return redirect(url_for('index'))
-
 @app.route('/playlists')
 def liste_playlists():
     global LAST_ACTIVITY_TIME
