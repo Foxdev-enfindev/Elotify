@@ -1,6 +1,8 @@
 import os
 import time
 import random
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_session import Session
 import spotipy
@@ -9,7 +11,7 @@ from spotipy.oauth2 import SpotifyOAuth
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify')
 
-# --- CONFIGURATION SESSION CÔTÉ SERVEUR (Pour playlists 800+ titres) ---
+# --- CONFIGURATION SESSION CÔTÉ SERVEUR ---
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_PERMANENT"] = False
 Session(app)
@@ -17,6 +19,41 @@ Session(app)
 # Variables globales & Cache d'inactivité
 LAST_ACTIVITY_TIME = time.time()
 USER_PROFILE_CACHE = {"data": None, "timestamp": 0}
+
+# --- BASE DE DONNÉES NEON POSTGRESQL ---
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+def get_db_connection():
+    if not DATABASE_URL:
+        return None
+    return psycopg2.connect(DATABASE_URL, sslmode='require')
+
+def init_db():
+    """Initialise la table dans Neon si elle n'existe pas encore."""
+    if not DATABASE_URL:
+        return
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS tracks_scores (
+                playlist_id VARCHAR(255),
+                track_id VARCHAR(255),
+                name TEXT,
+                artist TEXT,
+                image_url TEXT,
+                elo INT,
+                PRIMARY KEY (playlist_id, track_id)
+            );
+        """)
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"⚠️ Erreur initialisation BDD Neon : {e}")
+
+# Initialisation au démarrage
+init_db()
 
 # --- CONFIGURATION SPOTIFY OAUTH ---
 SPOTIPY_CLIENT_ID = os.environ.get('SPOTIPY_CLIENT_ID')
@@ -43,7 +80,6 @@ def get_spotify_client():
 def get_user_profile_cached(sp):
     global USER_PROFILE_CACHE
     now = time.time()
-    # Cache du profil pendant 10 minutes
     if USER_PROFILE_CACHE["data"] and (now - USER_PROFILE_CACHE["timestamp"] < 600):
         return USER_PROFILE_CACHE["data"]
     
@@ -63,7 +99,7 @@ def get_user_profile_cached(sp):
         print(f"⚠️ Erreur récupération profil : {e}")
         return None
 
-# --- GESTION DU SCORE ELO ---
+# --- GESTION DU SCORE ELO & BDD ---
 def calculate_elo(elo_a, elo_b, outcome_a, k=32):
     expected_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
     expected_b = 1 - expected_a
@@ -76,12 +112,68 @@ def calculate_elo(elo_a, elo_b, outcome_a, k=32):
     return new_elo_a, new_elo_b
 
 def load_local_scores():
-    # Remplacez cette fonction par votre appel BDD Neon si nécessaire
-    return session.get('local_scores', {})
+    playlist_id = session.get('selected_playlist_id')
+    if not playlist_id or not DATABASE_URL:
+        return session.get('local_scores_fallback', {})
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(
+            "SELECT track_id, name, artist, image_url, elo FROM tracks_scores WHERE playlist_id = %s;",
+            (playlist_id,)
+        )
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+
+        scores = {}
+        for row in rows:
+            scores[row['track_id']] = {
+                'name': row['name'],
+                'artist': row['artist'],
+                'image_url': row['image_url'],
+                'elo': row['elo']
+            }
+        return scores
+    except Exception as e:
+        print(f"⚠️ Erreur chargement BDD Neon : {e}")
+        return session.get('local_scores_fallback', {})
 
 def save_local_scores(scores):
-    session['local_scores'] = scores
-    session.modified = True
+    playlist_id = session.get('selected_playlist_id')
+    if not playlist_id:
+        return
+
+    if not DATABASE_URL:
+        session['local_scores_fallback'] = scores
+        session.modified = True
+        return
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        
+        for track_id, data in scores.items():
+            cur.execute("""
+                INSERT INTO tracks_scores (playlist_id, track_id, name, artist, image_url, elo)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                ON CONFLICT (playlist_id, track_id) 
+                DO UPDATE SET elo = EXCLUDED.elo, name = EXCLUDED.name, artist = EXCLUDED.artist, image_url = EXCLUDED.image_url;
+            """, (
+                playlist_id,
+                track_id,
+                data.get('name', ''),
+                data.get('artist', ''),
+                data.get('image_url', ''),
+                data.get('elo', 1000)
+            ))
+
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"⚠️ Erreur sauvegarde BDD Neon : {e}")
 
 # --- ROUTES AUTHENTIFICATION ---
 @app.route('/login')
@@ -173,7 +265,6 @@ def index():
             offset = 0
             limit = 100
 
-            # Pagination complète pour charger jusqu'à la fin de la playlist
             while True:
                 results = sp.playlist_tracks(playlist_id, limit=limit, offset=offset)
                 items = results.get('items', []) if isinstance(results, dict) else []
@@ -265,20 +356,24 @@ def vote():
     delta_a = new_elo_a - elo_a
     delta_b = new_elo_b - elo_b
 
-    scores[id_a] = {
-        'name': track_a['name'],
-        'artist': track_a['artist'],
-        'image_url': track_a['image_url'],
-        'elo': new_elo_a
-    }
-    scores[id_b] = {
-        'name': track_b['name'],
-        'artist': track_b['artist'],
-        'image_url': track_b['image_url'],
-        'elo': new_elo_b
+    # Préparation des données mises à jour
+    updated_scores = {
+        id_a: {
+            'name': track_a['name'],
+            'artist': track_a['artist'],
+            'image_url': track_a['image_url'],
+            'elo': new_elo_a
+        },
+        id_b: {
+            'name': track_b['name'],
+            'artist': track_b['artist'],
+            'image_url': track_b['image_url'],
+            'elo': new_elo_b
+        }
     }
 
-    save_local_scores(scores)
+    # Sauvegarde Neon / BDD
+    save_local_scores(updated_scores)
 
     # Mise à jour synchrone du cache de session
     for t in session.get('tracks_cache', []):
