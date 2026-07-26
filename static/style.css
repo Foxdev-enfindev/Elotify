@@ -746,3 +746,104 @@ h1 {
         display: none;
     }
 }
+/* =======================================================
+   8. PAGE CLASSEMENT (PAGE COMPLETE & MOBILE)
+   ======================================================= */
+.ranking-container {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px 10px;
+}
+
+.ranking-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+
+.ranking-table th, 
+.ranking-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ranking-table th {
+    background: #202020;
+    color: var(--neon-green);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ranking-track-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ranking-cover {
+    width: 48px;
+    height: 48px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.ranking-rank {
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    width: 30px;
+    text-align: center;
+}
+
+/* Top 3 podium styling */
+.ranking-row:nth-child(1) .ranking-rank { color: #ffd700; font-size: 1.3rem; } /* Or */
+.ranking-row:nth-child(2) .ranking-rank { color: #c0c0c0; font-size: 1.2rem; } /* Argent */
+.ranking-row:nth-child(3) .ranking-rank { color: #cd7f32; font-size: 1.1rem; } /* Bronze */
+
+
+/* --- AJUSTEMENTS MOBILE PORTRAIT POUR LE CLASSEMENT --- */
+@media screen and (max-width: 900px) and (orientation: portrait) {
+    .ranking-container {
+        padding-top: 55px !important; /* Dégage sous le profil */
+        box-sizing: border-box;
+    }
+
+    .ranking-table th, 
+    .ranking-table td {
+        padding: 8px 10px;
+    }
+
+    .ranking-cover {
+        width: 40px;
+        height: 40px;
+    }
+
+    .ranking-info h2, .ranking-title {
+        font-size: 0.85rem;
+        max-width: 160px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ranking-info h3, .ranking-artist {
+        font-size: 0.75rem;
+        max-width: 160px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .ranking-elo {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--neon-green);
+    }
+}
