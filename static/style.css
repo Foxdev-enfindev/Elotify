@@ -747,103 +747,103 @@ h1 {
     }
 }
 /* =======================================================
-   8. PAGE CLASSEMENT (PAGE COMPLETE & MOBILE)
+   FIX PAGE CLASSEMENT (SCROLL + DESIGN COMPACT MOBILE)
    ======================================================= */
+
+/* 1. Autorise le défilement sur la page classement */
+body.ranking-body, 
+body:has(.ranking-container) {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+}
+
+/* 2. Style global du classement */
 .ranking-container {
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
-    padding: 20px 10px;
+    padding: 10px;
+    padding-top: 55px !important; /* Dégage le haut sous le profil */
+    padding-bottom: 30px !important;
+    box-sizing: border-box;
 }
 
-.ranking-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--card-bg);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-}
-
-.ranking-table th, 
-.ranking-table td {
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.ranking-table th {
-    background: #202020;
-    color: var(--neon-green);
+/* Style du lien retour */
+.ranking-container a[href*="index"],
+.ranking-container a[href*="/"] {
+    color: #a855f7;
+    text-decoration: underline;
     font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 10px;
 }
 
-.ranking-track-cell {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+.ranking-container h1 {
+    margin-bottom: 15px !important;
 }
 
-.ranking-cover {
-    width: 48px;
-    height: 48px;
+/* Limite la taille des pochettes à 50px maximum ! */
+.ranking-container img {
+    width: 50px !important;
+    height: 50px !important;
+    max-width: 50px !important;
+    max-height: 50px !important;
     border-radius: 6px;
     object-fit: cover;
     flex-shrink: 0;
 }
 
-.ranking-rank {
-    font-weight: 800;
-    font-size: 1.1rem;
+/* Structure en tableau ou liste propre */
+.ranking-table, .ranking-list {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.ranking-table tr, .ranking-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 10px;
+}
+
+.ranking-table td, .ranking-table th {
+    padding: 0;
+    border: none;
+}
+
+/* Ajustements textes compacts */
+.ranking-info, .track-details {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    flex: 1;
+}
+
+.ranking-info h2, .ranking-title, .track-details strong {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #fff;
+}
+
+.ranking-info h3, .ranking-artist, .track-details span {
+    font-size: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     color: var(--text-muted);
-    width: 30px;
-    text-align: center;
 }
 
-/* Top 3 podium styling */
-.ranking-row:nth-child(1) .ranking-rank { color: #ffd700; font-size: 1.3rem; } /* Or */
-.ranking-row:nth-child(2) .ranking-rank { color: #c0c0c0; font-size: 1.2rem; } /* Argent */
-.ranking-row:nth-child(3) .ranking-rank { color: #cd7f32; font-size: 1.1rem; } /* Bronze */
-
-
-/* --- AJUSTEMENTS MOBILE PORTRAIT POUR LE CLASSEMENT --- */
-@media screen and (max-width: 900px) and (orientation: portrait) {
-    .ranking-container {
-        padding-top: 55px !important; /* Dégage sous le profil */
-        box-sizing: border-box;
-    }
-
-    .ranking-table th, 
-    .ranking-table td {
-        padding: 8px 10px;
-    }
-
-    .ranking-cover {
-        width: 40px;
-        height: 40px;
-    }
-
-    .ranking-info h2, .ranking-title {
-        font-size: 0.85rem;
-        max-width: 160px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .ranking-info h3, .ranking-artist {
-        font-size: 0.75rem;
-        max-width: 160px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .ranking-elo {
-        font-size: 0.85rem;
-        font-weight: 700;
-        color: var(--neon-green);
-    }
-}
+.ranking-elo, .score-tag {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--neon-green);
+    margin-left: auto;
+    flex-shrink: 0;
+}s
