@@ -31,7 +31,7 @@
     <div class="playlists-container">
         <h1>🎵 SÉLECTIONNEZ UNE PLAYLIST 🎵</h1>
         
-        <div class="playlists-grid">
+        <div class="playlists-grid playlist-grid">
             {% for pl in playlists %}
             <a href="{{ url_for('select_playlist', playlist_id=pl.id) }}" class="playlist-card">
                 <div class="playlist-cover-wrapper">

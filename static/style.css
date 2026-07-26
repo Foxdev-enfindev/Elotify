@@ -434,108 +434,128 @@ h1 {
    6. MOBILE PORTRAIT (< 900px vertical)
    ======================================================= */
 @media screen and (max-width: 900px) and (orientation: portrait) {
+    html, body {
+        height: 100%;
+        overflow-y: auto;
+    }
+
     body {
         padding: 10px 12px;
-        padding-top: 65px !important; /* Dégage entièrement le haut sous le profil */
+        padding-top: 55px !important;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+    }
+
+    .container {
+        display: flex;
+        flex-direction: column;
+        flex: 1; /* S'étire pour occuper toute la hauteur de l'écran */
+        justify-content: space-between;
     }
 
     h1 {
         font-size: 1.25rem;
-        margin: 0 0 10px 0 !important;
+        margin: 0 0 8px 0 !important;
         text-align: center;
     }
 
-    /* FIX BANNIÈRE DE RÉSULTAT : Marge de sécurité pour le profil */
+    /* BANNIÈRE : On autorise le texte à s'afficher entièrement sur 2 lignes si besoin */
     .result-banner {
         padding: 6px 12px;
         font-size: 0.75rem;
-        margin: 0 0 12px 0 !important;
-        max-width: calc(100% - 130px) !important; /* Laisse l'espace du bouton profil à droite */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        margin: 0 auto 10px auto !important;
+        width: 100%;
+        max-width: 100% !important;
+        text-align: center;
+        white-space: normal !important; /* Permet le retour à la ligne pour ne plus tronquer */
+        line-height: 1.2;
         box-sizing: border-box;
     }
 
+    /* DUEL : On répartit l'espace verticalement sur TOUT l'écran */
     .duel-zone {
+        display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
+        justify-content: space-evenly; /* Remplit l'écran du haut vers le bas */
+        flex: 1;
         width: 100%;
+        gap: 10px;
     }
 
+    /* CARTES : Lancement des cartes un peu plus généreuses */
     .track-card {
         width: 100%;
         max-width: 100%;
         flex-direction: row;
         align-items: center;
-        padding: 10px 12px;
+        padding: 14px 12px;
         gap: 12px;
         box-sizing: border-box;
     }
 
     .pochette-wrapper {
-        width: 75px;
-        height: 75px;
+        width: 85px;
+        height: 85px;
         margin-bottom: 0;
         flex-shrink: 0;
     }
 
     .pochette {
-        width: 75px;
-        height: 75px;
+        width: 85px;
+        height: 85px;
         border-radius: 8px;
     }
 
     .track-info h2 {
-        font-size: 0.95rem;
+        font-size: 1.05rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .track-info h3 {
-        font-size: 0.8rem;
+        font-size: 0.85rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
 
     .elo-display {
-        font-size: 0.75rem;
-        margin-top: 2px;
+        font-size: 0.8rem;
+        margin-top: 4px;
     }
 
-    /* ZONE CENTRALE : FIX DES BOUTONS ET DU RONGNAGE DU CLASSEMENT */
+    /* ZONE CENTRALE */
     .vs-zone {
         display: flex !important;
         flex-direction: row !important;
         justify-content: space-between;
         align-items: center;
         width: 100%;
-        padding: 0 4px;
+        padding: 4px 0;
         box-sizing: border-box;
     }
 
     .vs-circle {
-        width: 46px !important;
-        height: 46px !important;
-        min-width: 46px !important;
-        min-height: 46px !important;
+        width: 48px !important;
+        height: 48px !important;
+        min-width: 48px !important;
+        min-height: 48px !important;
         font-size: 1rem !important;
         border-radius: 50% !important;
         margin: 0 !important;
         flex-shrink: 0 !important;
     }
 
-    /* Règle le problème du bouton classement coupé */
     .rank-wrapper {
         display: inline-flex !important;
         position: static !important;
     }
 
     .top5-tooltip-box {
-        display: none !important; /* Désactivé sur mobile portrait pour ne pas casser le bouton */
+        display: none !important;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
@@ -546,21 +566,21 @@ h1 {
         white-space: nowrap;
     }
 
-    /* FIX PLAYLISTS PORTRAIT : Vraie grille à 2 colonnes proportionnelles */
+    /* FIX PLAYLISTS PORTRAIT (Gère les deux noms de classe : singular/plural) */
     .playlists-container {
         margin-top: 10px !important;
         width: 100%;
     }
 
-    .playlists-grid {
+    .playlists-grid, .playlist-grid {
         display: grid !important;
-        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-columns: repeat(2, 1fr) !important; /* Force 2 colonnes par ligne */
         gap: 12px !important;
-        width: 100%;
+        width: 100% !important;
     }
 
     .user-profile-container {
-        top: 10px !important;
+        top: 8px !important;
         right: 10px !important;
     }
 
@@ -573,7 +593,6 @@ h1 {
         display: none;
     }
 }
-
 
 /* =======================================================
    7. MOBILE PAYSAGE (< 1000px horizontal)
