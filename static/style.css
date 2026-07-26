@@ -434,63 +434,71 @@ h1 {
 }
 
 /* =======================================================
-   6. ADAPTATION MOBILE COMPACTE (Écrans < 768px)
+   ADAPTATION MOBILE OPTIMISÉE (PORTRAIT & PAYSAGE)
    ======================================================= */
 @media (max-width: 768px) {
     html, body {
         height: 100%;
-        overflow-y: auto; /* Permet le scroll sur le classement et les playlists */
+        overflow-y: auto;
     }
 
     body {
-        padding: 10px 8px;
+        padding: 10px 12px;
     }
 
+    /* Décalage du titre et de la bannière pour ne pas percuter le profil */
     h1 {
-        font-size: 1.3rem;
-        margin: 5px 0 10px 0;
+        font-size: 1.2rem;
+        margin: 35px 0 8px 0; /* Marge en haut pour laisser la place au profil */
+        text-align: center;
     }
 
     .result-banner {
-        padding: 6px 10px;
-        font-size: 0.8rem;
-        margin-bottom: 8px;
+        padding: 6px 12px;
+        font-size: 0.75rem;
+        margin: 0 auto 10px auto;
+        max-width: 85%; /* Empêche de toucher les bords ou le profil */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .container {
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-    }
-
-    /* Duel compact vertical */
-    .duel-zone {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
         width: 100%;
     }
 
-    /* Cartes de titre horizontales */
+    /* Zone de duel bien distribuée */
+    .duel-zone {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+    }
+
+    /* Cartes un peu plus épaisses et aérées */
     .track-card {
         width: 100%;
         max-width: 100%;
         flex-direction: row;
         align-items: center;
-        padding: 10px;
+        padding: 12px;
         gap: 12px;
+        box-sizing: border-box;
     }
 
     .pochette-wrapper {
-        width: 75px;
-        height: 75px;
+        width: 85px;
+        height: 85px;
         margin-bottom: 0;
         flex-shrink: 0;
     }
 
     .pochette {
-        width: 75px;
-        height: 75px;
+        width: 85px;
+        height: 85px;
         border-radius: 8px;
     }
 
@@ -501,7 +509,7 @@ h1 {
     }
 
     .track-info h2 {
-        font-size: 0.95rem;
+        font-size: 1.05rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -521,59 +529,54 @@ h1 {
         margin-top: 4px;
     }
 
-    .badge {
-        font-size: 0.65rem;
-        padding: 2px 6px;
-    }
-
-    /* Zone VS et boutons au milieu */
+    /* ZONE CENTRALE SUR 2 LIGNES PROPRES */
     .vs-zone {
-        flex-direction: row;
+        flex-direction: column; /* Le VS se met au-dessus des boutons */
         justify-content: center;
         align-items: center;
-        flex-wrap: wrap;
         gap: 8px;
         width: 100%;
-        margin: 2px 0;
+        margin: 4px 0;
     }
 
-    /* Fix strict du rond VS pour éviter la déformation */
+    /* Rond VS seul au milieu */
     .vs-circle {
-        width: 40px !important;
-        height: 40px !important;
-        min-width: 40px !important;
-        min-height: 40px !important;
+        width: 36px !important;
+        height: 36px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
         border-radius: 50% !important;
-        font-size: 0.85rem !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        margin: 0 !important;
-        flex-shrink: 0 !important;
+        font-size: 0.8rem !important;
+        margin: 0 auto !important;
+    }
+
+    /* Ligne pour les 3 boutons d'action */
+    .vs-zone form, 
+    .vs-zone .rank-wrapper {
+        display: inline-block;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
-        padding: 8px 12px;
+        padding: 8px 10px;
         font-size: 0.75rem;
-        border-radius: 20px;
+        border-radius: 18px;
     }
 
-    /* Menu profil mobile */
+    /* Fix du profil en haut à droite */
     .user-profile-container {
-        top: 8px !important;
-        right: 8px !important;
+        top: 10px !important;
+        right: 10px !important;
     }
 
     .user-avatar, .user-avatar-placeholder {
-        width: 28px !important;
-        height: 28px !important;
+        width: 30px !important;
+        height: 30px !important;
     }
 
     .user-name {
         display: none;
     }
 
-    /* Grille de playlists mobile */
     .playlists-grid {
         grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
         gap: 12px;
