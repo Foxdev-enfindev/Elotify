@@ -161,35 +161,43 @@ def index():
 
     scores = load_local_scores()
 
-    # Si les titres ne sont pas encore en cache dans la session
     if 'tracks_cache' not in session or not session['tracks_cache']:
         try:
             results = sp.playlist_tracks(playlist_id)
             
-            # Gestion multi-structure pour récupérer les éléments
+            # --- DEBUG : Inspection de la structure des titres ---
+            print("\n=== DEBUG PLAYLIST_TRACKS ===")
+            print(f"Type de results: {type(results)}")
             if isinstance(results, dict):
-                items = results.get('items', [])
+                print(f"Clés disponibles: {list(results.keys())}")
+                if 'items' in results:
+                    print(f"Nombre d'items sous 'items': {len(results['items'])}")
+                    if len(results['items']) > 0:
+                        print(f"Structure 1er item: {results['items'][0].keys()}")
+            print("=============================\n")
+
+            # Extraction multi-cas
+            items = []
+            if isinstance(results, dict):
+                if 'items' in results:
+                    items = results['items']
+                elif 'tracks' in results and isinstance(results['tracks'], dict):
+                    items = results['tracks'].get('items', [])
             elif isinstance(results, list):
                 items = results
-            else:
-                items = []
 
             tracks = []
-            
             for item in items:
                 if not item:
                     continue
                 
-                # Selon la réponse, le titre est soit sous 'track', soit directement dans 'item'
-                track = item.get('track', item)
+                track = item.get('track') if isinstance(item, dict) and 'track' in item else item
                 
                 if isinstance(track, dict) and track.get('id'):
-                    # Extraction sécurisée de l'image
                     album = track.get('album', {})
                     images = album.get('images', []) if isinstance(album, dict) else []
                     image_url = images[0]['url'] if images else ''
                     
-                    # Extraction des artistes
                     artists = track.get('artists', [])
                     artist_name = ", ".join([a.get('name', '') for a in artists if isinstance(a, dict)])
                     
@@ -210,7 +218,6 @@ def index():
     if len(tracks) < 2:
         return f"La playlist sélectionnée ne contient pas assez de morceaux valides (morceaux trouvés: {len(tracks)}) pour réaliser un match.", 400
 
-    # Sélection aléatoire de 2 titres
     track_a, track_b = random.sample(tracks, 2)
 
     elo_a = scores.get(track_a['id'], {}).get('elo', 1500)
