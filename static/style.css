@@ -514,20 +514,35 @@ h1 {
         border-radius: 8px;
     }
 
+    /* FORCE LA TRONCATION PROPRE DES TITRES ET ARTISTES LONGS */
+    .track-info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        flex: 1; /* Remplit l'espace restants à droite de l'image */
+        min-width: 0 !important; /* <--- La propriété magique qui empêche le texte de déborder */
+        width: 100%;
+        overflow: hidden;
+    }
+
     .track-info h2 {
         font-size: 1.05rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important; /* Ajoute les "..." en fin de ligne */
         margin: 2px 0;
+        width: 100%;
     }
 
     .track-info h3 {
         font-size: 0.85rem;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        color: var(--text-muted);
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important; /* Ajoute les "..." si la liste d'artistes est trop longue */
         margin: 0;
+        width: 100%;
     }
 
     .elo-display {
