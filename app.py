@@ -163,17 +163,31 @@ def index():
 
     if 'tracks_cache' not in session or not session['tracks_cache']:
         try:
-            results = sp.playlist_tracks(playlist_id)
-            
-            # Extraction des éléments de la playlist
-            items = results.get('items', []) if isinstance(results, dict) else []
-            tracks = []
+            raw_items = []
+            offset = 0
+            limit = 100  # Maximum autorisé par page par Spotify
 
-            for el in items:
+            # --- PAGINATION : Boucle jusqu'à avoir récupéré TOUS les morceaux ---
+            while True:
+                results = sp.playlist_tracks(playlist_id, limit=limit, offset=offset)
+                items = results.get('items', []) if isinstance(results, dict) else []
+                
+                if not items:
+                    break
+                    
+                raw_items.extend(items)
+                
+                # Si on a récupéré moins que la limite, c'est qu'on a atteint la fin
+                if len(items) < limit:
+                    break
+                    
+                offset += limit
+
+            tracks = []
+            for el in raw_items:
                 if not el:
                     continue
                 
-                # C'est la clé 'item' (ou 'track' en secours) qui contient le morceau
                 track = el.get('item') or el.get('track')
                 
                 if isinstance(track, dict) and track.get('id'):
