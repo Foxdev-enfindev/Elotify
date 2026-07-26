@@ -144,18 +144,24 @@
             }
         }
 
-        // Survol PC avec debouncer
+        // --- SURVOL PC OPTIMISÉ (sans relance intempestive) ---
         document.getElementById('card-1').addEventListener('mouseenter', () => {
             if (!isTouchDevice) {
-                clearTimeout(listenTimeout);
-                listenTimeout = setTimeout(() => playCard('1', '{{ track_a.uri }}'), 200);
+                const card1 = document.getElementById('card-1');
+                if (!card1.classList.contains('active')) {
+                    clearTimeout(listenTimeout);
+                    listenTimeout = setTimeout(() => playCard('1', '{{ track_a.uri }}'), 150);
+                }
             }
         });
 
         document.getElementById('card-2').addEventListener('mouseenter', () => {
             if (!isTouchDevice) {
-                clearTimeout(listenTimeout);
-                listenTimeout = setTimeout(() => playCard('2', '{{ track_b.uri }}'), 200);
+                const card2 = document.getElementById('card-2');
+                if (!card2.classList.contains('active')) {
+                    clearTimeout(listenTimeout);
+                    listenTimeout = setTimeout(() => playCard('2', '{{ track_b.uri }}'), 150);
+                }
             }
         });
 
