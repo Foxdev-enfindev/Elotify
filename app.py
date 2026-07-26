@@ -268,26 +268,16 @@ def liste_playlists():
         raw_playlists = results.get('items', [])
         playlists = []
         
-        if raw_playlists and len(raw_playlists) > 0:
-            print("\n=== DEBUG BRUT PREMIÈRE PLAYLIST ===")
-            print(json.dumps(raw_playlists[0], indent=2))
-            print("=====================================\n")
-        
         for pl in raw_playlists:
             if not pl: 
                 continue
             
-            # tentative multi-clés exhaustive
+            # Récupération du nombre de morceaux depuis 'items' (vu dans le JSON)
             total = 0
-            if 'tracks' in pl:
-                if isinstance(pl['tracks'], dict):
-                    total = pl['tracks'].get('total', 0)
-                elif isinstance(pl['tracks'], int):
-                    total = pl['tracks']
-            elif 'total_tracks' in pl:
-                total = pl.get('total_tracks', 0)
-            elif 'item_count' in pl:
-                total = pl.get('item_count', 0)
+            if 'items' in pl and isinstance(pl['items'], dict):
+                total = pl['items'].get('total', 0)
+            elif 'tracks' in pl and isinstance(pl['tracks'], dict):
+                total = pl['tracks'].get('total', 0)
                     
             playlists.append({
                 "id": pl.get('id'),
