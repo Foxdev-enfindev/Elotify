@@ -470,15 +470,32 @@ h1 {
         text-align: center;
     }
 
+    /* BANNIÈRE DE RÉSULTAT À HAUTEUR FIXE */
     .result-banner {
-        padding: 6px 10px;
+        height: 38px !important; /* Hauteur fixe réservée en permanence */
+        min-height: 38px !important;
+        max-height: 38px !important;
+        padding: 4px 10px;
         font-size: 0.75rem;
-        margin: 0 auto 15px auto !important;
+        margin: 0 auto 6px auto !important;
         width: 100%;
         text-align: center;
-        white-space: normal !important;
         line-height: 1.2;
         box-sizing: border-box;
+        
+        /* Alignement du texte au centre si 1 ou 2 lignes */
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; /* Empêche tout débordement */
+    }
+
+    /* Quand la bannière est vide (au premier duel) */
+    .result-banner:empty,
+    .result-banner.hidden {
+        visibility: hidden !important; /* Reste invisible mais conserve son espace physique */
+        border-color: transparent !important; /* Masque la bordure néon au 1er duel */
+        background: transparent !important;
     }
 
     /* DUEL : Pousse légèrement l'ensemble vers le bas pour équilibrer */
