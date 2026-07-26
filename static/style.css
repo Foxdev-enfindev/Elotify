@@ -447,11 +447,12 @@ h1 {
     }
 
     body {
-        padding: 10px 12px;
-        padding-top: 55px !important;
+        padding: 12px;
+        padding-top: 65px !important; /* Descend l'en-tête sous le menu profil */
+        padding-bottom: 25px !important; /* Laisse de l'espace sous la 2e carte */
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
+        justify-content: space-between;
         box-sizing: border-box;
     }
 
@@ -463,83 +464,83 @@ h1 {
     }
 
     h1 {
-        font-size: 1.25rem;
-        margin: 0 0 8px 0 !important;
+        font-size: 1.35rem;
+        margin: 10px 0 12px 0 !important; /* Descend le titre */
         text-align: center;
     }
 
-    /* BANNIÈRE : Texte complet autorisé sur 2 lignes */
     .result-banner {
-        padding: 6px 12px;
-        font-size: 0.75rem;
-        margin: 0 auto 10px auto !important;
+        padding: 8px 14px;
+        font-size: 0.8rem;
+        margin: 0 auto 12px auto !important;
         width: 100%;
         max-width: 100% !important;
         text-align: center;
         white-space: normal !important;
-        line-height: 1.2;
+        line-height: 1.25;
         box-sizing: border-box;
     }
 
-    /* DUEL : Répartition équilibrée sur toute la hauteur */
+    /* DUEL : Équilibre vertical sur tout l'écran */
     .duel-zone {
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-evenly;
+        justify-content: space-between;
         flex: 1;
         width: 100%;
-        gap: 10px;
+        gap: 12px;
     }
 
+    /* CARTES AGRANDIES POUR REMPLIR L'ESPACE */
     .track-card {
         width: 100%;
         max-width: 100%;
         flex-direction: row;
         align-items: center;
-        padding: 12px;
-        gap: 12px;
+        padding: 16px 14px; /* Carte plus haute */
+        gap: 14px;
         box-sizing: border-box;
     }
 
     .pochette-wrapper {
-        width: 80px;
-        height: 80px;
+        width: 95px; /* Pochette plus grande */
+        height: 95px;
         margin-bottom: 0;
         flex-shrink: 0;
     }
 
     .pochette {
-        width: 80px;
-        height: 80px;
-        border-radius: 8px;
+        width: 95px;
+        height: 95px;
+        border-radius: 10px;
     }
 
     .track-info h2 {
-        font-size: 1rem;
+        font-size: 1.1rem; /* Titre du morceau plus lisible */
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin: 3px 0;
     }
 
     .track-info h3 {
-        font-size: 0.85rem;
+        font-size: 0.9rem;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        margin: 0;
     }
 
     .elo-display {
-        font-size: 0.8rem;
-        margin-top: 4px;
+        font-size: 0.85rem;
+        margin-top: 6px;
     }
 
-  /* ===================================================
-       ZONE CENTRALE : VS A GAUCHE + 3 BOUTONS EMPILES A DROITE
-       =================================================== */
+    /* ZONE CENTRALE : GRID VS À GAUCHE + BOUTONS À DROITE */
     .vs-zone {
         display: grid !important;
-        grid-template-columns: auto 1fr !important; /* VS à gauche, colonne de boutons à droite */
+        grid-template-columns: auto 1fr !important;
         grid-template-areas: 
             "vs pause"
             "vs tie"
@@ -547,49 +548,47 @@ h1 {
         align-items: center;
         justify-items: center;
         width: 100%;
-        gap: 6px 12px !important;
-        padding: 4px 10px;
+        gap: 8px 16px !important;
+        padding: 6px 10px;
         box-sizing: border-box;
     }
 
-    /* Le gros rond VS prend toute la hauteur des 3 lignes à gauche */
     .vs-circle {
         grid-area: vs !important;
-        width: 68px !important;
-        height: 68px !important;
-        min-width: 68px !important;
-        min-height: 68px !important;
-        font-size: 1.4rem !important;
+        width: 72px !important; /* Légèrement plus imposant */
+        height: 72px !important;
+        min-width: 72px !important;
+        min-height: 72px !important;
+        font-size: 1.45rem !important;
         font-weight: 900 !important;
         border-radius: 50% !important;
         margin: 0 !important;
     }
 
-    /* Assignation de chaque bouton à sa ligne sur la droite */
     .vs-zone > #play-pause-btn {
         grid-area: pause !important;
         width: 100% !important;
-        max-width: 180px !important;
+        max-width: 190px !important;
     }
 
     .vs-zone > form {
         grid-area: tie !important;
         width: 100% !important;
-        max-width: 180px !important;
+        max-width: 190px !important;
     }
 
     .vs-zone > .rank-wrapper {
         grid-area: rank !important;
         width: 100% !important;
-        max-width: 180px !important;
+        max-width: 190px !important;
         position: static !important;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
         width: 100% !important;
-        padding: 7px 12px !important;
+        padding: 8px 12px !important;
         font-size: 0.8rem !important;
-        border-radius: 14px !important;
+        border-radius: 16px !important;
         margin: 0 !important;
         text-align: center;
         box-sizing: border-box;
@@ -603,7 +602,7 @@ h1 {
         display: none !important;
     }
 
-    /* PLAYLISTS PORTRAIT : Vignettes compactes de taille normale */
+    /* PLAYLISTS PORTRAIT */
     .playlists-container {
         margin-top: 10px !important;
         width: 100%;
@@ -621,20 +620,19 @@ h1 {
     }
 
     .user-profile-container {
-        top: 8px !important;
-        right: 10px !important;
+        top: 10px !important;
+        right: 12px !important;
     }
 
     .user-avatar, .user-avatar-placeholder {
-        width: 28px !important;
-        height: 28px !important;
+        width: 30px !important;
+        height: 30px !important;
     }
 
     .user-name {
         display: none;
     }
 }
-
 
 /* =======================================================
    7. MOBILE PAYSAGE (< 1000px horizontal)
