@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elotify K-Pop - Stats Groupes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+</head>
+<body>
+
+    {% if user %}
+    <div class="user-profile-container" id="profileMenuContainer">
+        <div class="profile-trigger" onclick="toggleDropdown(event)">
+            {% if user.image %}
+                <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
+            {% else %}
+                <div class="user-avatar-placeholder">👤</div>
+            {% endif %}
+            <span class="user-name">{{ user.display_name }}</span>
+            <span class="arrow-down">▼</span>
+        </div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
+            <hr>
+            <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="container ranking-container">
+        
+        <div style="margin-bottom: 20px; text-align: left;">
+            <a href="{{ url_for('index') }}" class="nav-btn">⚔️ Retour aux Duels</a>
+        </div>
+
+        <h1>🎤 TITRES PAR GROUPE 🎤</h1>
+        <p style="color: var(--text-muted); text-align: center; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;">
+            Total : {{ total_tracks }} titres dans la playlist
+        </p>
+
+        <div class="ranking-list">
+            {% for artist, count in sorted_artists %}
+            <div class="ranking-item">
+                <div class="rank-number">#{{ loop.index }}</div>
+                
+                <div class="rank-details">
+                    <span class="rank-name">{{ artist }}</span>
+                </div>
+                
+                <div class="rank-elo">{{ count }} titre{% if count > 1 %}s{% endif %}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        }
+    </script>
+</body>
+</html>

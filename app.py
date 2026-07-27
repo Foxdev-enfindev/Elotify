@@ -10,6 +10,7 @@ from flask_session import Session
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.exceptions import SpotifyException
+from collections import Counter
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify')
@@ -483,3 +484,36 @@ def api_top5():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+
+@app.route('/stats')
+def stats():
+    sp = get_spotify_client()
+    if not sp:
+        return redirect(url_for('login'))
+
+    playlist_id = session.get('selected_playlist_id')
+    if not playlist_id:
+        return redirect(url_for('liste_playlists'))
+
+    tracks = session.get('tracks_cache', [])
+    
+    # Si le cache est vide, on va charger la playlist via l'index d'abord
+    if not tracks:
+        return redirect(url_for('index'))
+
+    # Découpage des artistes pour compter chaque groupe séparément
+    artist_counter = Counter()
+    for t in tracks:
+        artist_str = t.get('artist', '')
+        artists = [a.strip() for a in artist_str.split(',') if a.strip()]
+        for artist in artists:
+            artist_counter[artist] += 1
+
+    sorted_artists = artist_counter.most_common()
+
+    return render_template(
+        'stats.html', 
+        sorted_artists=sorted_artists, 
+        total_tracks=len(tracks), 
+        user=get_user_profile_cached(sp)
+    )
