@@ -554,17 +554,17 @@ h1 {
         padding-bottom: 15px !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
+        justify-content: center !important; /* CENTRE VERTICALEMENT (Fixe l'écartement de l'image 1) */
         align-items: center !important;
     }
 
     body.duel-body .container {
         width: 100% !important;
         max-width: 900px !important;
-        height: 100% !important;
+        height: auto !important; /* Empeche l'étirement sur 100% de la hauteur */
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
+        justify-content: center !important;
         align-items: center !important;
     }
 
@@ -574,13 +574,13 @@ h1 {
     }
 
     .result-banner {
-        margin: 0 auto 8px auto !important;
+        margin: 0 auto 10px auto !important;
         padding: 4px 14px !important;
         font-size: 0.78rem !important;
         max-width: calc(100% - 150px) !important;
     }
 
-    /* DUEL ZONE CÔTÉ-À-CÔTE FLUIDE SUR DALLE DÉPLIÉE */
+    /* DUEL ZONE : COMPACTE ET RESSERRÉE DÈS LE CHARGEMENT */
     .duel-zone {
         display: flex !important;
         flex-direction: row !important;
@@ -588,12 +588,11 @@ h1 {
         justify-content: center !important;
         gap: 20px !important;
         width: 100% !important;
-        flex: 1 1 auto !important;
+        flex: 0 0 auto !important; /* Refuse catégoriquement l'étirement vertical */
     }
 
     .track-card {
-        flex: 1 1 0 !important;
-        max-width: 320px !important;
+        flex: 0 1 310px !important; /* Taille fixe compacte */
         padding: 14px !important;
         display: flex !important;
         flex-direction: column !important;
@@ -602,8 +601,8 @@ h1 {
     }
 
     .pochette-wrapper, .pochette {
-        width: clamp(130px, 18vh, 180px) !important;
-        height: clamp(130px, 18vh, 180px) !important;
+        width: 160px !important;
+        height: 160px !important;
         margin-bottom: 8px !important;
         flex-shrink: 0 !important;
     }
@@ -639,9 +638,10 @@ h1 {
         font-size: 0.75rem !important;
     }
 
+    /* BOUTON QUITTER : FIXÉ DIRECTEMENT SOUS LA ZONE DE DUEL */
     .quit-wrapper {
-        margin-top: auto !important;
-        margin-bottom: 8px !important;
+        margin-top: 15px !important; /* Distance fixe et modérée sous le duel */
+        margin-bottom: 0 !important;
         flex-shrink: 0 !important;
     }
 
