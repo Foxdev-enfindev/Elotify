@@ -21,21 +21,27 @@ html, body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 100dvh;
+    min-height: 100vh;
 }
 
-/* Centrage vertical et horizontal sur PC */
 body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* Permet le scroll naturel pour la sélection de playlist */
     padding: 20px;
     box-sizing: border-box;
 }
 
+/* Applique le centrage et blocage de scroll UNIQUEMENT sur la page de duel */
+body.duel-body {
+    justify-content: center !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+}
+
 /* =======================================================
-   2. EN-TÊTE, PROFIL & BANNIÈRE DE RÉSULTAT (PC)
+   2. EN-TÊTE, PROFIL & BANNIÈRE DE RÉSULTAT
    ======================================================= */
 h1 {
     font-size: 2.2rem;
@@ -361,18 +367,18 @@ h1 {
 }
 
 /* =======================================================
-   5. SELECTION PLAYLISTS (PC)
+   5. SELECTION PLAYLISTS (SCROLL PARFAITEMENT AUTORISÉ)
    ======================================================= */
 .playlists-container, .ranking-container {
     width: 100%;
     max-width: 1000px;
-    margin-top: 60px;
-    padding-bottom: 40px;
+    margin-top: 40px !important;
+    padding-bottom: 60px !important;
 }
 
 .playlists-grid, .playlist-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 20px;
     margin-top: 20px;
     width: 100%;
@@ -400,12 +406,7 @@ h1 {
    6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT CLASSIQUE < 450px)
    ======================================================= */
 @media screen and (max-width: 449px) {
-    html, body {
-        height: 100dvh;
-        overflow: hidden;
-    }
-
-    body {
+    body.duel-body {
         padding: 8px 12px !important;
         padding-top: 65px !important;
         display: flex !important;
@@ -414,7 +415,7 @@ h1 {
         justify-content: space-between !important;
     }
 
-    .container {
+    body.duel-body .container {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -444,7 +445,6 @@ h1 {
         width: 100% !important;
     }
 
-    /* Pochette à gauche, texte à droite */
     .track-card {
         padding: 8px 12px !important;
         flex-direction: row !important;
@@ -510,12 +510,7 @@ h1 {
    7. ÉCRAN OUVERT (FOLD 8 / RATIO 4:3 / TABLETTE ≥ 450px)
    ======================================================= */
 @media screen and (min-width: 450px) {
-    html, body {
-        height: 100dvh !important;
-        overflow: hidden !important;
-    }
-
-    body {
+    body.duel-body {
         padding-top: 55px !important;
         padding-bottom: 10px !important;
         display: flex !important;
@@ -524,7 +519,7 @@ h1 {
         align-items: center !important;
     }
 
-    .container {
+    body.duel-body .container {
         width: 100% !important;
         max-width: 850px !important;
         height: auto !important;
@@ -546,7 +541,6 @@ h1 {
         max-width: calc(100% - 150px) !important;
     }
 
-    /* DUEL ZONE COMPACTE (CÔTÉ-À-CÔTE NATIVE) */
     .duel-zone {
         display: flex !important;
         flex-direction: row !important;
@@ -566,7 +560,6 @@ h1 {
         box-sizing: border-box !important;
     }
 
-    /* Pochette compacte fixée */
     .pochette-wrapper, .pochette {
         width: 130px !important;
         height: 130px !important;
@@ -581,7 +574,6 @@ h1 {
     .track-info h3 { font-size: 0.78rem !important; }
     .elo-display { font-size: 0.78rem !important; margin-top: 3px !important; }
 
-    /* ZONE CENTRALE COMPACTE */
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
@@ -604,7 +596,6 @@ h1 {
         font-size: 0.72rem !important;
     }
 
-    /* BOUTON QUITTER DIRECTEMENT RAPPROCHÉ DE LA ZONE DE DUEL */
     .quit-wrapper {
         margin-top: 12px !important;
         margin-bottom: 0 !important;
@@ -618,28 +609,8 @@ h1 {
 }
 
 /* =======================================================
-   8. DÉFILEMENT AUTORISÉ (PLAYLISTS, CLASSEMENT & STATS)
+   8. CLASSEMENT & STATS
    ======================================================= */
-
-/* Autorise le scroll si la page contient les playlists, le classement ou les stats */
-html:has(.playlists-container), body:has(.playlists-container),
-html:has(.ranking-container), body:has(.ranking-container) {
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    height: auto !important;
-    min-height: 100% !important;
-}
-
-/* Réaligne le conteneur des playlists en haut de page */
-.playlists-container {
-    width: 100%;
-    max-width: 1000px;
-    margin-top: 20px !important;
-    padding-top: 40px !important;
-    padding-bottom: 40px !important;
-    box-sizing: border-box;
-}
-
 .ranking-container {
     width: 100%;
     max-width: 800px;
@@ -648,6 +619,118 @@ html:has(.ranking-container), body:has(.ranking-container) {
     padding-top: 55px !important;
     padding-bottom: 40px !important;
     box-sizing: border-box;
+}
+
+.nav-btn {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #181818 !important;
+    color: var(--neon-green) !important;
+    border: 1px solid var(--neon-green) !important;
+    padding: 8px 16px !important;
+    border-radius: 20px !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+    box-shadow: 0 0 8px var(--neon-green-glow);
+}
+
+.nav-btn:hover {
+    background: var(--neon-green) !important;
+    color: #000 !important;
+}
+
+.ranking-list {
+    width: 100%;
+    background: var(--card-bg);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ranking-item {
+    display: flex !important;
+    align-items: center !important;
+    padding: 10px 12px !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+    gap: 12px !important;
+    box-sizing: border-box;
+}
+
+.ranking-item:last-child { border-bottom: none !important; }
+
+.rank-number {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--text-muted);
+    min-width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.ranking-item:nth-child(1) .rank-number { color: #ffd700; font-size: 1.1rem; }
+.ranking-item:nth-child(2) .rank-number { color: #c0c0c0; }
+.ranking-item:nth-child(3) .rank-number { color: #cd7f32; }
+
+.rank-img {
+    width: 50px !important;
+    height: 50px !important;
+    min-width: 50px !important;
+    min-height: 50px !important;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.rank-img-placeholder {
+    background: #282828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.rank-details {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.rank-name {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-bottom: 2px !important;
+    display: block !important;
+}
+
+.rank-artist {
+    font-size: 0.78rem !important;
+    font-weight: 400 !important;
+    color: var(--text-muted) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block !important;
+}
+
+.rank-elo {
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    color: var(--neon-green) !important;
+    text-align: right !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
 }
 
 /* =======================================================
@@ -683,7 +766,7 @@ html:has(.ranking-container), body:has(.ranking-container) {
 }
 
 /* =======================================================
-   10. FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE (SANS SAUT)
+   10. FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE
    ======================================================= */
 .track-card.voted-winner {
     transform: scale(1.04) !important;
