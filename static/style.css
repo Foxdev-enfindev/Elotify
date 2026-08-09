@@ -407,7 +407,7 @@ h1 {
 @media screen and (max-width: 579px) {
     body.duel-body {
         padding: 6px 12px !important;
-        padding-top: 60px !important;
+        padding-top: 70px !important; /* Marge supérieure ajustée pour redescendre la page */
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -423,16 +423,16 @@ h1 {
     }
 
     h1 {
-        font-size: 1.15rem !important;
-        margin: 2px 0 !important;
+        font-size: 1.2rem !important;
+        margin: 6px 0 4px 0 !important;
     }
 
     .result-banner {
-        height: 30px !important;
-        min-height: 30px !important;
-        padding: 2px 8px !important;
-        font-size: 0.72rem !important;
-        margin: 0 auto 4px auto !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        padding: 3px 10px !important;
+        font-size: 0.75rem !important;
+        margin: 0 auto 8px auto !important;
         max-width: calc(100% - 110px) !important;
     }
 
@@ -440,24 +440,25 @@ h1 {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        gap: 6px !important;
+        gap: 8px !important;
         margin-top: 4px !important;
         width: 100% !important;
     }
 
     /* Pochette à gauche, texte à droite */
     .track-card {
-        padding: 8px 12px !important;
+        padding: 10px 14px !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 10px !important;
+        gap: 12px !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
 
+    /* Pochettes agrandies grâce au gain de hauteur du VS */
     .pochette-wrapper, .pochette {
-        width: 75px !important;
-        height: 75px !important;
+        width: 85px !important;
+        height: 85px !important;
         margin-bottom: 0 !important;
         flex-shrink: 0 !important;
     }
@@ -466,54 +467,66 @@ h1 {
         text-align: left !important;
     }
 
-    .track-info h2 { font-size: 0.95rem !important; margin: 1px 0 !important; }
-    .track-info h3 { font-size: 0.78rem !important; }
-    .elo-display { font-size: 0.75rem !important; margin-top: 2px !important; }
+    .track-info h2 { font-size: 1rem !important; margin: 2px 0 !important; }
+    .track-info h3 { font-size: 0.82rem !important; }
+    .elo-display { font-size: 0.78rem !important; margin-top: 3px !important; }
 
-    /* ZONE CENTRALE FLEXBOX VERROUILLÉE AU CENTRE */
+    /* DISPOSITION CÔTÉ-À-CÔTE : CERCLE VS À GAUCHE, BOUTONS À DROITE */
     .vs-zone {
-        display: flex !important;
-        flex-direction: column !important;
+        display: grid !important;
+        grid-template-columns: auto 1fr !important;
+        grid-template-areas: 
+            "vs pause"
+            "vs tie"
+            "vs rank" !important;
         align-items: center !important;
-        justify-content: center !important;
+        justify-items: center !important;
         width: 100% !important;
-        gap: 4px !important;
-        margin: 4px 0 !important;
+        gap: 4px 12px !important;
+        margin: 6px 0 !important;
+        padding: 0 10px !important;
+        box-sizing: border-box !important;
     }
 
     .vs-circle {
-        width: 42px !important;
-        height: 42px !important;
-        min-width: 42px !important;
-        min-height: 42px !important;
-        font-size: 0.9rem !important;
-        margin-bottom: 2px !important;
+        grid-area: vs !important;
+        width: 58px !important;
+        height: 58px !important;
+        min-width: 58px !important;
+        min-height: 58px !important;
+        font-size: 1.15rem !important;
+        margin: 0 !important;
     }
 
+    .vs-zone > #play-pause-btn { grid-area: pause !important; width: 100% !important; max-width: 175px !important; }
+    .vs-zone > form { grid-area: tie !important; width: 100% !important; max-width: 175px !important; }
+    .vs-zone > .rank-wrapper { grid-area: rank !important; width: 100% !important; max-width: 175px !important; position: static !important; }
+
     .pause-btn, .tie-btn, .central-rank-btn {
-        width: auto !important;
-        min-width: 160px !important;
-        padding: 5px 12px !important;
-        font-size: 0.72rem !important;
+        width: 100% !important;
+        padding: 5px 10px !important;
+        font-size: 0.75rem !important;
+        border-radius: 12px !important;
+        margin: 0 !important;
         text-align: center !important;
+        box-sizing: border-box !important;
     }
 
     .rank-wrapper {
-        width: auto !important;
         position: static !important;
     }
 
     .quit-wrapper { 
         margin-top: auto !important; 
-        margin-bottom: 10px !important; 
+        margin-bottom: 12px !important; 
     }
     
     .quit-btn { 
-        padding: 5px 16px !important; 
-        font-size: 0.8rem !important; 
+        padding: 6px 18px !important; 
+        font-size: 0.82rem !important; 
     }
     
-    .user-profile-container { top: 6px !important; right: 10px !important; }
+    .user-profile-container { top: 8px !important; right: 10px !important; }
 }
 
 /* =======================================================
