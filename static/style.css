@@ -142,12 +142,12 @@ h1 {
     background: rgba(0, 255, 102, 0.1);
     border: 1px solid var(--neon-green);
     color: var(--neon-green);
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 20px;
     text-align: center;
     font-weight: 600;
-    margin: 0 auto 20px auto;
-    max-width: 600px;
+    margin: 0 auto 15px auto;
+    max-width: 520px;
     box-shadow: 0 0 12px var(--neon-green-glow);
 }
 
@@ -407,7 +407,7 @@ h1 {
 
     body {
         padding: 8px 12px !important;
-        padding-top: 48px !important;
+        padding-top: 65px !important; /* Marge supérieure pour éviter le profil */
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -424,7 +424,7 @@ h1 {
 
     h1 {
         font-size: 1.15rem !important;
-        margin: 6px 0 4px 0 !important;
+        margin: 4px 0 !important;
     }
 
     .result-banner {
@@ -433,13 +433,14 @@ h1 {
         padding: 3px 10px !important;
         font-size: 0.72rem !important;
         margin: 0 auto 6px auto !important;
+        max-width: calc(100% - 110px) !important; /* Limite la largeur sous le profil */
     }
 
     .duel-zone {
         display: flex;
         flex-direction: column;
-        gap: 10px !important;
-        margin-top: 6px !important;
+        gap: 8px !important;
+        margin-top: 4px !important;
         width: 100%;
     }
 
@@ -451,8 +452,8 @@ h1 {
     }
 
     .pochette-wrapper, .pochette {
-        width: 78px !important;
-        height: 78px !important;
+        width: 75px !important;
+        height: 75px !important;
         margin-bottom: 0 !important;
     }
 
@@ -462,13 +463,13 @@ h1 {
 
     .vs-zone {
         gap: 4px 10px !important;
-        margin: 8px 0 !important;
+        margin: 6px 0 !important;
     }
 
     .vs-circle {
-        width: 52px !important;
-        height: 52px !important;
-        min-width: 52px !important;
+        width: 50px !important;
+        height: 50px !important;
+        min-width: 50px !important;
         font-size: 1rem !important;
     }
 
@@ -479,15 +480,15 @@ h1 {
 
     .quit-wrapper { 
         margin-top: auto !important; 
-        margin-bottom: 8px !important; 
+        margin-bottom: 12px !important; 
     }
     
     .quit-btn { 
-        padding: 6px 16px !important; 
+        padding: 6px 18px !important; 
         font-size: 0.8rem !important; 
     }
     
-    .user-profile-container { top: 6px !important; right: 10px !important; }
+    .user-profile-container { top: 8px !important; right: 10px !important; }
 }
 
 /* =======================================================
@@ -500,7 +501,7 @@ h1 {
     }
 
     body {
-        padding-top: 45px !important;
+        padding-top: 60px !important; /* Dégagement sous la pastille profil */
         padding-bottom: 15px !important;
         display: flex;
         flex-direction: column;
@@ -510,7 +511,7 @@ h1 {
 
     .container {
         width: 100% !important;
-        max-width: 950px !important;
+        max-width: 900px !important;
         height: 100%;
         display: flex;
         flex-direction: column;
@@ -518,73 +519,73 @@ h1 {
     }
 
     h1 {
-        font-size: 1.5rem !important;
-        margin: 4px 0 !important;
+        font-size: 1.3rem !important;
+        margin: 2px 0 !important;
     }
 
     .result-banner {
-        margin-bottom: 8px !important;
-        padding: 6px 14px !important;
-        font-size: 0.8rem !important;
+        margin: 0 auto 6px auto !important;
+        padding: 5px 12px !important;
+        font-size: 0.78rem !important;
+        max-width: calc(100% - 150px) !important; /* Évite de croiser le bouton profil */
     }
 
-    /* FORCER LE CÔTÉ-À-CÔTE HORIZONTAL AVEC FLEXBOX DYNAMIQUE */
+    /* FORCER LE CÔTÉ-À-CÔTE HORIZONTAL */
     .duel-zone {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 20px !important;
+        gap: 15px !important;
         width: 100% !important;
         flex: 1;
     }
 
-    /* Cartes fluides qui s'adaptent à la hauteur disponible */
     .track-card {
         flex: 1 1 0 !important;
-        max-width: 340px !important;
-        padding: 16px !important;
+        max-width: 300px !important;
+        padding: 12px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
     }
 
-    /* Taille de pochette dynamique : s'agrandit en portrait ouvert pour combler le vide */
+    /* Pochette fluide bridée à 160px max pour garder le bouton Quitter bien visible */
     .pochette-wrapper, .pochette {
-        width: clamp(130px, 20vh, 200px) !important;
-        height: clamp(130px, 20vh, 200px) !important;
-        margin-bottom: 10px !important;
+        width: clamp(110px, 15vh, 160px) !important;
+        height: clamp(110px, 15vh, 160px) !important;
+        margin-bottom: 6px !important;
     }
 
     .track-info {
         text-align: center !important;
     }
 
-    .track-info h2 { font-size: 1.05rem !important; margin: 4px 0 2px 0 !important; }
-    .track-info h3 { font-size: 0.85rem !important; }
-    .elo-display { font-size: 0.85rem !important; margin-top: 6px !important; }
+    .track-info h2 { font-size: 0.95rem !important; margin: 2px 0 !important; }
+    .track-info h3 { font-size: 0.8rem !important; }
+    .elo-display { font-size: 0.8rem !important; margin-top: 4px !important; }
 
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
-        gap: 12px !important;
+        gap: 8px !important;
         margin: 0 !important;
     }
 
     .vs-circle {
-        width: 52px !important;
-        height: 52px !important;
-        font-size: 1.1rem !important;
+        width: 46px !important;
+        height: 46px !important;
+        font-size: 1rem !important;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
-        padding: 8px 14px !important;
-        font-size: 0.8rem !important;
+        padding: 6px 12px !important;
+        font-size: 0.75rem !important;
     }
 
     .quit-wrapper {
         margin-top: auto !important;
-        margin-bottom: 5px !important;
+        margin-bottom: 10px !important;
     }
 }
 
