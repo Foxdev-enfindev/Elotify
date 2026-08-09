@@ -397,9 +397,9 @@ h1 {
 }
 
 /* =======================================================
-   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT STRIKTEMENT ÉTROIT < 480px)
+   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT ÉTROT - RATIO TÉLÉPHONE)
    ======================================================= */
-@media screen and (max-width: 479px) {
+@media screen and (max-width: 500px), screen and (max-aspect-ratio: 4/5) and (max-width: 600px) {
     html, body {
         height: 100dvh;
         overflow: hidden;
@@ -408,18 +408,18 @@ h1 {
     body {
         padding: 8px 12px !important;
         padding-top: 65px !important;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: space-between !important;
     }
 
     .container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        height: 100%;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        width: 100% !important;
+        height: 100% !important;
     }
 
     h1 {
@@ -436,19 +436,20 @@ h1 {
         max-width: calc(100% - 110px) !important;
     }
 
+    /* FORCER LE VRAI BLOC MOBILE ÉTROT */
     .duel-zone {
-        display: flex;
-        flex-direction: column;
+        display: flex !important;
+        flex-direction: column !important;
         gap: 8px !important;
         margin-top: 4px !important;
-        width: 100%;
+        width: 100% !important;
     }
 
-    /* Pochette à gauche, texte à droite */
     .track-card {
         padding: 8px 12px !important;
         flex-direction: row !important;
         gap: 10px !important;
+        width: 100% !important;
     }
 
     .pochette-wrapper, .pochette {
@@ -462,16 +463,30 @@ h1 {
     .elo-display { font-size: 0.75rem !important; margin-top: 2px !important; }
 
     .vs-zone {
+        display: grid !important;
+        grid-template-columns: auto 1fr !important;
+        grid-template-areas: 
+            "vs pause"
+            "vs tie"
+            "vs rank" !important;
+        align-items: center !important;
+        justify-items: center !important;
+        width: 100% !important;
         gap: 4px 10px !important;
         margin: 6px 0 !important;
     }
 
     .vs-circle {
+        grid-area: vs !important;
         width: 50px !important;
         height: 50px !important;
         min-width: 50px !important;
         font-size: 1rem !important;
     }
+
+    .vs-zone > #play-pause-btn { grid-area: pause !important; width: 100% !important; }
+    .vs-zone > form { grid-area: tie !important; width: 100% !important; }
+    .vs-zone > .rank-wrapper { grid-area: rank !important; width: 100% !important; position: static !important; }
 
     .pause-btn, .tie-btn, .central-rank-btn {
         padding: 5px 10px !important;
@@ -487,14 +502,12 @@ h1 {
         padding: 6px 18px !important; 
         font-size: 0.8rem !important; 
     }
-    
-    .user-profile-container { top: 8px !important; right: 10px !important; }
 }
 
 /* =======================================================
-   7. ÉCRAN OUVERT / TABLETTE / FOLD DÉPLIÉ (≥ 480px)
+   7. ÉCRAN OUVERT / TABLETTE / FOLD DÉPLIÉ (LARGE OU RATIO SQUARED)
    ======================================================= */
-@media screen and (min-width: 480px) {
+@media screen and (min-width: 501px) and (min-aspect-ratio: 4/5), screen and (min-width: 650px) {
     html, body {
         height: 100dvh;
         overflow: hidden;
@@ -531,10 +544,10 @@ h1 {
         max-width: calc(100% - 150px) !important;
     }
 
-    /* VERROUILLAGE STRICT DU CÔTÉ-À-CÔTE AU RECHARGEMENT */
+    /* FORCER LE CÔTÉ-À-CÔTE ABSOLU SUR FOLD DÉPLIÉ */
     .duel-zone {
         display: flex !important;
-        flex-direction: row !important; /* Force toujours les cartes à droite et à gauche */
+        flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
         gap: 15px !important;
@@ -572,7 +585,7 @@ h1 {
         justify-content: center !important;
         gap: 8px !important;
         margin: 0 !important;
-        flex-shrink: 0 !important; /* Empeche le VS de sauter ou glisser a gauche */
+        flex-shrink: 0 !important;
     }
 
     .vs-circle {
