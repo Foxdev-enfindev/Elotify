@@ -397,9 +397,9 @@ h1 {
 }
 
 /* =======================================================
-   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT ÉTROT - RATIO TÉLÉPHONE)
+   6. ÉCRAN FERMÉ (ÉCRAN EXTERNE ÉTROIT < 450px)
    ======================================================= */
-@media screen and (max-width: 500px), screen and (max-aspect-ratio: 4/5) and (max-width: 600px) {
+@media screen and (max-width: 449px) {
     html, body {
         height: 100dvh;
         overflow: hidden;
@@ -436,7 +436,6 @@ h1 {
         max-width: calc(100% - 110px) !important;
     }
 
-    /* FORCER LE VRAI BLOC MOBILE ÉTROT */
     .duel-zone {
         display: flex !important;
         flex-direction: column !important;
@@ -445,6 +444,7 @@ h1 {
         width: 100% !important;
     }
 
+    /* Pochette à gauche, texte à droite */
     .track-card {
         padding: 8px 12px !important;
         flex-direction: row !important;
@@ -505,9 +505,9 @@ h1 {
 }
 
 /* =======================================================
-   7. ÉCRAN OUVERT / TABLETTE / FOLD DÉPLIÉ (LARGE OU RATIO SQUARED)
+   7. ÉCRAN OUVERT (FOLD 8 / RATIO 4:3 / TABLETTE ≥ 450px)
    ======================================================= */
-@media screen and (min-width: 501px) and (min-aspect-ratio: 4/5), screen and (min-width: 650px) {
+@media screen and (min-width: 450px) {
     html, body {
         height: 100dvh;
         overflow: hidden;
@@ -544,10 +544,10 @@ h1 {
         max-width: calc(100% - 150px) !important;
     }
 
-    /* FORCER LE CÔTÉ-À-CÔTE ABSOLU SUR FOLD DÉPLIÉ */
+    /* FORCER L'ALIGNEMENT HORIZONTAL POUR LE FOLD DÉPLIÉ */
     .duel-zone {
         display: flex !important;
-        flex-direction: row !important;
+        flex-direction: row !important; /* Force la disposition horizontale */
         align-items: center !important;
         justify-content: center !important;
         gap: 15px !important;
