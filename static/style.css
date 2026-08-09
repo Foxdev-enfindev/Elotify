@@ -28,12 +28,12 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Permet le scroll naturel pour la sélection de playlist */
+    justify-content: flex-start;
     padding: 20px;
     box-sizing: border-box;
 }
 
-/* Applique le centrage et blocage de scroll UNIQUEMENT sur la page de duel */
+/* Blocage de scroll uniquement sur la page de duel */
 body.duel-body {
     justify-content: center !important;
     height: 100dvh !important;
@@ -186,14 +186,13 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: center;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 
 .track-card.active {
     border-color: var(--neon-green);
     box-shadow: 0 0 25px var(--neon-green-glow);
-    transform: translateY(-5px);
 }
 
 .pochette-wrapper {
@@ -367,7 +366,7 @@ h1 {
 }
 
 /* =======================================================
-   5. SELECTION PLAYLISTS (SCROLL PARFAITEMENT AUTORISÉ)
+   5. SELECTION PLAYLISTS
    ======================================================= */
 .playlists-container, .ranking-container {
     width: 100%;
@@ -403,9 +402,9 @@ h1 {
 }
 
 /* =======================================================
-   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT CLASSIQUE < 450px)
+   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT FERMÉ < 580px)
    ======================================================= */
-@media screen and (max-width: 449px) {
+@media screen and (max-width: 579px) {
     body.duel-body {
         padding: 8px 12px !important;
         padding-top: 65px !important;
@@ -424,7 +423,7 @@ h1 {
     }
 
     h1 {
-        font-size: 1.15rem !important;
+        font-size: 1.2rem !important;
         margin: 4px 0 !important;
     }
 
@@ -432,7 +431,7 @@ h1 {
         height: 32px !important;
         min-height: 32px !important;
         padding: 3px 10px !important;
-        font-size: 0.72rem !important;
+        font-size: 0.75rem !important;
         margin: 0 auto 6px auto !important;
         max-width: calc(100% - 110px) !important;
     }
@@ -440,27 +439,28 @@ h1 {
     .duel-zone {
         display: flex !important;
         flex-direction: column !important;
-        gap: 8px !important;
-        margin-top: 4px !important;
+        gap: 12px !important;
+        margin-top: 6px !important;
         width: 100% !important;
     }
 
+    /* Pochette à gauche, texte à droite */
     .track-card {
-        padding: 8px 12px !important;
+        padding: 10px 14px !important;
         flex-direction: row !important;
-        gap: 10px !important;
+        gap: 12px !important;
         width: 100% !important;
     }
 
     .pochette-wrapper, .pochette {
-        width: 75px !important;
-        height: 75px !important;
+        width: 85px !important;
+        height: 85px !important;
         margin-bottom: 0 !important;
     }
 
-    .track-info h2 { font-size: 0.95rem !important; margin: 2px 0 !important; }
-    .track-info h3 { font-size: 0.78rem !important; }
-    .elo-display { font-size: 0.75rem !important; margin-top: 2px !important; }
+    .track-info h2 { font-size: 1rem !important; margin: 2px 0 !important; }
+    .track-info h3 { font-size: 0.82rem !important; }
+    .elo-display { font-size: 0.8rem !important; margin-top: 4px !important; }
 
     .vs-zone {
         display: grid !important;
@@ -472,16 +472,16 @@ h1 {
         align-items: center !important;
         justify-items: center !important;
         width: 100% !important;
-        gap: 4px 10px !important;
-        margin: 6px 0 !important;
+        gap: 6px 12px !important;
+        margin: 8px 0 !important;
     }
 
     .vs-circle {
         grid-area: vs !important;
-        width: 50px !important;
-        height: 50px !important;
-        min-width: 50px !important;
-        font-size: 1rem !important;
+        width: 56px !important;
+        height: 56px !important;
+        min-width: 56px !important;
+        font-size: 1.1rem !important;
     }
 
     .vs-zone > #play-pause-btn { grid-area: pause !important; width: 100% !important; }
@@ -489,8 +489,8 @@ h1 {
     .vs-zone > .rank-wrapper { grid-area: rank !important; width: 100% !important; position: static !important; }
 
     .pause-btn, .tie-btn, .central-rank-btn {
-        padding: 5px 10px !important;
-        font-size: 0.72rem !important;
+        padding: 6px 12px !important;
+        font-size: 0.78rem !important;
     }
 
     .quit-wrapper { 
@@ -500,19 +500,19 @@ h1 {
     
     .quit-btn { 
         padding: 6px 18px !important; 
-        font-size: 0.8rem !important; 
+        font-size: 0.85rem !important; 
     }
     
     .user-profile-container { top: 8px !important; right: 10px !important; }
 }
 
 /* =======================================================
-   7. ÉCRAN OUVERT (FOLD 8 / RATIO 4:3 / TABLETTE ≥ 450px)
+   7. ÉCRAN OUVERT (FOLD DÉPLIÉ / TABLETTE ≥ 580px)
    ======================================================= */
-@media screen and (min-width: 450px) {
+@media screen and (min-width: 580px) {
     body.duel-body {
-        padding-top: 55px !important;
-        padding-bottom: 10px !important;
+        padding-top: 60px !important;
+        padding-bottom: 15px !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
@@ -521,7 +521,7 @@ h1 {
 
     body.duel-body .container {
         width: 100% !important;
-        max-width: 850px !important;
+        max-width: 950px !important;
         height: auto !important;
         display: flex !important;
         flex-direction: column !important;
@@ -530,81 +530,83 @@ h1 {
     }
 
     h1 {
-        font-size: 1.25rem !important;
-        margin: 2px 0 6px 0 !important;
+        font-size: 1.5rem !important;
+        margin: 2px 0 10px 0 !important;
     }
 
     .result-banner {
-        margin: 0 auto 10px auto !important;
-        padding: 4px 12px !important;
-        font-size: 0.75rem !important;
+        margin: 0 auto 12px auto !important;
+        padding: 6px 16px !important;
+        font-size: 0.82rem !important;
         max-width: calc(100% - 150px) !important;
     }
 
+    /* DUEL ZONE AÉRÉE (CÔTÉ-À-CÔTE) */
     .duel-zone {
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 15px !important;
+        gap: 25px !important;
         width: 100% !important;
         flex: 0 0 auto !important;
     }
 
     .track-card {
-        flex: 0 1 280px !important;
-        padding: 10px !important;
+        flex: 0 1 320px !important;
+        padding: 15px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         box-sizing: border-box !important;
     }
 
+    /* Pochettes plus grandes pour meubler l'écran ouvert */
     .pochette-wrapper, .pochette {
-        width: 130px !important;
-        height: 130px !important;
-        margin-bottom: 6px !important;
+        width: 170px !important;
+        height: 170px !important;
+        margin-bottom: 10px !important;
     }
 
     .track-info {
         text-align: center !important;
     }
 
-    .track-info h2 { font-size: 0.9rem !important; margin: 2px 0 !important; }
-    .track-info h3 { font-size: 0.78rem !important; }
-    .elo-display { font-size: 0.78rem !important; margin-top: 3px !important; }
+    .track-info h2 { font-size: 1.05rem !important; margin: 4px 0 2px 0 !important; }
+    .track-info h3 { font-size: 0.88rem !important; }
+    .elo-display { font-size: 0.85rem !important; margin-top: 6px !important; }
 
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 6px !important;
+        gap: 10px !important;
         margin: 0 !important;
         flex-shrink: 0 !important;
-        min-width: 130px !important;
+        min-width: 140px !important;
     }
 
     .vs-circle {
-        width: 44px !important;
-        height: 44px !important;
-        font-size: 0.95rem !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 1.1rem !important;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
-        padding: 5px 10px !important;
-        font-size: 0.72rem !important;
+        padding: 7px 14px !important;
+        font-size: 0.78rem !important;
     }
 
     .quit-wrapper {
-        margin-top: 12px !important;
+        margin-top: 20px !important;
         margin-bottom: 0 !important;
         flex-shrink: 0 !important;
     }
 
     .quit-btn {
-        padding: 5px 16px !important;
-        font-size: 0.78rem !important;
+        padding: 7px 20px !important;
+        font-size: 0.85rem !important;
     }
 }
 
@@ -766,14 +768,13 @@ h1 {
 }
 
 /* =======================================================
-   10. FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE
+   10. FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE (SANS SAUT FLEXBOX)
    ======================================================= */
 .track-card.voted-winner {
-    transform: scale(1.04) !important;
     border-color: var(--neon-green) !important;
-    box-shadow: 0 0 30px var(--neon-green-glow), 0 0 10px var(--neon-green) !important;
+    box-shadow: 0 0 35px var(--neon-green-glow), 0 0 12px var(--neon-green) !important;
     opacity: 1 !important;
-    transition: transform 0.15s ease-out, border-color 0.15s ease-out, box-shadow 0.15s ease-out !important;
+    transition: border-color 0.15s ease-out, box-shadow 0.15s ease-out !important;
 }
 
 .track-card.voted-loser,
@@ -785,5 +786,5 @@ h1 {
 }
 
 .vs-zone.tie-active {
-    transform: scale(1.05);
+    opacity: 0.8;
 }
