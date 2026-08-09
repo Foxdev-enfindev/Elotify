@@ -1,7 +1,7 @@
 /* =======================================================
-   1. STYLES GÉNÉRAUX & THÈME NÉON (PC / DESKTOP)
+   1. STYLES GÉNÉRAUX & PALETTES THÈMES
    ======================================================= */
-:root {
+:root, [data-theme="green"] {
     --bg-color: #0d0d0d;
     --card-bg: #181818;
     --neon-green: #00ff66;
@@ -9,6 +9,21 @@
     --text-color: #ffffff;
     --text-muted: #b3b3b3;
     --danger-color: #ff3366;
+}
+
+[data-theme="cyan"] {
+    --neon-green: #00f0ff;
+    --neon-green-glow: rgba(0, 240, 255, 0.4);
+}
+
+[data-theme="pink"] {
+    --neon-green: #ff007f;
+    --neon-green-glow: rgba(255, 0, 127, 0.4);
+}
+
+[data-theme="orange"] {
+    --neon-green: #ff9900;
+    --neon-green-glow: rgba(255, 153, 0, 0.4);
 }
 
 * {
@@ -40,11 +55,11 @@ body.duel-body {
     overflow: hidden !important;
     padding: 0 !important;
     margin: 0 !important;
-    display: block !important; /* On annule le flex sur le body pour éviter le recalcul Android */
+    display: block !important;
 }
 
 /* =======================================================
-   2. EN-TÊTE, PROFIL & BANNIÈRE DE RÉSULTAT
+   2. EN-TÊTE, PROFIL, MENU THÈME & BANNIÈRE RÉSULTAT
    ======================================================= */
 h1 {
     font-size: 2.2rem;
@@ -114,7 +129,7 @@ h1 {
     background: var(--card-bg);
     border: 1px solid #333;
     border-radius: 12px;
-    width: 180px;
+    width: 190px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     overflow: hidden;
 }
@@ -143,11 +158,50 @@ h1 {
     margin: 0;
 }
 
+/* STYLES DU SÉLECTEUR DE THÈME DANS LE MENU */
+.theme-selector-wrapper {
+    padding: 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.theme-label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.theme-dots {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.theme-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-dot:hover {
+    transform: scale(1.15);
+    border-color: #ffffff;
+}
+
+.dot-green { background: #00ff66; }
+.dot-cyan { background: #00f0ff; }
+.dot-pink { background: #ff007f; }
+.dot-orange { background: #ff9900; }
+
 .profile-dropdown .logout-link:hover {
     color: var(--danger-color);
 }
 
-/* BANNIÈRE DE RÉSULTAT : HAUTEUR FISE PERMANENTE */
+/* BANNIÈRE DE RÉSULTAT : HAUTEUR FIXE PERMANENTE */
 .result-banner {
     background: rgba(0, 255, 102, 0.1);
     border: 1px solid var(--neon-green);
@@ -423,10 +477,10 @@ h1 {
         right: 0 !important;
         margin: auto !important;
         height: 100% !important;
-        padding: 85px 12px 16px 12px !important; /* <- 1. Descend tout l'ensemble */
+        padding: 85px 12px 16px 12px !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-evenly !important; /* <- 2. Aère haut / milieu / bas */
+        justify-content: space-evenly !important;
         align-items: center !important;
         box-sizing: border-box !important;
     }
@@ -450,7 +504,7 @@ h1 {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        gap: 12px !important; /* <- 3. Espacement entre cartes et VS */
+        gap: 12px !important;
         width: 100% !important;
     }
 
@@ -535,7 +589,6 @@ h1 {
    7. ÉCRAN OUVERT (FOLD DÉPLIÉ / TABLETTE ≥ 480px)
    ======================================================= */
 @media screen and (min-width: 480px) {
-    /* POSITIONNEMENT ABSOLU DU CONTENEUR POUR VERROUILLER LA HAUTEUR VIRTULLE ANDROID */
     body.duel-body .container {
         position: absolute !important;
         top: 0 !important;
@@ -548,7 +601,7 @@ h1 {
         padding: 50px 15px 15px 15px !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-evenly !important; /* Distribue l'espace vertical de façon permanente */
+        justify-content: space-evenly !important;
         align-items: center !important;
         box-sizing: border-box !important;
     }
