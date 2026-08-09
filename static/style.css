@@ -397,9 +397,9 @@ h1 {
 }
 
 /* =======================================================
-   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT CLASSIQUE < 550px)
+   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT STRIKTEMENT ÉTROIT < 480px)
    ======================================================= */
-@media screen and (max-width: 549px) {
+@media screen and (max-width: 479px) {
     html, body {
         height: 100dvh;
         overflow: hidden;
@@ -407,7 +407,7 @@ h1 {
 
     body {
         padding: 8px 12px !important;
-        padding-top: 65px !important; /* Marge supérieure pour éviter le profil */
+        padding-top: 65px !important;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -433,7 +433,7 @@ h1 {
         padding: 3px 10px !important;
         font-size: 0.72rem !important;
         margin: 0 auto 6px auto !important;
-        max-width: calc(100% - 110px) !important; /* Limite la largeur sous le profil */
+        max-width: calc(100% - 110px) !important;
     }
 
     .duel-zone {
@@ -492,30 +492,31 @@ h1 {
 }
 
 /* =======================================================
-   7. ÉCRAN OUVERT (PORTRAIT & PAYSAGE / FOLD / TABLETTE ≥ 550px)
+   7. ÉCRAN OUVERT / TABLETTE / FOLD DÉPLIÉ (≥ 480px)
    ======================================================= */
-@media screen and (min-width: 550px) {
+@media screen and (min-width: 480px) {
     html, body {
         height: 100dvh;
         overflow: hidden;
     }
 
     body {
-        padding-top: 60px !important; /* Dégagement sous la pastille profil */
+        padding-top: 60px !important;
         padding-bottom: 15px !important;
-        display: flex;
-        flex-direction: column;
+        display: flex !important;
+        flex-direction: column !important;
         justify-content: space-between !important;
-        align-items: center;
+        align-items: center !important;
     }
 
     .container {
         width: 100% !important;
         max-width: 900px !important;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: center !important;
     }
 
     h1 {
@@ -527,18 +528,18 @@ h1 {
         margin: 0 auto 6px auto !important;
         padding: 5px 12px !important;
         font-size: 0.78rem !important;
-        max-width: calc(100% - 150px) !important; /* Évite de croiser le bouton profil */
+        max-width: calc(100% - 150px) !important;
     }
 
-    /* FORCER LE CÔTÉ-À-CÔTE HORIZONTAL */
+    /* VERROUILLAGE STRICT DU CÔTÉ-À-CÔTE AU RECHARGEMENT */
     .duel-zone {
         display: flex !important;
-        flex-direction: row !important;
+        flex-direction: row !important; /* Force toujours les cartes à droite et à gauche */
         align-items: center !important;
         justify-content: center !important;
         gap: 15px !important;
         width: 100% !important;
-        flex: 1;
+        flex: 1 1 auto !important;
     }
 
     .track-card {
@@ -550,7 +551,6 @@ h1 {
         align-items: center !important;
     }
 
-    /* Pochette fluide bridée à 160px max pour garder le bouton Quitter bien visible */
     .pochette-wrapper, .pochette {
         width: clamp(110px, 15vh, 160px) !important;
         height: clamp(110px, 15vh, 160px) !important;
@@ -568,8 +568,11 @@ h1 {
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
         gap: 8px !important;
         margin: 0 !important;
+        flex-shrink: 0 !important; /* Empeche le VS de sauter ou glisser a gauche */
     }
 
     .vs-circle {
