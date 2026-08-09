@@ -991,3 +991,91 @@ body:has(.ranking-container) {
 .vs-zone.tie-active {
     transform: scale(1.05);
 }
+
+/* =======================================================
+   OPTIMISATIONS GALAXY FOLD (FORMAT PASSEPORT / LARGE & COURT)
+   ======================================================= */
+
+/* 1. ÉCRAN INTERNE DÉPLIÉ (Format passeport / Hauteur réduite) */
+@media screen and (min-width: 550px) and (max-height: 700px) {
+    body {
+        padding-top: 50px !important;
+        padding-bottom: 10px !important;
+        height: 100dvh !important;
+        overflow: hidden !important; /* Pas de scroll vertical */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .container {
+        max-width: 95% !important;
+        margin: 0 auto;
+        padding: 0 !important;
+    }
+
+    h1 {
+        font-size: 1.2rem !important;
+        margin: 2px 0 !important;
+    }
+
+    .duel-zone {
+        display: flex !important;
+        flex-direction: row !important; /* Cartes côte à côte */
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 12px !important;
+    }
+
+    /* Compaction des cartes en hauteur */
+    .track-card {
+        max-width: 280px !important;
+        padding: 8px 10px !important;
+    }
+
+    .pochette-wrapper img {
+        max-height: 130px !important; /* Pochettes plus petites pour tenir dans la faible hauteur */
+        width: auto !important;
+        object-fit: contain;
+    }
+
+    .track-info h2 {
+        font-size: 0.85rem !important;
+        margin: 2px 0 !important;
+    }
+
+    .track-info h3 {
+        font-size: 0.75rem !important;
+    }
+
+    .elo-display {
+        font-size: 0.75rem !important;
+        margin-top: 2px !important;
+    }
+
+    .vs-zone {
+        gap: 6px !important;
+    }
+
+    .quit-wrapper {
+        margin-top: 4px !important;
+        margin-bottom: 4px !important;
+    }
+}
+
+/* 2. ÉCRAN EXTERNE FERMÉ (Format passeport plus large) */
+@media screen and (max-width: 549px) {
+    body {
+        padding-top: 55px !important;
+        padding-bottom: 10px !important;
+        min-height: 100dvh !important;
+    }
+
+    .track-card {
+        padding: 10px !important;
+    }
+
+    .pochette-wrapper img {
+        max-height: 160px !important;
+    }
+}
