@@ -24,7 +24,7 @@
         </div>
         <div class="profile-dropdown" id="profileDropdown">
             <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
-	    <a href="{{ url_for('stats') }}">🎤 Stats Groupes</a>
+            <a href="{{ url_for('stats') }}">🎤 Stats Groupes</a>
             <hr>
             <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
         </div>
@@ -68,7 +68,7 @@
                 
                 <button id="play-pause-btn" class="pause-btn" onclick="togglePlayPause()">⏸️ Pause</button>
                 
-                <form action="{{ url_for('vote') }}" method="POST">
+                <form action="{{ url_for('vote') }}" method="POST" onsubmit="applyVoteFeedback('tie')">
                     <input type="hidden" name="id_a" value="{{ track_a.id }}">
                     <input type="hidden" name="id_b" value="{{ track_b.id }}">
                     <input type="hidden" name="outcome" value="0.5">
@@ -137,6 +137,30 @@
             }
         }
 
+        // --- ANIMATION VISUELLE IMMÉDIATE AU VOTE ---
+        function applyVoteFeedback(winnerCardNumber) {
+            const card1 = document.getElementById('card-1');
+            const card2 = document.getElementById('card-2');
+            const vsZone = document.querySelector('.vs-zone');
+
+            // Bloque tous les clics secondaires pendant la soumission
+            document.body.style.pointerEvents = 'none';
+
+            if (winnerCardNumber === '1') {
+                card1.classList.add('voted-winner');
+                card2.classList.add('voted-loser');
+            } else if (winnerCardNumber === '2') {
+                card2.classList.add('voted-winner');
+                card1.classList.add('voted-loser');
+            } else if (winnerCardNumber === 'tie') {
+                card1.classList.add('voted-loser');
+                card2.classList.add('voted-loser');
+                if (vsZone) vsZone.classList.add('tie-active');
+            }
+
+            if (vsZone) vsZone.classList.add('voting-in-progress');
+        }
+
         // Clic / Tap sur la carte
         function handleCardClick(cardNumber, uri, formId, event) {
             const card = document.getElementById('card-' + cardNumber);
@@ -147,6 +171,7 @@
                     event.stopPropagation();
                     playCard(cardNumber, uri);
                 } else {
+                    applyVoteFeedback(cardNumber);
                     document.getElementById(formId).submit();
                 }
             }
@@ -155,7 +180,9 @@
         // Clic direct sur le bouton overlay (Vote direct PC)
         function handleVoteClick(cardNumber, formId, event) {
             const card = document.getElementById('card-' + cardNumber);
-            if (isTouchDevice && !card.classList.contains('active')) {
+            if (!isTouchDevice) {
+                applyVoteFeedback(cardNumber);
+            } else if (!card.classList.contains('active')) {
                 event.preventDefault();
                 event.stopPropagation();
                 const uri = cardNumber === '1' ? '{{ track_a.uri }}' : '{{ track_b.uri }}';

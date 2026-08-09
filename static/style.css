@@ -964,3 +964,30 @@ body:has(.ranking-container) {
         font-size: 0.95rem !important;
     }
 }
+
+/* =======================================================
+   FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE
+   ======================================================= */
+
+/* Carte gagnante : zoom + glow vert instantané */
+.track-card.voted-winner {
+    transform: scale(1.04) !important;
+    border-color: var(--neon-green) !important;
+    box-shadow: 0 0 30px var(--neon-green-glow), 0 0 10px var(--neon-green) !important;
+    opacity: 1 !important;
+    transition: all 0.15s ease-out !important;
+}
+
+/* Carte perdante / zone VS : assombrissement + désactivation clics */
+.track-card.voted-loser,
+.vs-zone.voting-in-progress {
+    opacity: 0.35 !important;
+    filter: grayscale(60%);
+    pointer-events: none !important; /* Empêche les double-clics */
+    transition: all 0.15s ease-out !important;
+}
+
+/* En cas de match nul */
+.vs-zone.tie-active {
+    transform: scale(1.05);
+}
