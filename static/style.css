@@ -397,7 +397,7 @@ h1 {
 }
 
 /* =======================================================
-   6. ÉCRAN FERMÉ (ÉCRAN EXTERNE ÉTROIT < 450px)
+   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT CLASSIQUE < 450px)
    ======================================================= */
 @media screen and (max-width: 449px) {
     html, body {
@@ -502,6 +502,8 @@ h1 {
         padding: 6px 18px !important; 
         font-size: 0.8rem !important; 
     }
+    
+    .user-profile-container { top: 8px !important; right: 10px !important; }
 }
 
 /* =======================================================
@@ -509,64 +511,65 @@ h1 {
    ======================================================= */
 @media screen and (min-width: 450px) {
     html, body {
-        height: 100dvh;
-        overflow: hidden;
+        height: 100dvh !important;
+        overflow: hidden !important;
     }
 
     body {
-        padding-top: 60px !important;
-        padding-bottom: 15px !important;
+        padding-top: 55px !important;
+        padding-bottom: 10px !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
+        justify-content: center !important;
         align-items: center !important;
     }
 
     .container {
         width: 100% !important;
-        max-width: 900px !important;
-        height: 100% !important;
+        max-width: 850px !important;
+        height: auto !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important;
+        justify-content: center !important;
         align-items: center !important;
     }
 
     h1 {
-        font-size: 1.3rem !important;
-        margin: 2px 0 !important;
+        font-size: 1.25rem !important;
+        margin: 2px 0 6px 0 !important;
     }
 
     .result-banner {
-        margin: 0 auto 6px auto !important;
-        padding: 5px 12px !important;
-        font-size: 0.78rem !important;
+        margin: 0 auto 10px auto !important;
+        padding: 4px 12px !important;
+        font-size: 0.75rem !important;
         max-width: calc(100% - 150px) !important;
     }
 
-    /* FORCER L'ALIGNEMENT HORIZONTAL POUR LE FOLD DÉPLIÉ */
+    /* DUEL ZONE COMPACTE (CÔTÉ-À-CÔTE NATIVE) */
     .duel-zone {
         display: flex !important;
-        flex-direction: row !important; /* Force la disposition horizontale */
+        flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
         gap: 15px !important;
         width: 100% !important;
-        flex: 1 1 auto !important;
+        flex: 0 0 auto !important;
     }
 
     .track-card {
-        flex: 1 1 0 !important;
-        max-width: 300px !important;
-        padding: 12px !important;
+        flex: 0 1 280px !important;
+        padding: 10px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
+        box-sizing: border-box !important;
     }
 
+    /* Pochette compacte fixée */
     .pochette-wrapper, .pochette {
-        width: clamp(110px, 15vh, 160px) !important;
-        height: clamp(110px, 15vh, 160px) !important;
+        width: 130px !important;
+        height: 130px !important;
         margin-bottom: 6px !important;
     }
 
@@ -574,34 +577,43 @@ h1 {
         text-align: center !important;
     }
 
-    .track-info h2 { font-size: 0.95rem !important; margin: 2px 0 !important; }
-    .track-info h3 { font-size: 0.8rem !important; }
-    .elo-display { font-size: 0.8rem !important; margin-top: 4px !important; }
+    .track-info h2 { font-size: 0.9rem !important; margin: 2px 0 !important; }
+    .track-info h3 { font-size: 0.78rem !important; }
+    .elo-display { font-size: 0.78rem !important; margin-top: 3px !important; }
 
+    /* ZONE CENTRALE COMPACTE */
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 8px !important;
+        gap: 6px !important;
         margin: 0 !important;
         flex-shrink: 0 !important;
+        min-width: 130px !important;
     }
 
     .vs-circle {
-        width: 46px !important;
-        height: 46px !important;
-        font-size: 1rem !important;
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 0.95rem !important;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
-        padding: 6px 12px !important;
-        font-size: 0.75rem !important;
+        padding: 5px 10px !important;
+        font-size: 0.72rem !important;
     }
 
+    /* BOUTON QUITTER DIRECTEMENT RAPPROCHÉ DE LA ZONE DE DUEL */
     .quit-wrapper {
-        margin-top: auto !important;
-        margin-bottom: 10px !important;
+        margin-top: 12px !important;
+        margin-bottom: 0 !important;
+        flex-shrink: 0 !important;
+    }
+
+    .quit-btn {
+        padding: 5px 16px !important;
+        font-size: 0.78rem !important;
     }
 }
 
@@ -771,14 +783,14 @@ body:has(.ranking-container) {
 }
 
 /* =======================================================
-   10. FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE
+   10. FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE (SANS SAUT)
    ======================================================= */
 .track-card.voted-winner {
     transform: scale(1.04) !important;
     border-color: var(--neon-green) !important;
     box-shadow: 0 0 30px var(--neon-green-glow), 0 0 10px var(--neon-green) !important;
     opacity: 1 !important;
-    transition: all 0.15s ease-out !important;
+    transition: transform 0.15s ease-out, border-color 0.15s ease-out, box-shadow 0.15s ease-out !important;
 }
 
 .track-card.voted-loser,
@@ -786,7 +798,7 @@ body:has(.ranking-container) {
     opacity: 0.35 !important;
     filter: grayscale(60%);
     pointer-events: none !important;
-    transition: all 0.15s ease-out !important;
+    transition: opacity 0.15s ease-out, filter 0.15s ease-out !important;
 }
 
 .vs-zone.tie-active {
