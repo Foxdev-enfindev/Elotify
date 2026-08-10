@@ -56,15 +56,14 @@
         <!-- ZONE DE DUEL PRINCIPALE -->
         <div class="duel-zone">
             
-            <!-- MORCEAU 1 -->
-            <div class="track-card" id="card-a">
-                <div class="pochette-wrapper">
+            <!-- MORCEAU 1 (Actif par défaut au chargement) -->
+            <div class="track-card active" id="card-a">
+                <div class="pochette-wrapper" onclick="onCardClick('a', '{{ track_a.uri }}')">
                     <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
-                    <form action="{{ url_for('vote') }}" method="POST" class="vote-form" onsubmit="handleVote(event, 'a')">
+                    <form action="{{ url_for('vote') }}" method="POST" id="form-a" class="vote-form" onsubmit="handleVote(event, 'a')">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
                         <input type="hidden" name="id_b" value="{{ track_b.id }}">
                         <input type="hidden" name="outcome" value="1.0">
-                        <button type="submit" class="vote-btn-overlay" title="Voter pour {{ track_a.name }}"></button>
                     </form>
                 </div>
                 <div class="track-info">
@@ -93,13 +92,12 @@
 
             <!-- MORCEAU 2 -->
             <div class="track-card" id="card-b">
-                <div class="pochette-wrapper">
+                <div class="pochette-wrapper" onclick="onCardClick('b', '{{ track_b.uri }}')">
                     <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="pochette">
-                    <form action="{{ url_for('vote') }}" method="POST" class="vote-form" onsubmit="handleVote(event, 'b')">
+                    <form action="{{ url_for('vote') }}" method="POST" id="form-b" class="vote-form" onsubmit="handleVote(event, 'b')">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
                         <input type="hidden" name="id_b" value="{{ track_b.id }}">
                         <input type="hidden" name="outcome" value="0.0">
-                        <button type="submit" class="vote-btn-overlay" title="Voter pour {{ track_b.name }}"></button>
                     </form>
                 </div>
                 <div class="track-info">
@@ -119,18 +117,43 @@
 
     </div>
 
-    <!-- SCRIPTS INTERACTIFS -->
     <script>
-        // Lancement de la lecture automatique du premier extrait au chargement
+        let currentPlaying = 'a'; // Morceau 1 en cours par défaut
+
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('elotify_theme') || 'green';
             setTheme(savedTheme);
 
+            // Lecture automatique du premier morceau
             fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
-                .then(res => res.json())
-                .then(data => console.log('Lecture démarrée :', data))
-                .catch(err => console.error('Erreur lecture :', err));
+                .catch(err => console.error('Erreur lecture initial :', err));
         });
+
+        // GESTION DU CLIC SUR LA CARTE (LECTURE OU VOTE)
+        function onCardClick(trackKey, trackUri) {
+            const cardA = document.getElementById('card-a');
+            const cardB = document.getElementById('card-b');
+
+            if (currentPlaying === trackKey) {
+                // Si la carte est DÉJÀ active, le clic valide le vote !
+                document.getElementById('form-' + trackKey).submit();
+            } else {
+                // Si la carte n'est pas active, on bascule la musique et le surlignage néon
+                currentPlaying = trackKey;
+                
+                if (trackKey === 'a') {
+                    cardA.classList.add('active');
+                    cardB.classList.remove('active');
+                } else {
+                    cardB.classList.add('active');
+                    cardA.classList.remove('active');
+                }
+
+                // Lancement de la musique Spotify
+                fetch('/listen/' + trackUri, { method: 'POST' })
+                    .catch(err => console.error('Erreur changement piste :', err));
+            }
+        }
 
         function togglePause() {
             fetch('/toggle-pause', { method: 'POST' })
@@ -147,8 +170,7 @@
         }
 
         function toggleProfileDropdown() {
-            const dropdown = document.getElementById('profileDropdown');
-            dropdown.classList.toggle('show');
+            document.getElementById('profileDropdown').classList.toggle('show');
         }
 
         window.onclick = function(event) {

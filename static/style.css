@@ -271,10 +271,10 @@ h1 {
 }
 
 /* =======================================================
-   5. LAYOUT PAYSAGE (PAYSAGE OUVERT ET FERMÉ)
+   5. LAYOUT PAYSAGE (BOUTON QUITTER 100% VERROUILLÉ À L'ÉCRAN)
    ======================================================= */
 @media screen and (orientation: landscape) {
-    .header-zone { padding-top: 25px; }
+    .header-zone { padding-top: 30px; }
 
     .duel-zone {
         display: flex !important;
@@ -282,32 +282,32 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 900px !important;
-        gap: 14px !important;
+        max-width: 880px !important;
+        gap: 12px !important;
         flex: 1 !important;
     }
 
     .track-card {
         flex: 1 !important;
-        max-width: 320px !important;
-        padding: 6px 10px !important;
+        max-width: 300px !important;
+        padding: 6px 8px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
     }
 
-    /* Pochette dynamique réduite pour ne jamais masquer le bouton Quitter */
+    /* Pochette ultra-compacte en paysage pour empêcher le rejet du bouton Quitter */
     .pochette-wrapper, .pochette {
-        width: clamp(70px, 20vh, 120px) !important;
-        height: clamp(70px, 20vh, 120px) !important;
+        width: clamp(60px, 18vh, 100px) !important;
+        height: clamp(60px, 18vh, 100px) !important;
         margin-bottom: 2px !important;
         flex-shrink: 0 !important;
     }
 
     .track-info { text-align: center !important; width: 100% !important; }
-    .track-info h2 { font-size: 0.8rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
-    .track-info h3 { font-size: 0.7rem !important; color: var(--text-muted) !important; }
+    .track-info h2 { font-size: 0.78rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
+    .track-info h3 { font-size: 0.68rem !important; color: var(--text-muted) !important; }
     .elo-display { font-size: 0.65rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
 
     .vs-zone {
@@ -315,15 +315,15 @@ h1 {
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 5px !important;
-        width: 115px !important;
+        gap: 4px !important;
+        width: 110px !important;
         flex-shrink: 0 !important;
     }
 
     .vs-circle {
-        width: 38px !important;
-        height: 38px !important;
-        font-size: 0.85rem !important;
+        width: 36px !important;
+        height: 36px !important;
+        font-size: 0.8rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
