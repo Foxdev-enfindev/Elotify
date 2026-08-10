@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elotify K-Pop - Session terminée</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+</head>
+<body style="justify-content: center; align-items: center; text-align: center; min-height: 100dvh; padding: 20px 0;">
+
+    <div class="container" style="max-width: 500px; padding: 20px;">
+        <h1 style="font-size: 2rem; margin-bottom: 10px;">👋 À BIENTÔT ! 👋</h1>
+        
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">
+            Musique en pause. Voici le Top 5 actuel de ta playlist :
+        </p>
+
+        {% if top5 %}
+        <div class="ranking-list" style="margin-bottom: 25px; text-align: left;">
+            {% for track in top5 %}
+            <div class="ranking-item" style="padding: 8px 12px;">
+                <div class="rank-number">#{{ loop.index }}</div>
+                
+                {% if track.image_url %}
+                    <img src="{{ track.image_url }}" alt="Pochette" class="rank-img" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px;">
+                {% else %}
+                    <div class="rank-img rank-img-placeholder" style="width: 40px; height: 40px; min-width: 40px; min-height: 40px; font-size: 1rem;">🎵</div>
+                {% endif %}
+                
+                <div class="rank-details">
+                    <span class="rank-name" style="font-size: 0.85rem;">{{ track.name }}</span>
+                    <span class="rank-artist" style="font-size: 0.75rem;">{{ track.artist }}</span>
+                </div>
+                
+                <div class="rank-elo" style="font-size: 0.85rem;">{{ track.elo }} pts</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
+            <a href="{{ url_for('index') }}" class="nav-btn" style="padding: 12px 20px; font-size: 0.9rem; text-decoration: none; border-radius: 25px;">
+                ⚔️ Reprendre le duel
+            </a>
+            <a href="{{ url_for('liste_playlists') }}" class="pause-btn" style="padding: 12px 20px; font-size: 0.9rem; text-decoration: none; border-radius: 25px; text-align: center;">
+                📁 Changer de playlist
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

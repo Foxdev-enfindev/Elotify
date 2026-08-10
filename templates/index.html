@@ -292,14 +292,8 @@
         function hideTop5() { document.getElementById('top5-tooltip').classList.remove('visible'); }
 
         function handleQuit() {
-            fetch('/toggle-pause', { method: 'POST' })
-                .finally(() => {
-                    window.close();
-                    setTimeout(() => {
-                        window.location.replace("about:blank");
-                    }, 300);
-                });
-        }
+ 	   window.location.href = "{{ url_for('quit_app') }}";
+	}
 
         window.onload = function() {
             playCard('1', '{{ track_a.uri }}');

@@ -76,12 +76,13 @@ SPOTIPY_CLIENT_SECRET = os.environ.get('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = os.environ.get('SPOTIPY_REDIRECT_URI', 'https://elotify.onrender.com/callback')
 SCOPE = 'playlist-read-private playlist-read-collaborative user-read-playback-state user-modify-playback-state'
 
-def get_spotify_oauth():
+def get_spotify_oauth(show_dialog=False):
     return SpotifyOAuth(
         client_id=SPOTIPY_CLIENT_ID,
         client_secret=SPOTIPY_CLIENT_SECRET,
         redirect_uri=SPOTIPY_REDIRECT_URI,
         scope=SCOPE,
+        show_dialog=show_dialog,
         cache_handler=spotipy.cache_handler.FlaskSessionCacheHandler(session)
     )
 
@@ -250,9 +251,9 @@ def save_local_scores(scores_to_update):
 # --- ROUTES AUTHENTIFICATION ---
 @app.route('/login')
 def login():
-    sp_oauth = get_spotify_oauth()
+    sp_oauth = get_spotify_oauth(show_dialog=True)
     auth_url = sp_oauth.get_authorize_url()
-    return redirect(auth_url)
+    return render_template('login.html', auth_url=auth_url)
 
 @app.route('/callback')
 def callback():
@@ -265,7 +266,6 @@ def callback():
         sp = spotipy.Spotify(auth=token_info['access_token'])
         profile = get_user_profile_cached(sp)
         
-        # Récupération de la playlist active liée au compte Spotify
         active_playlist = get_user_active_playlist_db(profile.get('id')) if profile else None
         
         if active_playlist:
@@ -332,7 +332,6 @@ def select_playlist(playlist_id):
     session['selected_playlist_id'] = playlist_id
     session.pop('tracks_cache', None)
     
-    # Sauvegarde la playlist choisie en BDD pour ce compte Spotify
     if user_id:
         set_user_active_playlist_db(user_id, playlist_id)
         
@@ -351,7 +350,6 @@ def index():
     profile = get_user_profile_cached(sp)
     user_id = profile.get('id') if profile else None
 
-    # Tente de lire en session ou en BDD Neon
     playlist_id = session.get('selected_playlist_id')
     if not playlist_id and user_id:
         playlist_id = get_user_active_playlist_db(user_id)
@@ -363,7 +361,6 @@ def index():
 
     scores = load_local_scores()
 
-    # Rechargement automatique de la playlist si la session a été vidée
     if 'tracks_cache' not in session or not session['tracks_cache']:
         try:
             raw_items = []
@@ -585,6 +582,27 @@ def stats():
         total_tracks=len(tracks), 
         user=profile
     )
+
+# --- ROUTE PAGE DE SORTIE AVEC CLASSEMENT ---
+@app.route('/quit')
+def quit_app():
+    sp = get_spotify_client()
+    if sp:
+        try:
+            playback = sp.current_playback()
+            if playback and playback.get('is_playing'):
+                sp.pause_playback()
+        except Exception as e:
+            print(f"⚠️ Erreur lors de la mise en pause à la sortie : {e}")
+
+    scores = load_local_scores()
+    tracks = list(scores.values())
+    tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
+    top5 = tracks[:5]
+
+    session.pop('tracks_cache', None)
+    
+    return render_template('quit.html', top5=top5)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
