@@ -34,17 +34,19 @@ body.duel-body {
 }
 
 /* =======================================================
-   2. STRUCTURE EN GRILLE FIXE (VERROUILLE LE BOUTON QUITTER EN BAS)
+   2. CONTENEUR FLEX RIGIDE (VERROUILLAGE D'ÉCRAN)
    ======================================================= */
 .container {
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-    padding: 8px 12px;
-    display: grid !important;
-    grid-template-rows: auto 1fr auto !important; /* Header / Cartes au milieu / Quitter en bas */
-    row-gap: 6px !important;
+    padding: 6px 12px;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     box-sizing: border-box;
+    overflow: hidden !important;
 }
 
 .header-zone {
@@ -53,7 +55,8 @@ body.duel-body {
     flex-direction: column;
     align-items: center;
     position: relative;
-    padding-top: 28px;
+    padding-top: 26px;
+    flex-shrink: 0 !important;
 }
 
 .user-profile-container {
@@ -69,15 +72,15 @@ body.duel-body {
     gap: 6px;
     background: rgba(24, 24, 24, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 4px 10px;
+    padding: 3px 8px;
     border-radius: 20px;
     cursor: pointer;
 }
 
-.user-avatar, .user-avatar-placeholder { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
-.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-.user-name { font-size: 0.8rem; font-weight: 600; }
-.arrow-down { font-size: 0.65rem; color: var(--text-muted); }
+.user-avatar, .user-avatar-placeholder { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
+.user-name { font-size: 0.75rem; font-weight: 600; }
+.arrow-down { font-size: 0.6rem; color: var(--text-muted); }
 
 .profile-dropdown {
     display: none;
@@ -87,7 +90,7 @@ body.duel-body {
     background: var(--card-bg);
     border: 1px solid #333;
     border-radius: 12px;
-    width: 180px;
+    width: 170px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     overflow: hidden;
 }
@@ -104,7 +107,7 @@ body.duel-body {
 .dot-green { background: #00ff66; } .dot-cyan { background: #00f0ff; } .dot-pink { background: #ff007f; } .dot-orange { background: #ff9900; }
 
 h1 {
-    font-size: clamp(1.1rem, 2.2vh, 1.7rem);
+    font-size: clamp(1rem, 2vh, 1.5rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 10px var(--neon-green-glow);
@@ -113,10 +116,9 @@ h1 {
     text-align: center;
 }
 
-/* BANNIÈRE HAUTEUR FIXE RÉSERVÉE */
 .result-banner-wrapper {
-    height: 32px;
-    min-height: 32px;
+    height: 28px;
+    min-height: 28px;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -128,17 +130,16 @@ h1 {
     background: rgba(0, 255, 102, 0.12) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 3px 14px !important;
-    border-radius: 16px !important;
+    padding: 2px 12px !important;
+    border-radius: 14px !important;
     text-align: center !important;
     font-weight: 600 !important;
-    font-size: clamp(0.72rem, 1.3vh, 0.85rem) !important;
+    font-size: clamp(0.68rem, 1.2vh, 0.82rem) !important;
     box-shadow: 0 0 10px var(--neon-green-glow) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     max-width: 95% !important;
-    visibility: visible;
 }
 
 .result-banner.hidden {
@@ -149,22 +150,22 @@ h1 {
 }
 
 /* =======================================================
-   3. CARTES ET BOUTONS
+   3. CARTES ET BOUTONS DE DUEL
    ======================================================= */
 .track-card {
     background: var(--card-bg);
     border: 2px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    border-radius: 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
 }
 
 .track-card.active, .track-card:hover {
     border-color: var(--neon-green) !important;
-    box-shadow: 0 0 18px var(--neon-green-glow) !important;
+    box-shadow: 0 0 15px var(--neon-green-glow) !important;
 }
 
-.pochette-wrapper { position: relative; border-radius: 12px; overflow: hidden; cursor: pointer; }
+.pochette-wrapper { position: relative; border-radius: 10px; overflow: hidden; cursor: pointer; }
 .pochette { width: 100%; height: 100%; object-fit: cover; }
 .vote-form { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
@@ -174,10 +175,10 @@ h1 {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 6px 0 !important;
-    border-radius: 16px !important;
+    padding: 5px 0 !important;
+    border-radius: 14px !important;
     font-weight: 800 !important;
-    font-size: 0.75rem !important;
+    font-size: 0.72rem !important;
     cursor: pointer !important;
     text-decoration: none !important;
     display: flex !important;
@@ -192,16 +193,17 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-bottom: 4px;
+    flex-shrink: 0 !important;
+    padding-bottom: 2px;
 }
 
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 7px 0 !important;
-    border-radius: 16px !important;
-    font-size: 0.8rem !important;
+    padding: 6px 0 !important;
+    border-radius: 14px !important;
+    font-size: 0.78rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 8px rgba(255, 51, 102, 0.4) !important;
@@ -209,7 +211,7 @@ h1 {
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    width: 130px !important;
+    width: 120px !important;
 }
 
 /* =======================================================
@@ -222,41 +224,42 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 450px !important;
-        gap: 8px !important;
-        height: 100% !important;
+        max-width: 440px !important;
+        gap: 6px !important;
+        flex: 1 1 auto !important;
+        min-height: 0 !important; /* Autorise la réduction de la zone de duel */
     }
 
     .track-card {
         width: 100% !important;
-        padding: 8px 12px !important;
+        padding: 6px 10px !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 12px !important;
+        gap: 10px !important;
     }
 
-    .pochette-wrapper, .pochette { width: clamp(65px, 9vh, 85px) !important; height: clamp(65px, 9vh, 85px) !important; flex-shrink: 0 !important; }
+    .pochette-wrapper, .pochette { width: clamp(55px, 8vh, 75px) !important; height: clamp(55px, 8vh, 75px) !important; flex-shrink: 0 !important; }
     .track-info { text-align: left !important; flex: 1 !important; }
-    .track-info h2 { font-size: 0.88rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
-    .track-info h3 { font-size: 0.75rem !important; color: var(--text-muted) !important; }
-    .elo-display { font-size: 0.72rem !important; margin-top: 2px !important; color: var(--neon-green) !important; }
+    .track-info h2 { font-size: 0.82rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
+    .track-info h3 { font-size: 0.72rem !important; color: var(--text-muted) !important; }
+    .elo-display { font-size: 0.68rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 55px 1fr !important;
+        grid-template-columns: 50px 1fr !important;
         grid-template-areas: "circle pause" "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 250px !important;
-        gap: 4px 10px !important;
+        max-width: 240px !important;
+        gap: 3px 8px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 55px !important;
-        height: 55px !important;
-        font-size: 1rem !important;
+        width: 50px !important;
+        height: 50px !important;
+        font-size: 0.95rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -275,7 +278,7 @@ h1 {
    5. LAYOUT PAYSAGE (PAYSAGE OUVERT ET FERMÉ)
    ======================================================= */
 @media screen and (orientation: landscape) {
-    .header-zone { padding-top: 20px; }
+    .header-zone { padding-top: 15px; }
 
     .duel-zone {
         display: flex !important;
@@ -283,15 +286,16 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 880px !important;
-        gap: 12px !important;
-        height: 100% !important;
+        max-width: 850px !important;
+        gap: 10px !important;
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
     }
 
     .track-card {
         flex: 1 !important;
-        max-width: 300px !important;
-        padding: 6px 8px !important;
+        max-width: 280px !important;
+        padding: 4px 6px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -299,31 +303,31 @@ h1 {
     }
 
     .pochette-wrapper, .pochette {
-        width: clamp(55px, 16vh, 95px) !important;
-        height: clamp(55px, 16vh, 95px) !important;
+        width: clamp(50px, 14vh, 85px) !important;
+        height: clamp(50px, 14vh, 85px) !important;
         margin-bottom: 2px !important;
         flex-shrink: 0 !important;
     }
 
     .track-info { text-align: center !important; width: 100% !important; }
-    .track-info h2 { font-size: 0.78rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
-    .track-info h3 { font-size: 0.68rem !important; color: var(--text-muted) !important; }
-    .elo-display { font-size: 0.65rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
+    .track-info h2 { font-size: 0.75rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
+    .track-info h3 { font-size: 0.65rem !important; color: var(--text-muted) !important; }
+    .elo-display { font-size: 0.62rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
 
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 4px !important;
-        width: 110px !important;
+        gap: 3px !important;
+        width: 100px !important;
         flex-shrink: 0 !important;
     }
 
     .vs-circle {
-        width: 36px !important;
-        height: 36px !important;
-        font-size: 0.8rem !important;
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.75rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -335,7 +339,7 @@ h1 {
 }
 
 /* =======================================================
-   6. STYLES CORRIGÉS DE LA PAGE DE SORTIE (QUIT.HTML)
+   6. PAGE DE SORTIE (QUIT.HTML)
    ======================================================= */
 body.quit-body {
     overflow-y: auto !important;
@@ -386,7 +390,6 @@ body.quit-body {
     min-width: 25px;
 }
 
-/* DIMENTIONS DE SÉCURITÉ POUR ÉVITER LE ZOOM DES IMAGES */
 .top5-img {
     width: 48px !important;
     height: 48px !important;
