@@ -49,7 +49,7 @@ body {
     box-sizing: border-box;
 }
 
-/* Verrouillage strict sous Android */
+/* Verrouillage strict de la page duel */
 body.duel-body {
     height: 100vh !important;
     height: 100dvh !important;
@@ -69,7 +69,7 @@ h1 {
     font-size: clamp(1.1rem, 2.5vh, 2.2rem);
     font-weight: 800;
     text-align: center;
-    margin: 0 0 1vh 0;
+    margin: 0;
     color: var(--neon-green);
     text-shadow: 0 0 10px var(--neon-green-glow);
     letter-spacing: 2px;
@@ -77,8 +77,8 @@ h1 {
 
 .user-profile-container {
     position: fixed;
-    top: 2vh;
-    right: 2vw;
+    top: 15px;
+    right: 20px;
     z-index: 1000;
 }
 
@@ -89,14 +89,14 @@ h1 {
     background: rgba(24, 24, 24, 0.95);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 0.8vh 1.2vw;
+    padding: 6px 14px;
     border-radius: 30px;
     cursor: pointer;
 }
 
 .user-avatar, .user-avatar-placeholder {
-    width: clamp(26px, 3.5vh, 36px);
-    height: clamp(26px, 3.5vh, 36px);
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -109,7 +109,7 @@ h1 {
     font-size: 0.8rem;
 }
 
-.user-name { font-size: clamp(0.75rem, 1.2vh, 0.9rem); font-weight: 600; }
+.user-name { font-size: 0.85rem; font-weight: 600; }
 .arrow-down { font-size: 0.7rem; color: var(--text-muted); }
 
 .profile-dropdown {
@@ -120,7 +120,7 @@ h1 {
     background: var(--card-bg);
     border: 1px solid #333;
     border-radius: 12px;
-    width: clamp(160px, 15vw, 200px);
+    width: 180px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     overflow: hidden;
 }
@@ -129,7 +129,7 @@ h1 {
 
 .profile-dropdown a {
     display: block;
-    padding: 1.2vh 1vw;
+    padding: 10px 14px;
     color: var(--text-color);
     text-decoration: none;
     font-size: 0.85rem;
@@ -138,7 +138,7 @@ h1 {
 .profile-dropdown a:hover { background: #282828; color: var(--neon-green); }
 .profile-dropdown hr { border: none; border-top: 1px solid #333; margin: 0; }
 
-.theme-selector-wrapper { padding: 1vh 1vw; display: flex; flex-direction: column; gap: 0.5vh; }
+.theme-selector-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 5px; }
 .theme-label { font-size: 0.75rem; color: var(--text-muted); }
 .theme-dots { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .theme-dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; }
@@ -148,30 +148,33 @@ h1 {
 .dot-pink { background: #ff007f; }
 .dot-orange { background: #ff9900; }
 
+/* BANNIÈRE DE RÉSULTAT EN POSITION ABSOLUE POUR NE PAS POUSSER LE BOUTON QUITTER */
 .result-banner {
-    background: rgba(0, 255, 102, 0.08) !important;
+    position: absolute !important;
+    top: 10px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: rgba(0, 0, 0, 0.85) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 0.5vh 2vw !important;
-    border-radius: 8px !important;
+    padding: 4px 14px !important;
+    border-radius: 20px !important;
     text-align: center !important;
     font-weight: 600 !important;
-    margin: 0 auto 1vh auto !important;
-    width: 90% !important;
-    max-width: 900px !important;
-    height: clamp(26px, 4vh, 38px) !important;
+    width: auto !important;
+    max-width: 80% !important;
+    height: 28px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    box-shadow: 0 0 10px var(--neon-green-glow) !important;
+    box-shadow: 0 0 12px var(--neon-green-glow) !important;
     box-sizing: border-box !important;
-    font-size: clamp(0.68rem, 1.2vh, 0.85rem) !important;
+    font-size: clamp(0.68rem, 1.2vh, 0.8rem) !important;
+    z-index: 100 !important;
 }
 
 .result-banner:empty, .result-banner.hidden {
-    visibility: hidden !important;
-    border-color: transparent !important;
-    background: transparent !important;
+    display: none !important;
 }
 
 .container {
@@ -183,10 +186,11 @@ h1 {
     align-items: center;
     justify-content: space-between;
     box-sizing: border-box;
+    position: relative;
 }
 
 /* =======================================================
-   3. CARTES ET BOUTONS (BASE UNIVERSELLE RELATIVE)
+   3. BASE CARTES ET BOUTONS UNIFORMES
    ======================================================= */
 .track-card {
     background: var(--card-bg);
@@ -207,7 +211,7 @@ h1 {
 .vote-form { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 .vote-btn-overlay { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.2); border: none; cursor: pointer; }
 
-/* BOUTONS ET LIENS FLUIDES */
+/* UNIFORMISATION STRICTE DES BOUTONS CENTRAUX */
 .pause-btn, 
 .tie-btn, 
 .central-rank-btn, 
@@ -215,18 +219,19 @@ a.central-rank-btn {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 1vh 0 !important;
+    padding: 8px 0 !important;
     border-radius: 20px !important;
     font-weight: 800 !important;
-    font-size: clamp(0.7rem, 1.2vh, 0.85rem) !important;
+    font-size: clamp(0.7rem, 1.2vh, 0.82rem) !important;
     cursor: pointer !important;
     text-decoration: none !important;
-    display: inline-flex !important;
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     box-shadow: 0 0 10px var(--neon-green-glow) !important;
     transition: transform 0.2s ease !important;
-    width: 100% !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
 }
 
 .pause-btn:hover, .tie-btn:hover, .central-rank-btn:hover, a.central-rank-btn:hover {
@@ -238,13 +243,14 @@ a.central-rank-btn {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 1vh;
 }
 
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 1vh 0 !important;
+    padding: 8px 0 !important;
     border-radius: 20px !important;
     font-size: clamp(0.72rem, 1.3vh, 0.85rem) !important;
     font-weight: 800 !important;
@@ -254,15 +260,15 @@ a.central-rank-btn {
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    width: clamp(120px, 30%, 180px) !important;
+    width: clamp(130px, 25%, 170px) !important;
 }
 
 /* =======================================================
-   4. LAYOUT PORTRAIT (TOUTES LES TAILLES D'ÉCRANS EN PORTRAIT)
+   4. LAYOUT PORTRAIT
    ======================================================= */
 @media screen and (orientation: portrait) {
     .container {
-        padding-top: 6vh;
+        padding-top: 5vh;
         padding-bottom: 2vh;
     }
 
@@ -329,13 +335,13 @@ a.central-rank-btn {
         box-shadow: 0 0 15px var(--neon-green-glow) !important;
     }
 
-    .vs-zone > #play-pause-btn { grid-area: pause !important; }
-    .vs-zone > form { grid-area: tie !important; }
-    .vs-zone > a.central-rank-btn { grid-area: rank !important; }
+    .vs-zone > #play-pause-btn { grid-area: pause !important; width: 100% !important; }
+    .vs-zone > form { grid-area: tie !important; width: 100% !important; }
+    .vs-zone > a.central-rank-btn { grid-area: rank !important; width: 100% !important; }
 }
 
 /* =======================================================
-   5. LAYOUT PAYSAGE (TOUTES LES TAILLES D'ÉCRANS EN PAYSAGE)
+   5. LAYOUT PAYSAGE (TAILLE DES BOUTONS STRICTEMENT ÉGALE)
    ======================================================= */
 @media screen and (orientation: landscape) {
     .container {
@@ -365,8 +371,8 @@ a.central-rank-btn {
     }
 
     .pochette-wrapper, .pochette {
-        width: clamp(80px, 28vh, 220px) !important;
-        height: clamp(80px, 28vh, 220px) !important;
+        width: clamp(75px, 26vh, 200px) !important;
+        height: clamp(75px, 26vh, 200px) !important;
         margin-bottom: 1vh !important;
         flex-shrink: 0 !important;
     }
@@ -376,9 +382,9 @@ a.central-rank-btn {
         width: 100% !important;
     }
 
-    .track-info h2 { font-size: clamp(0.8rem, 2.2vh, 1.25rem) !important; margin: 0.3vh 0 !important; font-weight: 700 !important; }
-    .track-info h3 { font-size: clamp(0.7rem, 1.8vh, 0.9rem) !important; color: var(--text-muted) !important; }
-    .elo-display { font-size: clamp(0.68rem, 1.6vh, 0.85rem) !important; margin-top: 0.4vh !important; color: var(--neon-green) !important; }
+    .track-info h2 { font-size: clamp(0.8rem, 2.2vh, 1.2rem) !important; margin: 0.3vh 0 !important; font-weight: 700 !important; }
+    .track-info h3 { font-size: clamp(0.7rem, 1.8vh, 0.88rem) !important; color: var(--text-muted) !important; }
+    .elo-display { font-size: clamp(0.68rem, 1.6vh, 0.82rem) !important; margin-top: 0.4vh !important; color: var(--neon-green) !important; }
 
     .vs-zone {
         display: flex !important;
@@ -386,14 +392,14 @@ a.central-rank-btn {
         align-items: center !important;
         justify-content: center !important;
         gap: 1vh !important;
-        width: clamp(110px, 15vw, 170px) !important;
+        width: clamp(120px, 14vw, 160px) !important;
         flex-shrink: 0 !important;
     }
 
     .vs-circle {
-        width: clamp(42px, 9vh, 75px) !important;
-        height: clamp(42px, 9vh, 75px) !important;
-        font-size: clamp(0.85rem, 2.5vh, 1.4rem) !important;
+        width: clamp(40px, 8vh, 70px) !important;
+        height: clamp(40px, 8vh, 70px) !important;
+        font-size: clamp(0.85rem, 2.2vh, 1.3rem) !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -403,10 +409,108 @@ a.central-rank-btn {
         justify-content: center !important;
         box-shadow: 0 0 15px var(--neon-green-glow) !important;
     }
+
+    /* FORÇAGE DE LA LARGEUR À 100% DE LA VS-ZONE POUR QUE TOUS LES BOUTONS SOIENT IDENTIQUES */
+    .vs-zone > #play-pause-btn,
+    .vs-zone > form,
+    .vs-zone > a.central-rank-btn {
+        width: 100% !important;
+    }
+
+    .pause-btn, .tie-btn, .central-rank-btn, a.central-rank-btn {
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+    }
 }
 
 /* =======================================================
-   6. PAGES CLASSEMENT, STATS, PLAYLISTS
+   6. STYLES PAGE LOGIN (CARTE HABILLÉE ET CENTRÉE)
+   ======================================================= */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    width: 100%;
+    padding: 20px;
+}
+
+.login-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(0, 255, 102, 0.2);
+    border-radius: 24px;
+    padding: 40px 30px;
+    max-width: 420px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 255, 102, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.login-icon {
+    font-size: 3rem;
+    margin-bottom: -10px;
+}
+
+.login-subtitle {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    line-height: 1.4;
+}
+
+.login-features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin: 10px 0;
+}
+
+.feature-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    color: var(--text-color);
+}
+
+.login-btn {
+    background: var(--neon-green);
+    color: #0d0d0d;
+    font-weight: 800;
+    font-size: 0.95rem;
+    padding: 14px 24px;
+    border-radius: 30px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 0 15px var(--neon-green-glow);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.login-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 25px var(--neon-green-glow);
+}
+
+.spotify-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #0d0d0d;
+    border-radius: 50%;
+}
+
+/* =======================================================
+   7. CLASSEMENT & STATS
    ======================================================= */
 .ranking-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 55px 14px 40px 14px; }
 .nav-btn { display: inline-flex !important; align-items: center; justify-content: center; background: #181818 !important; color: var(--neon-green) !important; border: 1px solid var(--neon-green) !important; padding: 8px 16px !important; border-radius: 20px !important; font-weight: 600 !important; text-decoration: none !important; }
@@ -420,7 +524,7 @@ a.central-rank-btn {
 .rank-elo { font-size: 0.9rem !important; font-weight: 700 !important; color: var(--neon-green) !important; margin-left: auto !important; }
 
 /* =======================================================
-   7. FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE
+   8. FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE
    ======================================================= */
 .track-card.voted-winner {
     border-color: var(--neon-green) !important;

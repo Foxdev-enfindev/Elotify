@@ -1,30 +1,21 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elotify K-Pop - Connexion</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script>
-        (function() {
-            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        })();
-    </script>
-</head>
-<body style="justify-content: center; align-items: center; text-align: center; height: 100dvh;">
+{% extends "base.html" %}
 
-    <div class="container" style="max-width: 450px; padding: 20px;">
-        <h1 style="font-size: 2.2rem; margin-bottom: 10px;">⚔️ ELOTIFY ⚔️</h1>
-        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 30px;">
-            Classe tes morceaux Spotify préférés grâce aux duels Elo.
-        </p>
+{% block content %}
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="login-icon">🎧</div>
+        <h1>ELOTIFY DUEL</h1>
+        <p class="login-subtitle">Classe tes morceaux Spotify préférés grâce au système de duels Elo.</p>
+        
+        <div class="login-features">
+            <div class="feature-item">⚡ Duels instantanés 1v1</div>
+            <div class="feature-item">📊 Classements en temps réel</div>
+            <div class="feature-item">🎨 Thèmes personnalisables</div>
+        </div>
 
-        <a href="{{ auth_url }}" class="nav-btn" style="padding: 12px 28px; font-size: 1rem; border-radius: 25px; width: 100%;">
-            🟢 Se connecter avec Spotify
+        <a href="{{ url_for('login') }}" class="login-btn">
+            <span class="spotify-dot"></span> Se connecter avec Spotify
         </a>
     </div>
-
-</body>
-</html>
+</div>
+{% endblock %}
