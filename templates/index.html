@@ -94,13 +94,7 @@
                     <button type="submit" class="tie-btn">🤝 Match Nul</button>
                 </form>
 
-                <div class="rank-wrapper">
-                    <a href="{{ url_for('classement') }}" class="nav-btn central-rank-btn" onmouseenter="showTop5()" onmouseleave="hideTop5()">📊 Classement</a>
-                    <div id="top5-tooltip" class="top5-tooltip-box">
-                        <h3>⭐ TOP 5 GLOBAL ⭐</h3>
-                        <div id="top5-list">Chargement...</div>
-                    </div>
-                </div>
+                <a href="{{ url_for('classement') }}" class="central-rank-btn">📊 Classement</a>
             </div>
 
             <!-- --- CARTE 2 --- -->
