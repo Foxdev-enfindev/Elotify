@@ -23,23 +23,24 @@ html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     width: 100vw;
     height: 100vh;
-    height: 100dvh;
 }
 
 body.duel-body {
     overflow: hidden !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+    position: fixed;
+    width: 100%;
+    height: 100%;
 }
 
 /* =======================================================
-   2. CONTENEUR FLEX RIGIDE (VERROUILLAGE D'ÉCRAN)
+   2. CONTENEUR FIXE CADRÉ (VERROUILLAGE STRICT DU VIEWPORT)
    ======================================================= */
 .container {
-    width: 100vw;
-    height: 100vh;
-    height: 100dvh;
+    position: fixed !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
     padding: 6px 12px;
     display: flex !important;
     flex-direction: column !important;
@@ -107,7 +108,7 @@ body.duel-body {
 .dot-green { background: #00ff66; } .dot-cyan { background: #00f0ff; } .dot-pink { background: #ff007f; } .dot-orange { background: #ff9900; }
 
 h1 {
-    font-size: clamp(1rem, 2vh, 1.5rem);
+    font-size: clamp(1rem, 2vh, 1.4rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 10px var(--neon-green-glow);
@@ -227,7 +228,7 @@ h1 {
         max-width: 440px !important;
         gap: 6px !important;
         flex: 1 1 auto !important;
-        min-height: 0 !important; /* Autorise la réduction de la zone de duel */
+        min-height: 0 !important;
     }
 
     .track-card {
@@ -239,7 +240,7 @@ h1 {
         gap: 10px !important;
     }
 
-    .pochette-wrapper, .pochette { width: clamp(55px, 8vh, 75px) !important; height: clamp(55px, 8vh, 75px) !important; flex-shrink: 0 !important; }
+    .pochette-wrapper, .pochette { width: clamp(50px, 7.5vh, 70px) !important; height: clamp(50px, 7.5vh, 70px) !important; flex-shrink: 0 !important; }
     .track-info { text-align: left !important; flex: 1 !important; }
     .track-info h2 { font-size: 0.82rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
     .track-info h3 { font-size: 0.72rem !important; color: var(--text-muted) !important; }
@@ -303,8 +304,8 @@ h1 {
     }
 
     .pochette-wrapper, .pochette {
-        width: clamp(50px, 14vh, 85px) !important;
-        height: clamp(50px, 14vh, 85px) !important;
+        width: clamp(45px, 13vh, 80px) !important;
+        height: clamp(45px, 13vh, 80px) !important;
         margin-bottom: 2px !important;
         flex-shrink: 0 !important;
     }
@@ -347,6 +348,7 @@ body.quit-body {
     padding: 20px 10px !important;
     display: flex !important;
     justify-content: center !important;
+    position: static !important;
 }
 
 .quit-page-container {
