@@ -121,7 +121,7 @@ def calculate_elo(elo_a, elo_b, outcome_a, k=32):
     return new_elo_a, new_elo_b
 
 def load_local_scores():
-    playlist_id = session.get('selected_playlist_id')
+    playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
     if not playlist_id or not DATABASE_URL:
         return session.get('local_scores_fallback', {})
 
@@ -180,7 +180,7 @@ def _save_to_db_async(playlist_id, scores_to_update):
         print(f"⚠️ Erreur sauvegarde asynchrone BDD Neon : {e}")
 
 def save_local_scores(scores_to_update):
-    playlist_id = session.get('selected_playlist_id')
+    playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
     if not playlist_id:
         return
 
@@ -191,7 +191,6 @@ def save_local_scores(scores_to_update):
         session.modified = True
         return
 
-    # Exécution dans un thread séparé pour supprimer toute latence lors du vote
     thread = threading.Thread(target=_save_to_db_async, args=(playlist_id, scores_to_update))
     thread.daemon = True
     thread.start()
@@ -207,27 +206,28 @@ def login():
 def callback():
     sp_oauth = get_spotify_oauth()
     
-    saved_playlist_id = session.get('selected_playlist_id')
-    session.clear()
+    saved_playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
     
-    if saved_playlist_id:
-        session['selected_playlist_id'] = saved_playlist_id
-        session.permanent = True
-        
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
     
     if token_info:
+        response = redirect(url_for('index') if saved_playlist_id else url_for('liste_playlists'))
         if saved_playlist_id:
-            return redirect(url_for('index'))
-        return redirect(url_for('liste_playlists'))
+            session['selected_playlist_id'] = saved_playlist_id
+            session.permanent = True
+            response.set_cookie('elotify_playlist_id', saved_playlist_id, max_age=30*24*3600)
+        return response
         
     return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    response = redirect(url_for('login'))
+    # Efface le cookie de playlist lors de la déconnexion
+    response.delete_cookie('elotify_playlist_id')
+    return response
 
 # --- ROUTE SELECTION PLAYLIST ---
 @app.route('/playlists')
@@ -271,8 +271,10 @@ def select_playlist(playlist_id):
     session.permanent = True
     session['selected_playlist_id'] = playlist_id
     session.pop('tracks_cache', None)
-    # Écrase l'entrée dans l'historique de navigation du navigateur
-    return '<script>window.location.replace("/");</script>'
+    
+    response = Flask.make_response(app, '<script>window.location.replace("/");</script>')
+    response.set_cookie('elotify_playlist_id', playlist_id, max_age=30*24*3600)
+    return response
 
 # --- ROUTE PRINCIPALE (DUEL) ---
 @app.route('/')
@@ -284,10 +286,11 @@ def index():
     if not sp:
         return redirect(url_for('login'))
 
-    playlist_id = session.get('selected_playlist_id')
+    playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
     if not playlist_id:
         return redirect(url_for('liste_playlists'))
 
+    session['selected_playlist_id'] = playlist_id
     scores = load_local_scores()
 
     if 'tracks_cache' not in session or not session['tracks_cache']:
@@ -296,7 +299,6 @@ def index():
             offset = 0
             limit = 100
 
-            # Pagination complète pour charger l'intégralité des titres
             while True:
                 results = sp.playlist_tracks(playlist_id, limit=limit, offset=offset)
                 items = results.get('items', []) if isinstance(results, dict) else []
@@ -336,12 +338,12 @@ def index():
                     
             session['tracks_cache'] = tracks
         except Exception as e:
-            print(f"⚠️ Erreur chargement titres playlist : {e}")
+            print(f"⚠️ Erreur rechargement titres : {e}")
             return redirect(url_for('liste_playlists'))
 
     tracks = session.get('tracks_cache', [])
     if len(tracks) < 2:
-        return f"La playlist sélectionnée ne contient pas assez de morceaux valides (morceaux trouvés: {len(tracks)}) pour réaliser un match.", 400
+        return f"La playlist sélectionnée ne contient pas assez de morceaux valides ({len(tracks)}) pour réaliser un match.", 400
 
     track_a, track_b = random.sample(tracks, 2)
 
@@ -403,10 +405,8 @@ def vote():
         }
     }
 
-    # Sauvegarde asynchrone (instantané pour l'utilisateur)
     save_local_scores(updated_scores)
 
-    # Mise à jour immédiate du cache de session
     for t in session.get('tracks_cache', []):
         if t['id'] == id_a:
             t['elo'] = new_elo_a
@@ -482,26 +482,20 @@ def api_top5():
     top5 = tracks[:5]
     return jsonify(top5)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
 @app.route('/stats')
 def stats():
     sp = get_spotify_client()
     if not sp:
         return redirect(url_for('login'))
 
-    playlist_id = session.get('selected_playlist_id')
+    playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
     if not playlist_id:
         return redirect(url_for('liste_playlists'))
 
     tracks = session.get('tracks_cache', [])
-    
-    # Si le cache est vide, on va charger la playlist via l'index d'abord
     if not tracks:
         return redirect(url_for('index'))
 
-    # Découpage des artistes pour compter chaque groupe séparément
     artist_counter = Counter()
     for t in tracks:
         artist_str = t.get('artist', '')
@@ -517,3 +511,6 @@ def stats():
         total_tracks=len(tracks), 
         user=get_user_profile_cached(sp)
     )
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
