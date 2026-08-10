@@ -53,11 +53,12 @@ def init_db():
             );
         """)
         
-        # Table des préférences utilisateurs (playlist active par compte)
+        # Table des préférences utilisateurs (playlist active + thème)
         cur.execute("""
             CREATE TABLE IF NOT EXISTS user_preferences (
                 user_id VARCHAR(255) PRIMARY KEY,
-                active_playlist_id VARCHAR(255)
+                active_playlist_id VARCHAR(255),
+                theme VARCHAR(50) DEFAULT 'green'
             );
         """)
         
@@ -121,7 +122,7 @@ def get_user_profile_cached(sp):
         print(f"⚠️ Erreur récupération profil : {e}")
         return session.get('user_profile')
 
-# --- GESTION DE LA PLAYLIST ACTIVE EN BDD (PAR COMPTE SPOTIFY) ---
+# --- GESTION DE LA PLAYLIST ACTIVE & PRÉFÉRENCES BDD ---
 def get_user_active_playlist_db(user_id):
     if not DATABASE_URL or not user_id:
         return None
@@ -282,6 +283,31 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
+# --- ROUTE CHANGEMENT DE THÈME (SYNCHRO MULTI-APPAREILS) ---
+@app.route('/set_theme/<theme_name>', methods=['POST'])
+def set_theme_route(theme_name):
+    session['theme'] = theme_name
+    sp = get_spotify_client()
+    if sp:
+        profile = get_user_profile_cached(sp)
+        user_id = profile.get('id') if profile else None
+        if user_id and DATABASE_URL:
+            try:
+                conn = get_db_connection()
+                cur = conn.cursor()
+                cur.execute("""
+                    INSERT INTO user_preferences (user_id, theme)
+                    VALUES (%s, %s)
+                    ON CONFLICT (user_id)
+                    DO UPDATE SET theme = EXCLUDED.theme;
+                """, (user_id, theme_name))
+                conn.commit()
+                cur.close()
+                conn.close()
+            except Exception as e:
+                print(f"⚠️ Erreur sauvegarde thème BDD : {e}")
+    return jsonify({"status": "success", "theme": theme_name})
+
 # --- ROUTE SELECTION PLAYLIST ---
 @app.route('/playlists')
 def liste_playlists():
@@ -349,6 +375,22 @@ def index():
 
     profile = get_user_profile_cached(sp)
     user_id = profile.get('id') if profile else None
+
+    # Chargement du thème utilisateur
+    current_theme = session.get('theme', 'green')
+    if DATABASE_URL and user_id:
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT theme FROM user_preferences WHERE user_id = %s;", (user_id,))
+            row = cur.fetchone()
+            if row and row[0]:
+                current_theme = row[0]
+                session['theme'] = current_theme
+            cur.close()
+            conn.close()
+        except Exception as e:
+            print(f"⚠️ Erreur lecture thème BDD : {e}")
 
     playlist_id = session.get('selected_playlist_id')
     if not playlist_id and user_id:
@@ -428,7 +470,8 @@ def index():
         track_a=track_a, 
         track_b=track_b, 
         dernier_resultat=dernier_resultat,
-        user=profile
+        user=profile,
+        current_theme=current_theme
     )
 
 # --- ROUTE VOTE ---

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="{{ current_theme if current_theme else 'green' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -108,7 +108,7 @@
 
         </div>
 
-        <!-- BOUTON QUITTER EN BAS -->
+        <!-- BOUTON QUITTER EN BAS DES CARTES -->
         <div class="quit-wrapper">
             <a href="{{ url_for('quit_app') }}" class="quit-btn">🚪 Quitter</a>
         </div>
@@ -119,9 +119,6 @@
         let currentPlaying = 'a';
 
         window.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
-            setTheme(savedTheme);
-
             fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
                 .catch(err => console.error('Erreur lecture initial :', err));
         });
@@ -131,11 +128,10 @@
             const cardB = document.getElementById('card-b');
 
             if (currentPlaying === trackKey) {
-                // Déclenche l'animation visuelle de victoire/défaite puis soumet le formulaire
                 triggerVoteAnimation(trackKey);
                 setTimeout(() => {
                     document.getElementById('form-' + trackKey).submit();
-                }, 150); // Petit délai de 150ms pour laisser le feedback visuel s'afficher
+                }, 150);
             } else {
                 currentPlaying = trackKey;
                 if (trackKey === 'a') {
@@ -203,7 +199,8 @@
 
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('elotify_theme', theme);
+            fetch('/set_theme/' + theme, { method: 'POST' })
+                .catch(err => console.error('Erreur sauvegarde thème BDD :', err));
         }
     </script>
 </body>
