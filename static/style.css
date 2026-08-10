@@ -73,8 +73,8 @@ h1 {
 
 .user-profile-container {
     position: fixed;
-    top: 15px;
-    right: 20px;
+    top: 20px;
+    right: 25px;
     z-index: 1000;
 }
 
@@ -206,15 +206,15 @@ h1 {
     background: rgba(0, 255, 102, 0.08) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 6px 16px !important;
+    padding: 8px 16px !important;
     border-radius: 8px !important;
     text-align: center !important;
     font-weight: 600 !important;
-    margin: 0 auto 10px auto !important;
+    margin: 0 auto 15px auto !important;
     width: 100% !important;
     max-width: 950px !important;
-    height: 38px !important;
-    min-height: 38px !important;
+    height: 40px !important;
+    min-height: 40px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -239,7 +239,7 @@ h1 {
 }
 
 /* =======================================================
-   BOUTONS CENTRAUX NÉON & QUITTER (DIMENSIONS DÉFAUT)
+   BOUTONS CENTRAUX NÉON & QUITTER (RÈGLES ET DIMS UNIFORMES)
    ======================================================= */
 .pause-btn, 
 .tie-btn, 
@@ -248,7 +248,7 @@ a.central-rank-btn {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 8px 0 !important;
+    padding: 10px 0 !important;
     border-radius: 20px !important;
     font-weight: 800 !important;
     font-size: 0.85rem !important;
@@ -259,9 +259,9 @@ a.central-rank-btn {
     justify-content: center !important;
     box-shadow: 0 0 12px var(--neon-green-glow) !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-    width: 160px !important;
-    min-width: 160px !important;
-    max-width: 160px !important;
+    width: 170px !important;
+    min-width: 170px !important;
+    max-width: 170px !important;
     box-sizing: border-box !important;
     text-align: center !important;
 }
@@ -274,21 +274,21 @@ a.central-rank-btn:hover {
     box-shadow: 0 0 20px var(--neon-green-glow) !important;
 }
 
-/* BOUTON QUITTER : MEMES DIMENSIONS */
+/* BOUTON QUITTER : MÊMES DIMENSIONS QUE LES BOUTONS CENTRAUX */
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 8px 0 !important;
+    padding: 10px 0 !important;
     border-radius: 20px !important;
     font-size: 0.85rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 12px rgba(255, 51, 102, 0.4) !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-    width: 160px !important;
-    min-width: 160px !important;
-    max-width: 160px !important;
+    width: 170px !important;
+    min-width: 170px !important;
+    max-width: 170px !important;
     box-sizing: border-box !important;
     text-align: center !important;
     display: inline-flex !important;
@@ -553,9 +553,9 @@ a.central-rank-btn:hover {
 }
 
 /* =======================================================
-   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT FERMÉ < 580px)
+   6. ÉCRAN FERMÉ (FOCUS SMARTPHONE / FOLD FERMÉ < 600px)
    ======================================================= */
-@media screen and (max-width: 580px) and (orientation: portrait) {
+@media screen and (max-width: 600px) {
     body.duel-body .container {
         position: absolute !important;
         top: 0 !important;
@@ -564,7 +564,7 @@ a.central-rank-btn:hover {
         right: 0 !important;
         margin: auto !important;
         height: 100% !important;
-        padding: 60px 10px 10px 10px !important;
+        padding: 65px 12px 12px 12px !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
@@ -573,14 +573,13 @@ a.central-rank-btn:hover {
     }
 
     h1 {
-        font-size: 1.15rem !important;
+        font-size: 1.2rem !important;
         margin: 0 !important;
     }
 
     .result-banner {
         height: 32px !important;
         min-height: 32px !important;
-        max-height: 32px !important;
         padding: 2px 8px !important;
         font-size: 0.72rem !important;
         margin: 0 auto !important;
@@ -595,14 +594,16 @@ a.central-rank-btn:hover {
         width: 100% !important;
     }
 
-    /* Cartes compactes horizontales */
+    /* Cartes compactes rangées horizontalement */
     .track-card {
         padding: 8px 12px !important;
+        display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         gap: 12px !important;
         width: 100% !important;
         min-width: unset !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
         background: var(--card-bg) !important;
         border: 2px solid transparent !important;
@@ -615,10 +616,10 @@ a.central-rank-btn:hover {
     }
 
     .pochette-wrapper, .pochette {
-        width: 70px !important;
-        height: 70px !important;
-        min-width: 70px !important;
-        min-height: 70px !important;
+        width: 72px !important;
+        height: 72px !important;
+        min-width: 72px !important;
+        min-height: 72px !important;
         margin-bottom: 0 !important;
         flex-shrink: 0 !important;
     }
@@ -628,41 +629,34 @@ a.central-rank-btn:hover {
         flex: 1 !important;
     }
 
-    .track-info h2 { 
-        font-size: 0.88rem !important; 
-        margin: 1px 0 !important; 
-    }
+    .track-info h2 { font-size: 0.9rem !important; margin: 1px 0 !important; }
+    .track-info h3 { font-size: 0.75rem !important; }
+    .elo-display { font-size: 0.72rem !important; margin-top: 2px !important; color: var(--neon-green) !important; }
 
-    .track-info h3 { 
-        font-size: 0.74rem !important; 
-    }
-
-    .elo-display { 
-        font-size: 0.72rem !important; 
-        margin-top: 2px !important; 
-        color: var(--neon-green) !important; 
-    }
-
-    /* Restructuration zone VS : rond à gauche, pile de boutons à droite */
+    /* ZONE VS : STRUCTURE STRICTEMENT EMPILÉE À DROITE DU CERCLE */
     .vs-zone {
-        display: flex !important;
-        flex-direction: row !important;
+        display: grid !important;
+        grid-template-columns: 56px 1fr !important;
+        grid-template-rows: auto auto auto !important;
+        grid-template-areas: 
+            "circle pause"
+            "circle tie"
+            "circle rank" !important;
         align-items: center !important;
-        justify-content: center !important;
+        justify-items: center !important;
         width: 100% !important;
-        gap: 12px !important;
+        max-width: 240px !important;
+        gap: 4px 10px !important;
         margin: 2px 0 !important;
-        padding: 0 !important;
-        box-sizing: border-box !important;
     }
 
     .vs-circle {
-        width: 54px !important;
-        height: 54px !important;
-        min-width: 54px !important;
-        min-height: 54px !important;
+        grid-area: circle !important;
+        width: 56px !important;
+        height: 56px !important;
+        min-width: 56px !important;
+        min-height: 56px !important;
         font-size: 1rem !important;
-        margin: 0 !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -673,45 +667,46 @@ a.central-rank-btn:hover {
         box-shadow: 0 0 12px var(--neon-green-glow) !important;
     }
 
-    /* Force l'empilement vertical à droite du rond */
-    .vs-zone > #play-pause-btn,
-    .vs-zone > form,
-    .vs-zone > .rank-wrapper {
-        display: block !important;
-        width: auto !important;
-    }
+    .vs-zone > #play-pause-btn { grid-area: pause !important; width: 100% !important; }
+    .vs-zone > form { grid-area: tie !important; width: 100% !important; }
+    .vs-zone > .rank-wrapper { grid-area: rank !important; width: 100% !important; position: static !important; }
 
+    /* Style des 3 boutons centraux */
     .pause-btn, 
     .tie-btn, 
     .central-rank-btn, 
     a.central-rank-btn {
-        width: 135px !important;
-        min-width: 135px !important;
-        max-width: 135px !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
         padding: 5px 0 !important;
         font-size: 0.72rem !important;
         font-weight: 800 !important;
         border-radius: 12px !important;
-        margin: 2px 0 !important;
+        margin: 0 !important;
         text-align: center !important;
         box-sizing: border-box !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         border: none !important;
         box-shadow: 0 0 8px var(--neon-green-glow) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
 
-    .quit-wrapper { 
-        margin-top: 0 !important; 
-        margin-bottom: 2px !important; 
-    }
+    .quit-wrapper { margin-top: 0 !important; }
     
     .quit-btn { 
-        width: 135px !important;
-        min-width: 135px !important;
-        max-width: 135px !important;
-        padding: 5px 0 !important; 
-        font-size: 0.78rem !important; 
+        width: 140px !important;
+        min-width: 140px !important;
+        padding: 6px 0 !important; 
+        font-size: 0.8rem !important;
+        background: var(--danger-color) !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 20px !important;
+        font-weight: 800 !important;
     }
     
     .user-profile-container { top: 6px !important; right: 8px !important; }
@@ -720,7 +715,7 @@ a.central-rank-btn:hover {
 /* =======================================================
    7. ÉCRAN OUVERT / TABLETTE / PAYSAGE
    ======================================================= */
-@media screen and (min-width: 581px) and (max-width: 900px), screen and (orientation: landscape) and (max-height: 800px) {
+@media screen and (min-width: 601px) and (max-width: 900px), screen and (orientation: landscape) and (max-height: 800px) {
     body.duel-body .container {
         position: absolute !important;
         top: 0 !important;
@@ -784,7 +779,6 @@ a.central-rank-btn:hover {
         box-shadow: 0 0 20px var(--neon-green-glow);
     }
 
-    /* Pochette ultra-adaptative en hauteur paysage */
     .pochette-wrapper, .pochette {
         width: clamp(80px, 18vh, 130px) !important;
         height: clamp(80px, 18vh, 130px) !important;
