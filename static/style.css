@@ -24,27 +24,26 @@ html, body {
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-    overflow: hidden;
 }
 
 body.duel-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    overflow: hidden !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 
 /* =======================================================
-   2. EN-TÊTE FIXE & EMPLACEMENT BANNIÈRE RÉSERVÉ
+   2. STRUCTURE EN GRILLE FIXE (VERROUILLE LE BOUTON QUITTER EN BAS)
    ======================================================= */
 .container {
     width: 100vw;
     height: 100vh;
     height: 100dvh;
     padding: 8px 12px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+    display: grid !important;
+    grid-template-rows: auto 1fr auto !important; /* Header / Cartes au milieu / Quitter en bas */
+    row-gap: 6px !important;
     box-sizing: border-box;
 }
 
@@ -54,7 +53,7 @@ body.duel-body {
     flex-direction: column;
     align-items: center;
     position: relative;
-    padding-top: 32px;
+    padding-top: 28px;
 }
 
 .user-profile-container {
@@ -75,7 +74,7 @@ body.duel-body {
     cursor: pointer;
 }
 
-.user-avatar, .user-avatar-placeholder { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+.user-avatar, .user-avatar-placeholder { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
 .user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
 .user-name { font-size: 0.8rem; font-weight: 600; }
 .arrow-down { font-size: 0.65rem; color: var(--text-muted); }
@@ -105,7 +104,7 @@ body.duel-body {
 .dot-green { background: #00ff66; } .dot-cyan { background: #00f0ff; } .dot-pink { background: #ff007f; } .dot-orange { background: #ff9900; }
 
 h1 {
-    font-size: clamp(1.1rem, 2.2vh, 1.8rem);
+    font-size: clamp(1.1rem, 2.2vh, 1.7rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 10px var(--neon-green-glow);
@@ -114,7 +113,7 @@ h1 {
     text-align: center;
 }
 
-/* HAUTEUR STRICTEMENT RÉSERVÉE : N'IMPACTE NULLEMENT LE RESTE DU LAYOUT */
+/* BANNIÈRE HAUTEUR FIXE RÉSERVÉE */
 .result-banner-wrapper {
     height: 32px;
     min-height: 32px;
@@ -122,7 +121,7 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .result-banner {
@@ -193,7 +192,7 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 2px;
+    padding-bottom: 4px;
 }
 
 .quit-btn {
@@ -225,7 +224,7 @@ h1 {
         width: 100% !important;
         max-width: 450px !important;
         gap: 8px !important;
-        flex: 1 !important;
+        height: 100% !important;
     }
 
     .track-card {
@@ -237,7 +236,7 @@ h1 {
         gap: 12px !important;
     }
 
-    .pochette-wrapper, .pochette { width: 75px !important; height: 75px !important; flex-shrink: 0 !important; }
+    .pochette-wrapper, .pochette { width: clamp(65px, 9vh, 85px) !important; height: clamp(65px, 9vh, 85px) !important; flex-shrink: 0 !important; }
     .track-info { text-align: left !important; flex: 1 !important; }
     .track-info h2 { font-size: 0.88rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
     .track-info h3 { font-size: 0.75rem !important; color: var(--text-muted) !important; }
@@ -276,7 +275,7 @@ h1 {
    5. LAYOUT PAYSAGE (PAYSAGE OUVERT ET FERMÉ)
    ======================================================= */
 @media screen and (orientation: landscape) {
-    .header-zone { padding-top: 25px; }
+    .header-zone { padding-top: 20px; }
 
     .duel-zone {
         display: flex !important;
@@ -286,7 +285,7 @@ h1 {
         width: 100% !important;
         max-width: 880px !important;
         gap: 12px !important;
-        flex: 1 !important;
+        height: 100% !important;
     }
 
     .track-card {
@@ -300,8 +299,8 @@ h1 {
     }
 
     .pochette-wrapper, .pochette {
-        width: clamp(60px, 18vh, 100px) !important;
-        height: clamp(60px, 18vh, 100px) !important;
+        width: clamp(55px, 16vh, 95px) !important;
+        height: clamp(55px, 16vh, 95px) !important;
         margin-bottom: 2px !important;
         flex-shrink: 0 !important;
     }
@@ -336,7 +335,106 @@ h1 {
 }
 
 /* =======================================================
-   6. FEEDBACK VISUEL DE VOTE
+   6. STYLES CORRIGÉS DE LA PAGE DE SORTIE (QUIT.HTML)
+   ======================================================= */
+body.quit-body {
+    overflow-y: auto !important;
+    min-height: 100vh !important;
+    padding: 20px 10px !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
+.quit-page-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.quit-subtitle {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    margin: 6px 0 16px 0;
+}
+
+.top5-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.top5-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.top5-rank {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--neon-green);
+    min-width: 25px;
+}
+
+/* DIMENTIONS DE SÉCURITÉ POUR ÉVITER LE ZOOM DES IMAGES */
+.top5-img {
+    width: 48px !important;
+    height: 48px !important;
+    max-width: 48px !important;
+    max-height: 48px !important;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.top5-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    flex: 1;
+}
+
+.top5-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.top5-artist {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.top5-elo {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--neon-green);
+    margin-left: auto;
+}
+
+.resume-btn {
+    background: var(--neon-green);
+    color: #0d0d0d;
+    font-weight: 800;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    box-shadow: 0 0 10px var(--neon-green-glow);
+}
+
+/* =======================================================
+   7. FEEDBACK VISUEL DE VOTE
    ======================================================= */
 .track-card.voted-winner {
     border-color: var(--neon-green) !important;
