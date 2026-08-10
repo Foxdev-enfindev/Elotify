@@ -22,25 +22,26 @@ html, body {
     color: var(--text-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     width: 100vw;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
 body.duel-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 100vh !important;
+    height: 100dvh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
 }
 
 /* =======================================================
-   2. CONTENEUR ET HEADER
+   2. EN-TÊTE ET BANNIÈRE FIXES (EMPECHE LES DÉCALAGES)
    ======================================================= */
 .container {
     width: 100vw;
     height: 100vh;
     height: 100dvh;
-    padding: 10px 15px;
+    padding: 12px 16px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -54,20 +55,22 @@ body.duel-body {
     flex-direction: column;
     align-items: center;
     position: relative;
+    padding-top: 5px;
 }
 
 h1 {
-    font-size: clamp(1.1rem, 2.2vh, 1.8rem);
+    font-size: clamp(1.3rem, 2.8vh, 2rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 10px var(--neon-green-glow);
     letter-spacing: 2px;
+    margin-bottom: 6px;
 }
 
 .user-profile-container {
     position: absolute;
     top: 0;
-    right: 5px;
+    right: 0;
     z-index: 1000;
 }
 
@@ -77,15 +80,15 @@ h1 {
     gap: 6px;
     background: rgba(24, 24, 24, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 20px;
     cursor: pointer;
 }
 
-.user-avatar, .user-avatar-placeholder { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
-.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
-.user-name { font-size: 0.8rem; font-weight: 600; }
-.arrow-down { font-size: 0.65rem; color: var(--text-muted); }
+.user-avatar, .user-avatar-placeholder { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+.user-name { font-size: 0.85rem; font-weight: 600; }
+.arrow-down { font-size: 0.7rem; color: var(--text-muted); }
 
 .profile-dropdown {
     display: none;
@@ -95,7 +98,7 @@ h1 {
     background: var(--card-bg);
     border: 1px solid #333;
     border-radius: 12px;
-    width: 170px;
+    width: 180px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     overflow: hidden;
 }
@@ -106,57 +109,73 @@ h1 {
 .profile-dropdown hr { border: none; border-top: 1px solid #333; margin: 0; }
 
 .theme-selector-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 4px; }
-.theme-label { font-size: 0.72rem; color: var(--text-muted); }
+.theme-label { font-size: 0.75rem; color: var(--text-muted); }
 .theme-dots { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; }
 .dot-green { background: #00ff66; } .dot-cyan { background: #00f0ff; } .dot-pink { background: #ff007f; } .dot-orange { background: #ff9900; }
 
-/* BANNIÈRE DE RÉSULTAT COMPACTE */
+/* EMPLACEMENT AVEC HAUTEUR RÉSERVÉE FIXE POUR LA BANNIÈRE */
+.result-banner-wrapper {
+    height: 32px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .result-banner {
-    background: rgba(0, 255, 102, 0.1) !important;
+    background: rgba(0, 255, 102, 0.12) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 2px 10px !important;
-    border-radius: 15px !important;
+    padding: 4px 16px !important;
+    border-radius: 20px !important;
     text-align: center !important;
     font-weight: 600 !important;
-    font-size: clamp(0.65rem, 1.2vh, 0.8rem) !important;
-    margin-top: 4px !important;
+    font-size: clamp(0.75rem, 1.4vh, 0.9rem) !important;
+    box-shadow: 0 0 10px var(--neon-green-glow) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 90% !important;
 }
-.result-banner:empty, .result-banner.hidden { display: none !important; }
+
+.result-banner.hidden {
+    visibility: hidden !important;
+    border-color: transparent !important;
+    background: transparent !important;
+}
 
 /* =======================================================
-   3. CARTES ET BOUTONS DE BASE
+   3. CARTES ET BOUTONS
    ======================================================= */
 .track-card {
     background: var(--card-bg);
     border: 2px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
 }
 
 .track-card.active, .track-card:hover {
     border-color: var(--neon-green) !important;
-    box-shadow: 0 0 15px var(--neon-green-glow) !important;
+    box-shadow: 0 0 18px var(--neon-green-glow) !important;
 }
 
-.pochette-wrapper { position: relative; border-radius: 10px; overflow: hidden; cursor: pointer; }
+.pochette-wrapper { position: relative; border-radius: 12px; overflow: hidden; cursor: pointer; }
 .pochette { width: 100%; height: 100%; object-fit: cover; }
 .vote-form { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 .vote-btn-overlay { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.2); border: none; cursor: pointer; }
 
-/* HARMONISATION DES BOUTONS CENTRAUX */
 .vs-zone form { width: 100% !important; }
 
 .pause-btn, .tie-btn, .central-rank-btn, a.central-rank-btn {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 6px 0 !important;
-    border-radius: 16px !important;
+    padding: 7px 0 !important;
+    border-radius: 18px !important;
     font-weight: 800 !important;
-    font-size: 0.75rem !important;
+    font-size: 0.78rem !important;
     cursor: pointer !important;
     text-decoration: none !important;
     display: flex !important;
@@ -171,27 +190,28 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-bottom: 4px;
 }
 
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 6px 0 !important;
-    border-radius: 16px !important;
-    font-size: 0.78rem !important;
+    padding: 8px 0 !important;
+    border-radius: 18px !important;
+    font-size: 0.82rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
-    box-shadow: 0 0 8px rgba(255, 51, 102, 0.4) !important;
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.4) !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    width: 130px !important;
+    width: 140px !important;
 }
 
 /* =======================================================
-   4. MEDIA QUERY PORTRAIT
+   4. LAYOUT PORTRAIT (< 600px)
    ======================================================= */
 @media screen and (orientation: portrait) {
     .duel-zone {
@@ -200,41 +220,41 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 450px !important;
-        gap: 10px !important;
+        max-width: 460px !important;
+        gap: 12px !important;
         flex: 1 !important;
     }
 
     .track-card {
         width: 100% !important;
-        padding: 8px 12px !important;
+        padding: 10px 14px !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 12px !important;
+        gap: 14px !important;
     }
 
-    .pochette-wrapper, .pochette { width: 75px !important; height: 75px !important; flex-shrink: 0 !important; }
+    .pochette-wrapper, .pochette { width: 80px !important; height: 80px !important; flex-shrink: 0 !important; }
     .track-info { text-align: left !important; flex: 1 !important; }
-    .track-info h2 { font-size: 0.9rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
-    .track-info h3 { font-size: 0.75rem !important; color: var(--text-muted) !important; }
-    .elo-display { font-size: 0.72rem !important; margin-top: 2px !important; color: var(--neon-green) !important; }
+    .track-info h2 { font-size: 0.95rem !important; margin: 2px 0 !important; font-weight: 700 !important; }
+    .track-info h3 { font-size: 0.78rem !important; color: var(--text-muted) !important; }
+    .elo-display { font-size: 0.75rem !important; margin-top: 2px !important; color: var(--neon-green) !important; }
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 55px 1fr !important;
+        grid-template-columns: 60px 1fr !important;
         grid-template-areas: "circle pause" "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 250px !important;
-        gap: 4px 10px !important;
+        max-width: 260px !important;
+        gap: 5px 12px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 55px !important;
-        height: 55px !important;
-        font-size: 1rem !important;
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.1rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -250,7 +270,7 @@ h1 {
 }
 
 /* =======================================================
-   5. MEDIA QUERY PAYSAGE (TAILLES STRICTEMENT VROUILLÉES)
+   5. LAYOUT PAYSAGE (TAILLES STRICTEMENT VROUILLÉES)
    ======================================================= */
 @media screen and (orientation: landscape) {
     .duel-zone {
@@ -259,22 +279,21 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 900px !important;
-        gap: 15px !important;
+        max-width: 920px !important;
+        gap: 16px !important;
         flex: 1 !important;
     }
 
     .track-card {
         flex: 1 !important;
-        max-width: 320px !important;
-        padding: 8px !important;
+        max-width: 340px !important;
+        padding: 8px 12px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
     }
 
-    /* Pochette limitée à 110px pour ne PAS pousser le bouton Quitter */
     .pochette-wrapper, .pochette {
         width: 110px !important;
         height: 110px !important;
@@ -283,9 +302,9 @@ h1 {
     }
 
     .track-info { text-align: center !important; width: 100% !important; }
-    .track-info h2 { font-size: 0.82rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
-    .track-info h3 { font-size: 0.7rem !important; color: var(--text-muted) !important; }
-    .elo-display { font-size: 0.68rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
+    .track-info h2 { font-size: 0.85rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
+    .track-info h3 { font-size: 0.72rem !important; color: var(--text-muted) !important; }
+    .elo-display { font-size: 0.7rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
 
     .vs-zone {
         display: flex !important;
@@ -293,14 +312,14 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         gap: 6px !important;
-        width: 120px !important;
+        width: 125px !important;
         flex-shrink: 0 !important;
     }
 
     .vs-circle {
-        width: 42px !important;
-        height: 42px !important;
-        font-size: 0.9rem !important;
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 0.95rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -312,7 +331,25 @@ h1 {
 }
 
 /* =======================================================
-   6. FEEDBACK VISUEL DE VOTE
+   6. PAGE DE SORTIE (QUIT.HTML) - DÉVERROUILLAGE SCROLL
+   ======================================================= */
+body:not(.duel-body) {
+    overflow-y: auto !important;
+    min-height: 100vh !important;
+}
+
+.quit-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px 16px 50px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* =======================================================
+   7. FEEDBACK VISUEL DE VOTE
    ======================================================= */
 .track-card.voted-winner {
     border-color: var(--neon-green) !important;

@@ -3,91 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elotify K-Pop - Le Duel</title>
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>Elotify Duel</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    
-    <!-- Script exécuté immédiatement pour éviter tout flash blanc/vert au chargement -->
-    <script>
-        (function() {
-            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        })();
-    </script>
 </head>
 <body class="duel-body">
-
-    <!-- --- BLOC PROFIL & MENU DÉROULANT --- -->
-    {% if user %}
-    <div class="user-profile-container" id="profileMenuContainer">
-        <div class="profile-trigger" onclick="toggleDropdown(event)">
-            {% if user.image %}
-                <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
-            {% else %}
-                <div class="user-avatar-placeholder">👤</div>
-            {% endif %}
-            <span class="user-name">{{ user.display_name }}</span>
-            <span class="arrow-down">▼</span>
-        </div>
-        <div class="profile-dropdown" id="profileDropdown">
-            <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
-            <a href="{{ url_for('stats') }}">🎤 Stats Groupes</a>
-            <hr>
-            <!-- SÉLECTEUR DE THÈME -->
-            <div class="theme-selector-wrapper">
-                <span class="theme-label">Thème :</span>
-                <div class="theme-dots">
-                    <button type="button" class="theme-dot dot-green" onclick="setTheme('green')" title="Vert Néon"></button>
-                    <button type="button" class="theme-dot dot-cyan" onclick="setTheme('cyan')" title="Cyan Cyber"></button>
-                    <button type="button" class="theme-dot dot-pink" onclick="setTheme('pink')" title="Rose Neon"></button>
-                    <button type="button" class="theme-dot dot-orange" onclick="setTheme('orange')" title="Orange Amber"></button>
+    <div class="container">
+        
+        <!-- EN-TÊTE FIXE ET BANNIÈRE DE RÉSULTAT -->
+        <div class="header-zone">
+            {% if user %}
+            <div class="user-profile-container">
+                <div class="profile-trigger" onclick="toggleProfileDropdown()">
+                    {% if user.image %}
+                        <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
+                    {% else %}
+                        <div class="user-avatar-placeholder">👤</div>
+                    {% endif %}
+                    <span class="user-name">{{ user.display_name }}</span>
+                    <span class="arrow-down">▼</span>
+                </div>
+                
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="{{ url_for('liste_playlists') }}">🎵 Mes Playlists</a>
+                    <a href="{{ url_for('stats') }}">📊 Mes Statistiques</a>
+                    <hr>
+                    <div class="theme-selector-wrapper">
+                        <span class="theme-label">Thème d'accent :</span>
+                        <div class="theme-dots">
+                            <div class="theme-dot dot-green" onclick="setTheme('green')"></div>
+                            <div class="theme-dot dot-cyan" onclick="setTheme('cyan')"></div>
+                            <div class="theme-dot dot-pink" onclick="setTheme('pink')"></div>
+                            <div class="theme-dot dot-orange" onclick="setTheme('orange')"></div>
+                        </div>
+                    </div>
+                    <hr>
+                    <a href="{{ url_for('logout') }}" style="color: var(--danger-color);">Déconnexion</a>
                 </div>
             </div>
-            <hr>
-            <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="container">
-        <!-- BANNIÈRE DE RÉSULTAT À EMPLACEMENT FIXE -->
-        <div class="result-banner {% if not dernier_resultat %}hidden{% endif %}">
-            {% if dernier_resultat %}
-                {{ dernier_resultat }}
             {% endif %}
+
+            <h1>⚔️ ELOTIFY DUEL ⚔️</h1>
+
+            <div class="result-banner-wrapper">
+                {% if dernier_resultat %}
+                    <div class="result-banner">{{ dernier_resultat }}</div>
+                {% else %}
+                    <div class="result-banner hidden"></div>
+                {% endif %}
+            </div>
         </div>
 
-        <h1>⚔️ ELOTIFY DUEL ⚔️</h1>
-        
+        <!-- ZONE DE DUEL PRINCIPALE -->
         <div class="duel-zone">
             
-            <!-- --- CARTE 1 --- -->
-            <div id="card-1" class="track-card active">
-                <div class="pochette-wrapper" onclick="handleCardClick('1', '{{ track_a.uri }}', 'form-card-1', event)">
-                    <img src="{{ track_a.image_url }}" alt="Pochette {{ track_a.name }}" class="pochette">
-                    <form id="form-card-1" action="{{ url_for('vote') }}" method="POST" class="vote-form">
+            <!-- MORCEAU 1 -->
+            <div class="track-card" id="card-a">
+                <div class="pochette-wrapper">
+                    <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
+                    <form action="{{ url_for('vote') }}" method="POST" class="vote-form" onsubmit="handleVote(event, 'a')">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
                         <input type="hidden" name="id_b" value="{{ track_b.id }}">
                         <input type="hidden" name="outcome" value="1.0">
-                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre" onclick="handleVoteClick('1', 'form-card-1', event)"></button>
+                        <button type="submit" class="vote-btn-overlay" title="Voter pour {{ track_a.name }}"></button>
                     </form>
                 </div>
                 <div class="track-info">
-                    <span class="badge">TITRE 1</span>
-                    <h2>{{ track_a.name }}</h2>
-                    <h3>{{ track_a.artist }}</h3>
-                    <p class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></p>
+                    <h2>TITRE 1</h2>
+                    <h3>{{ track_a.name }}</h3>
+                    <p>{{ track_a.artist }}</p>
+                    <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
                 </div>
             </div>
 
-            <!-- --- CENTRE --- -->
-            <div class="vs-zone">
+            <!-- CONTRÔLES CENTRAUX -->
+            <div class="vs-zone" id="vsZone">
                 <div class="vs-circle">VS</div>
-                
-                <button id="play-pause-btn" class="pause-btn" onclick="togglePlayPause()">⏸️ Pause</button>
-                
-                <form action="{{ url_for('vote') }}" method="POST" onsubmit="applyVoteFeedback('tie')">
+
+                <button type="button" class="pause-btn" id="play-pause-btn" onclick="togglePause()">⏸ Pause</button>
+
+                <form action="{{ url_for('vote') }}" method="POST" onsubmit="handleVote(event, 'tie')">
                     <input type="hidden" name="id_a" value="{{ track_a.id }}">
                     <input type="hidden" name="id_b" value="{{ track_b.id }}">
                     <input type="hidden" name="outcome" value="0.5">
@@ -97,201 +91,98 @@
                 <a href="{{ url_for('classement') }}" class="central-rank-btn">📊 Classement</a>
             </div>
 
-            <!-- --- CARTE 2 --- -->
-            <div id="card-2" class="track-card">
-                <div class="pochette-wrapper" onclick="handleCardClick('2', '{{ track_b.uri }}', 'form-card-2', event)">
-                    <img src="{{ track_b.image_url }}" alt="Pochette {{ track_b.name }}" class="pochette">
-                    <form id="form-card-2" action="{{ url_for('vote') }}" method="POST" class="vote-form">
+            <!-- MORCEAU 2 -->
+            <div class="track-card" id="card-b">
+                <div class="pochette-wrapper">
+                    <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="pochette">
+                    <form action="{{ url_for('vote') }}" method="POST" class="vote-form" onsubmit="handleVote(event, 'b')">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
                         <input type="hidden" name="id_b" value="{{ track_b.id }}">
                         <input type="hidden" name="outcome" value="0.0">
-                        <button type="submit" class="vote-btn-overlay" title="Voter pour ce titre" onclick="handleVoteClick('2', 'form-card-2', event)"></button>
+                        <button type="submit" class="vote-btn-overlay" title="Voter pour {{ track_b.name }}"></button>
                     </form>
                 </div>
                 <div class="track-info">
-                    <span class="badge">TITRE 2</span>
-                    <h2>{{ track_b.name }}</h2>
-                    <h3>{{ track_b.artist }}</h3>
-                    <p class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></p>
+                    <h2>TITRE 2</h2>
+                    <h3>{{ track_b.name }}</h3>
+                    <p>{{ track_b.artist }}</p>
+                    <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
                 </div>
             </div>
 
-        </div><!-- FIN DE DUEL-ZONE -->
+        </div>
 
-        <!-- BOUTON QUITTER CENTRÉ EN BAS -->
+        <!-- BOUTON QUITTER EN BAS -->
         <div class="quit-wrapper">
-            <button id="quit-btn" class="quit-btn" onclick="handleQuit()">🚪 Quitter</button>
+            <a href="{{ url_for('quit_app') }}" class="quit-btn">🚪 Quitter</a>
         </div>
 
     </div>
 
+    <!-- SCRIPTS INTERACTIFS -->
     <script>
-        const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-        let currentPlayingCard = '1';
-        let listenTimeout = null;
+        // Lancement de la lecture automatique du premier extrait au chargement
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
+            setTheme(savedTheme);
 
-        // --- GESTION DU THÈME ---
-        function setTheme(themeName) {
-            document.documentElement.setAttribute('data-theme', themeName);
-            localStorage.setItem('elotify_theme', themeName);
-        }
-
-        function playCard(cardNumber, uri) {
-            const isPaused = document.getElementById('play-pause-btn').classList.contains('is-paused');
-            currentPlayingCard = cardNumber;
-            
-            fetch('/listen/' + uri, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.warning) {
-                        alert("⚠️ " + data.warning);
-                    }
-                })
-                .catch(() => {});
-
-            if (!isPaused) {
-                document.getElementById('card-1').classList.remove('active');
-                document.getElementById('card-2').classList.remove('active');
-                document.getElementById('card-' + cardNumber).classList.add('active');
-            }
-        }
-
-        // --- ANIMATION VISUELLE IMMÉDIATE AU VOTE ---
-        function applyVoteFeedback(winnerCardNumber) {
-            const card1 = document.getElementById('card-1');
-            const card2 = document.getElementById('card-2');
-            const vsZone = document.querySelector('.vs-zone');
-
-            // Bloque tous les clics secondaires pendant la soumission
-            document.body.style.pointerEvents = 'none';
-
-            if (winnerCardNumber === '1') {
-                card1.classList.add('voted-winner');
-                card2.classList.add('voted-loser');
-            } else if (winnerCardNumber === '2') {
-                card2.classList.add('voted-winner');
-                card1.classList.add('voted-loser');
-            } else if (winnerCardNumber === 'tie') {
-                card1.classList.add('voted-loser');
-                card2.classList.add('voted-loser');
-                if (vsZone) vsZone.classList.add('tie-active');
-            }
-
-            if (vsZone) vsZone.classList.add('voting-in-progress');
-        }
-
-        // Clic / Tap sur la carte
-        function handleCardClick(cardNumber, uri, formId, event) {
-            const card = document.getElementById('card-' + cardNumber);
-            
-            if (isTouchDevice) {
-                if (!card.classList.contains('active')) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    playCard(cardNumber, uri);
-                } else {
-                    applyVoteFeedback(cardNumber);
-                    document.getElementById(formId).submit();
-                }
-            }
-        }
-
-        // Clic direct sur le bouton overlay (Vote direct PC)
-        function handleVoteClick(cardNumber, formId, event) {
-            const card = document.getElementById('card-' + cardNumber);
-            if (!isTouchDevice) {
-                applyVoteFeedback(cardNumber);
-            } else if (!card.classList.contains('active')) {
-                event.preventDefault();
-                event.stopPropagation();
-                const uri = cardNumber === '1' ? '{{ track_a.uri }}' : '{{ track_b.uri }}';
-                playCard(cardNumber, uri);
-            }
-        }
-
-        // --- SURVOL PC OPTIMISÉ ---
-        document.getElementById('card-1').addEventListener('mouseenter', () => {
-            if (!isTouchDevice) {
-                const card1 = document.getElementById('card-1');
-                if (!card1.classList.contains('active')) {
-                    clearTimeout(listenTimeout);
-                    listenTimeout = setTimeout(() => playCard('1', '{{ track_a.uri }}'), 150);
-                }
-            }
+            fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => console.log('Lecture démarrée :', data))
+                .catch(err => console.error('Erreur lecture :', err));
         });
 
-        document.getElementById('card-2').addEventListener('mouseenter', () => {
-            if (!isTouchDevice) {
-                const card2 = document.getElementById('card-2');
-                if (!card2.classList.contains('active')) {
-                    clearTimeout(listenTimeout);
-                    listenTimeout = setTimeout(() => playCard('2', '{{ track_b.uri }}'), 150);
-                }
-            }
-        });
-
-        function togglePlayPause() {
-            const btn = document.getElementById('play-pause-btn');
+        function togglePause() {
             fetch('/toggle-pause', { method: 'POST' })
-                .then(response => response.json())
+                .then(res => res.json())
                 .then(data => {
-                    if (data.warning) {
-                        alert("⚠️ " + data.warning);
-                        return;
-                    }
+                    const btn = document.getElementById('play-pause-btn');
                     if (data.status === 'paused') {
-                        btn.innerHTML = "▶️ Reprendre";
-                        btn.classList.add('is-paused');
-                        document.getElementById('card-1').classList.remove('active');
-                        document.getElementById('card-2').classList.remove('active');
+                        btn.innerText = '▶ Jouer';
                     } else if (data.status === 'playing') {
-                        btn.innerHTML = "⏸️ Pause";
-                        btn.classList.remove('is-paused');
-                        if (!currentPlayingCard) currentPlayingCard = '1';
-                        document.getElementById('card-' + currentPlayingCard).classList.add('active');
+                        btn.innerText = '⏸ Pause';
                     }
                 })
-                .catch(err => console.error("Erreur lecture", err));
+                .catch(err => console.error('Erreur pause :', err));
         }
 
-        function toggleDropdown(event) {
-            event.stopPropagation();
+        function toggleProfileDropdown() {
             const dropdown = document.getElementById('profileDropdown');
-            if (dropdown) dropdown.classList.toggle('show');
+            dropdown.classList.toggle('show');
         }
 
         window.onclick = function(event) {
-            const dropdown = document.getElementById('profileDropdown');
-            if (dropdown && dropdown.classList.contains('show')) dropdown.classList.remove('show');
+            if (!event.target.closest('.user-profile-container')) {
+                const dropdown = document.getElementById('profileDropdown');
+                if (dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
         }
 
-        function showTop5() {
-            const tooltip = document.getElementById('top5-tooltip');
-            const listContainer = document.getElementById('top5-list');
-            tooltip.classList.add('visible');
-            fetch('/api/top5')
-                .then(response => response.json())
-                .then(data => {
-                    listContainer.innerHTML = "";
-                    data.forEach((track, index) => {
-                        const item = document.createElement('div');
-                        item.className = 'top5-item';
-                        item.innerHTML = "<strong>#" + (index + 1) + "</strong> " + track.name + " <span class='top5-elo'>" + track.elo + " pts</span>";
-                        listContainer.appendChild(item);
-                    });
-                })
-                .catch(() => { listContainer.innerText = "Données indisponibles"; });
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('elotify_theme', theme);
         }
 
-        function hideTop5() { document.getElementById('top5-tooltip').classList.remove('visible'); }
+        function handleVote(event, winner) {
+            const cardA = document.getElementById('card-a');
+            const cardB = document.getElementById('card-b');
+            const vsZone = document.getElementById('vsZone');
 
-        function handleQuit() {
- 	   window.location.href = "{{ url_for('quit_app') }}";
-	}
+            vsZone.classList.add('voting-in-progress');
 
-        window.onload = function() {
-            playCard('1', '{{ track_a.uri }}');
-        };
+            if (winner === 'a') {
+                cardA.classList.add('voted-winner');
+                cardB.classList.add('voted-loser');
+            } else if (winner === 'b') {
+                cardB.classList.add('voted-winner');
+                cardA.classList.add('voted-loser');
+            } else {
+                cardA.classList.add('voted-winner');
+                cardB.classList.add('voted-winner');
+            }
+        }
     </script>
 </body>
 </html>
