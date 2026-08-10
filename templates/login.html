@@ -19,8 +19,8 @@
                 <div class="feature-item">🎨 Thèmes personnalisables</div>
             </div>
 
-            <!-- Utilisation de la fonction route Flask -->
-            <a href="{{ url_for('login') }}" class="login-btn">
+            <!-- Utilisation directe de l'URL générée par SpotifyOAuth dans app.py -->
+            <a href="{{ auth_url }}" class="login-btn">
                 <span class="spotify-dot"></span> Se connecter avec Spotify
             </a>
         </div>
