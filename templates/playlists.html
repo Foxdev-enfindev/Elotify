@@ -6,6 +6,14 @@
     <title>Elotify K-Pop - Choix de la Playlist</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    
+    <!-- Restauration du thème au chargement -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
 <body>
 
@@ -24,6 +32,17 @@
         <div class="profile-dropdown" id="profileDropdown">
             <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
             <hr>
+            <!-- SÉLECTEUR DE THÈME -->
+            <div class="theme-selector-wrapper">
+                <span class="theme-label">Thème :</span>
+                <div class="theme-dots">
+                    <button type="button" class="theme-dot dot-green" onclick="setTheme('green')" title="Vert Néon"></button>
+                    <button type="button" class="theme-dot dot-cyan" onclick="setTheme('cyan')" title="Cyan Cyber"></button>
+                    <button type="button" class="theme-dot dot-pink" onclick="setTheme('pink')" title="Rose Neon"></button>
+                    <button type="button" class="theme-dot dot-orange" onclick="setTheme('orange')" title="Orange Amber"></button>
+                </div>
+            </div>
+            <hr>
             <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
         </div>
     </div>
@@ -31,19 +50,19 @@
 
     <div class="container">
         <h1>🎵 CHOISIS TA PLAYLIST 🎵</h1>
-        <p class="subtitle">Sélectionne une playlist pour démarrer les duels Elo</p>
+        <p class="subtitle" style="color: var(--text-muted); text-align: center; margin-bottom: 20px;">Sélectionne une playlist pour démarrer les duels Elo</p>
 
         <div class="playlists-grid">
             {% for pl in playlists %}
             <div class="playlist-card" onclick="selectPlaylist('{{ pl.id }}')">
                 {% if pl.images and pl.images[0].url %}
-                    <img src="{{ pl.images[0].url }}" alt="{{ pl.name }}" class="playlist-cover">
+                    <img src="{{ pl.images[0].url }}" alt="{{ pl.name }}" class="playlist-cover" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
                 {% else %}
-                    <div class="playlist-cover playlist-placeholder">🎵</div>
+                    <div class="playlist-cover playlist-placeholder" style="width: 100%; height: 160px; background: #282828; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 10px; font-size: 2rem;">🎵</div>
                 {% endif %}
                 <div class="playlist-info">
-                    <h3>{{ pl.name }}</h3>
-                    <p>{{ pl.total_tracks }} titres</p>
+                    <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">{{ pl.name }}</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">{{ pl.total_tracks }} titres</p>
                 </div>
             </div>
             {% endfor %}
@@ -51,7 +70,11 @@
     </div>
 
     <script>
-        // Remplace la page actuelle dans l'historique du navigateur au lieu d'ajouter une étape
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('elotify_theme', themeName);
+        }
+
         function selectPlaylist(playlistId) {
             window.location.replace("/select_playlist/" + playlistId);
         }

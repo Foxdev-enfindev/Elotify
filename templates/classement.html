@@ -6,6 +6,14 @@
     <title>Elotify K-Pop - Classement</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    
+    <!-- Restauration du thème au chargement -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
 <body>
 
@@ -23,6 +31,18 @@
         </div>
         <div class="profile-dropdown" id="profileDropdown">
             <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
+            <a href="{{ url_for('stats') }}">🎤 Stats Groupes</a>
+            <hr>
+            <!-- SÉLECTEUR DE THÈME -->
+            <div class="theme-selector-wrapper">
+                <span class="theme-label">Thème :</span>
+                <div class="theme-dots">
+                    <button type="button" class="theme-dot dot-green" onclick="setTheme('green')" title="Vert Néon"></button>
+                    <button type="button" class="theme-dot dot-cyan" onclick="setTheme('cyan')" title="Cyan Cyber"></button>
+                    <button type="button" class="theme-dot dot-pink" onclick="setTheme('pink')" title="Rose Neon"></button>
+                    <button type="button" class="theme-dot dot-orange" onclick="setTheme('orange')" title="Orange Amber"></button>
+                </div>
+            </div>
             <hr>
             <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
         </div>
@@ -60,6 +80,11 @@
     </div>
 
     <script>
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('elotify_theme', themeName);
+        }
+
         function toggleDropdown(event) {
             event.stopPropagation();
             const dropdown = document.getElementById('profileDropdown');
