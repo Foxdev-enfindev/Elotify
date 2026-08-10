@@ -201,26 +201,26 @@ h1 {
     color: var(--danger-color);
 }
 
-/* BANNIÈRE DE RÉSULTAT : HAUTEUR FIXE PERMANENTE */
+/* BANNIÈRE DE RÉSULTAT (RECTANGULAIRE ANCIENNE DA) */
 .result-banner {
-    background: rgba(0, 255, 102, 0.1);
-    border: 1px solid var(--neon-green);
-    color: var(--neon-green);
-    padding: 8px 16px;
-    border-radius: 20px;
-    text-align: center;
-    font-weight: 600;
-    margin: 0 auto 15px auto;
-    max-width: 520px;
-    height: 36px !important;
-    min-height: 36px !important;
-    max-height: 36px !important;
+    background: rgba(0, 255, 102, 0.08) !important;
+    border: 1px solid var(--neon-green) !important;
+    color: var(--neon-green) !important;
+    padding: 8px 16px !important;
+    border-radius: 8px !important;
+    text-align: center !important;
+    font-weight: 600 !important;
+    margin: 0 auto 15px auto !important;
+    width: 100% !important;
+    max-width: 950px !important;
+    height: 40px !important;
+    min-height: 40px !important;
     display: flex !important;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 12px var(--neon-green-glow);
-    box-sizing: border-box;
-    overflow: hidden;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 0 10px var(--neon-green-glow) !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
 }
 
 .result-banner:empty,
@@ -239,7 +239,50 @@ h1 {
 }
 
 /* =======================================================
-   3. ZONE DE DUEL & CARTES (PC / DESKTOP ≥ 901px)
+   BOUTONS ET CERCLAGE NÉON (ANCIENNE DA)
+   ======================================================= */
+.pause-btn, .tie-btn, .central-rank-btn {
+    background: var(--neon-green) !important;
+    color: #0d0d0d !important;
+    border: none !important;
+    padding: 10px 18px !important;
+    border-radius: 20px !important;
+    font-weight: 800 !important;
+    font-size: 0.85rem !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 0 12px var(--neon-green-glow) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.pause-btn:hover, .tie-btn:hover, .central-rank-btn:hover {
+    transform: scale(1.04) !important;
+    box-shadow: 0 0 20px var(--neon-green-glow) !important;
+}
+
+.quit-btn {
+    background: var(--danger-color) !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 8px 24px !important;
+    border-radius: 20px !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 12px rgba(255, 51, 102, 0.4) !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.quit-btn:hover {
+    transform: scale(1.04) !important;
+    box-shadow: 0 0 20px rgba(255, 51, 102, 0.6) !important;
+}
+
+/* =======================================================
+   3. ZONE DE DUEL & CARTES (DESKTOP ≥ 901px)
    ======================================================= */
 @media screen and (min-width: 901px) {
     body.duel-body {
@@ -264,15 +307,6 @@ h1 {
     h1 {
         font-size: 2.2rem !important;
         margin-bottom: 15px !important;
-    }
-
-    .result-banner {
-        margin: 0 auto 15px auto !important;
-        padding: 8px 16px !important;
-        font-size: 0.85rem !important;
-        max-width: 550px !important;
-        height: 38px !important;
-        min-height: 38px !important;
     }
 
     .duel-zone {
@@ -345,53 +379,31 @@ h1 {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        gap: 15px !important;
-        min-width: 160px !important;
+        gap: 16px !important;
+        min-width: 180px !important;
     }
 
     .vs-circle {
-        width: 60px !important;
-        height: 60px !important;
-        font-size: 1.2rem !important;
-        background: var(--neon-green);
-        color: #000;
-        font-weight: 900;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 15px var(--neon-green-glow);
+        width: 80px !important; /* CERCLE GÉANT ANCIENNE DA */
+        height: 80px !important;
+        font-size: 1.5rem !important;
+        background: var(--neon-green) !important;
+        color: #0d0d0d !important;
+        font-weight: 900 !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 0 20px var(--neon-green-glow) !important;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
-        padding: 10px 18px !important;
-        font-size: 0.85rem !important;
-        border-radius: 20px !important;
-        width: auto !important;
-        background: #222;
-        color: #fff;
-        border: 1px solid #444;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .pause-btn:hover, .tie-btn:hover, .central-rank-btn:hover {
-        border-color: var(--neon-green);
-        color: var(--neon-green);
-        box-shadow: 0 0 10px var(--neon-green-glow);
+        width: 100% !important;
+        max-width: 160px !important;
     }
 
     .quit-wrapper {
         margin-top: 25px !important;
-    }
-
-    .quit-btn {
-        padding: 8px 24px !important;
-        font-size: 0.9rem !important;
     }
 }
 
@@ -537,7 +549,7 @@ h1 {
         right: 0 !important;
         margin: auto !important;
         height: 100% !important;
-        padding: 85px 12px 16px 12px !important;
+        padding: 75px 12px 12px 12px !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-evenly !important;
@@ -551,9 +563,9 @@ h1 {
     }
 
     .result-banner {
-        height: 32px !important;
-        min-height: 32px !important;
-        max-height: 32px !important;
+        height: 34px !important;
+        min-height: 34px !important;
+        max-height: 34px !important;
         padding: 2px 8px !important;
         font-size: 0.72rem !important;
         margin: 0 auto !important;
@@ -564,42 +576,59 @@ h1 {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        gap: 12px !important;
+        gap: 8px !important;
         width: 100% !important;
     }
 
+    /* Cartes compactes en ligne */
     .track-card {
         padding: 8px 12px !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 10px !important;
+        gap: 12px !important;
         width: 100% !important;
+        min-width: unset !important;
         box-sizing: border-box !important;
-        background: var(--card-bg);
-        border: 2px solid transparent;
-        border-radius: 16px;
+        background: var(--card-bg) !important;
+        border: 2px solid transparent !important;
+        border-radius: 16px !important;
     }
 
     .track-card.active {
-        border-color: var(--neon-green);
-        box-shadow: 0 0 25px var(--neon-green-glow);
+        border-color: var(--neon-green) !important;
+        box-shadow: 0 0 20px var(--neon-green-glow) !important;
     }
 
     .pochette-wrapper, .pochette {
-        width: 85px !important;
-        height: 85px !important;
+        width: 75px !important;
+        height: 75px !important;
+        min-width: 75px !important;
+        min-height: 75px !important;
         margin-bottom: 0 !important;
         flex-shrink: 0 !important;
     }
 
     .track-info {
         text-align: left !important;
+        flex: 1 !important;
     }
 
-    .track-info h2 { font-size: 0.95rem !important; margin: 1px 0 !important; }
-    .track-info h3 { font-size: 0.78rem !important; }
-    .elo-display { font-size: 0.75rem !important; margin-top: 2px !important; color: var(--neon-green); }
+    .track-info h2 { 
+        font-size: 0.92rem !important; 
+        margin: 1px 0 !important; 
+    }
 
+    .track-info h3 { 
+        font-size: 0.76rem !important; 
+    }
+
+    .elo-display { 
+        font-size: 0.75rem !important; 
+        margin-top: 2px !important; 
+        color: var(--neon-green) !important; 
+    }
+
+    /* Restructuration de la zone VS centrale (Cercle à gauche, boutons fluo à droite) */
     .vs-zone {
         display: grid !important;
         grid-template-columns: auto 1fr !important;
@@ -610,51 +639,48 @@ h1 {
         align-items: center !important;
         justify-items: center !important;
         width: 100% !important;
-        gap: 4px 12px !important;
-        margin: 8px 0 !important;
+        gap: 4px 10px !important;
+        margin: 4px 0 !important;
         padding: 0 10px !important;
         box-sizing: border-box !important;
     }
 
     .vs-circle {
         grid-area: vs !important;
-        width: 54px !important;
-        height: 54px !important;
-        min-width: 54px !important;
-        min-height: 54px !important;
+        width: 58px !important;
+        height: 58px !important;
+        min-width: 58px !important;
+        min-height: 58px !important;
         font-size: 1.1rem !important;
-        margin: 0 !important;
-        background: var(--neon-green);
-        color: #000;
-        font-weight: 900;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 15px var(--neon-green-glow);
+        margin: 0 6px 0 0 !important;
+        background: var(--neon-green) !important;
+        color: #0d0d0d !important;
+        font-weight: 900 !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 0 15px var(--neon-green-glow) !important;
     }
 
     .vs-zone > #play-pause-btn { grid-area: pause !important; width: 100% !important; max-width: 175px !important; }
     .vs-zone > form { grid-area: tie !important; width: 100% !important; max-width: 175px !important; }
     .vs-zone > .rank-wrapper { grid-area: rank !important; width: 100% !important; max-width: 175px !important; position: static !important; }
 
+    /* Boutons centraux fluo avec texte sombre */
     .pause-btn, .tie-btn, .central-rank-btn {
         width: 100% !important;
         padding: 5px 10px !important;
         font-size: 0.75rem !important;
+        font-weight: 800 !important;
         border-radius: 12px !important;
         margin: 0 !important;
         text-align: center !important;
         box-sizing: border-box !important;
-        background: #222;
-        color: #fff;
-        border: 1px solid #444;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        background: var(--neon-green) !important;
+        color: #0d0d0d !important;
+        border: none !important;
+        box-shadow: 0 0 8px var(--neon-green-glow) !important;
     }
 
     .quit-wrapper { 
@@ -663,8 +689,8 @@ h1 {
     }
     
     .quit-btn { 
-        padding: 6px 18px !important; 
-        font-size: 0.82rem !important; 
+        padding: 6px 20px !important; 
+        font-size: 0.8rem !important; 
     }
     
     .user-profile-container { top: 8px !important; right: 10px !important; }
@@ -752,39 +778,31 @@ h1 {
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 8px !important;
+        gap: 10px !important;
         margin: 0 !important;
         flex-shrink: 0 !important;
-        min-width: 130px !important;
+        min-width: 140px !important;
     }
 
     .vs-circle {
-        width: 48px !important;
-        height: 48px !important;
-        font-size: 1rem !important;
-        background: var(--neon-green);
-        color: #000;
-        font-weight: 900;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 0 15px var(--neon-green-glow);
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.1rem !important;
+        background: var(--neon-green) !important;
+        color: #0d0d0d !important;
+        font-weight: 900 !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 0 15px var(--neon-green-glow) !important;
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
         padding: 6px 12px !important;
         font-size: 0.75rem !important;
-        background: #222;
-        color: #fff;
-        border: 1px solid #444;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 20px;
+        border-radius: 20px !important;
+        width: 100% !important;
     }
 
     .quit-wrapper {
@@ -931,24 +949,6 @@ h1 {
     justify-content: center !important;
     align-items: center !important;
     clear: both !important;
-}
-
-.quit-btn {
-    background: #181818 !important;
-    color: #ff5555 !important;
-    border: 1px solid #ff5555 !important;
-    padding: 8px 22px !important;
-    border-radius: 20px !important;
-    font-size: 0.85rem !important;
-    font-weight: 700 !important;
-    cursor: pointer;
-    box-shadow: 0 0 8px rgba(255, 85, 85, 0.2);
-}
-
-.quit-btn:hover {
-    background: #ff5555 !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 14px rgba(255, 85, 85, 0.6);
 }
 
 /* =======================================================

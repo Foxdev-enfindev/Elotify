@@ -486,11 +486,11 @@ def vote():
     sign_b = f"+{delta_b}" if delta_b > 0 else f"{delta_b}"
 
     if outcome == 1.0:
-        session['dernier_resultat'] = f"Victoire de : {track_a['name']} ({sign_a} pts) contre {track_b['name']} ({sign_b} pts) !"
+        session['dernier_resultat'] = f"🏆 Victoire de {track_a['name']} ({sign_a} Elo) face à {track_b['name']} ({sign_b} Elo)"
     elif outcome == 0.0:
-        session['dernier_resultat'] = f"Victoire de : {track_b['name']} ({sign_b} pts) contre {track_a['name']} ({sign_a} pts) !"
+        session['dernier_resultat'] = f"🏆 Victoire de {track_b['name']} ({sign_b} Elo) face à {track_a['name']} ({sign_a} Elo)"
     else:
-        session['dernier_resultat'] = f"Match nul entre {track_a['name']} ({sign_a} pts) et {track_b['name']} ({sign_b} pts) !"
+        session['dernier_resultat'] = f"🤝 Match nul entre {track_a['name']} ({sign_a} Elo) et {track_b['name']} ({sign_b} Elo)"
 
     return redirect(url_for('index'))
 
