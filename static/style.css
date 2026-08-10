@@ -1,5 +1,5 @@
 /* =======================================================
-   1. STYLES GÉNÉRAUX & PALETTES THÈMES
+   1. PALETTES ET THÈMES
    ======================================================= */
 :root, [data-theme="green"] {
     --bg-color: #0d0d0d;
@@ -36,7 +36,7 @@ html, body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    width: 100vw;
+    width: 100%;
     min-height: 100vh;
 }
 
@@ -45,40 +45,44 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 2vh 2vw;
     box-sizing: border-box;
 }
 
-/* Verrouillage strict de la page duel */
 body.duel-body {
-    height: 100vh !important;
-    height: 100dvh !important;
-    width: 100vw !important;
-    overflow: hidden !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+    min-height: 100vh;
+    min-height: 100dvh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* =======================================================
-   2. HEADER, PROFIL & BANNIÈRE RÉSULTAT
+   2. HEADER, PROFIL & BANNIÈRE (SANS CHEVAUCHEMENT)
    ======================================================= */
+.header-zone {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
 h1 {
-    font-size: clamp(1.1rem, 2.5vh, 2.2rem);
+    font-size: clamp(1.2rem, 2.5vh, 2rem);
     font-weight: 800;
     text-align: center;
-    margin: 0;
     color: var(--neon-green);
     text-shadow: 0 0 10px var(--neon-green-glow);
     letter-spacing: 2px;
 }
 
 .user-profile-container {
-    position: fixed;
-    top: 15px;
-    right: 20px;
+    position: absolute;
+    top: 0;
+    right: 10px;
     z-index: 1000;
 }
 
@@ -89,14 +93,14 @@ h1 {
     background: rgba(24, 24, 24, 0.95);
     backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 6px 14px;
+    padding: 6px 12px;
     border-radius: 30px;
     cursor: pointer;
 }
 
 .user-avatar, .user-avatar-placeholder {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -148,29 +152,25 @@ h1 {
 .dot-pink { background: #ff007f; }
 .dot-orange { background: #ff9900; }
 
-/* BANNIÈRE DE RÉSULTAT EN POSITION ABSOLUE POUR NE PAS POUSSER LE BOUTON QUITTER */
+/* BANNIÈRE DE RÉSULTAT FLUIDE */
 .result-banner {
-    position: absolute !important;
-    top: 10px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    background: rgba(0, 0, 0, 0.85) !important;
+    background: rgba(0, 255, 102, 0.1) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 4px 14px !important;
+    padding: 4px 12px !important;
     border-radius: 20px !important;
     text-align: center !important;
     font-weight: 600 !important;
     width: auto !important;
-    max-width: 80% !important;
-    height: 28px !important;
+    max-width: 90% !important;
+    min-height: 28px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    box-shadow: 0 0 12px var(--neon-green-glow) !important;
+    box-shadow: 0 0 10px var(--neon-green-glow) !important;
     box-sizing: border-box !important;
-    font-size: clamp(0.68rem, 1.2vh, 0.8rem) !important;
-    z-index: 100 !important;
+    font-size: clamp(0.7rem, 1.2vh, 0.85rem) !important;
+    margin: 4px auto !important;
 }
 
 .result-banner:empty, .result-banner.hidden {
@@ -178,19 +178,20 @@ h1 {
 }
 
 .container {
-    width: 100vw;
-    height: 100dvh;
-    padding: 2vh 2vw;
+    width: 100%;
+    max-width: 1100px;
+    padding: 15px 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
     box-sizing: border-box;
-    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
 }
 
 /* =======================================================
-   3. BASE CARTES ET BOUTONS UNIFORMES
+   3. CARTES ET BOUTONS
    ======================================================= */
 .track-card {
     background: var(--card-bg);
@@ -211,7 +212,13 @@ h1 {
 .vote-form { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 .vote-btn-overlay { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.2); border: none; cursor: pointer; }
 
-/* UNIFORMISATION STRICTE DES BOUTONS CENTRAUX */
+/* REGRESSION DU BOUTON MATCH NUL FIXÉE GRÂCE À UNE LARGEUR UNIFORME SUR FORM */
+.vs-zone form {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+}
+
 .pause-btn, 
 .tie-btn, 
 .central-rank-btn, 
@@ -222,7 +229,7 @@ a.central-rank-btn {
     padding: 8px 0 !important;
     border-radius: 20px !important;
     font-weight: 800 !important;
-    font-size: clamp(0.7rem, 1.2vh, 0.82rem) !important;
+    font-size: clamp(0.72rem, 1.2vh, 0.85rem) !important;
     cursor: pointer !important;
     text-decoration: none !important;
     display: flex !important;
@@ -232,6 +239,7 @@ a.central-rank-btn {
     transition: transform 0.2s ease !important;
     box-sizing: border-box !important;
     text-align: center !important;
+    width: 100% !important;
 }
 
 .pause-btn:hover, .tie-btn:hover, .central-rank-btn:hover, a.central-rank-btn:hover {
@@ -243,16 +251,17 @@ a.central-rank-btn {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 1vh;
+    margin-top: 15px;
+    margin-bottom: 10px;
 }
 
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 8px 0 !important;
+    padding: 10px 0 !important;
     border-radius: 20px !important;
-    font-size: clamp(0.72rem, 1.3vh, 0.85rem) !important;
+    font-size: clamp(0.75rem, 1.3vh, 0.88rem) !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 10px rgba(255, 51, 102, 0.4) !important;
@@ -260,41 +269,40 @@ a.central-rank-btn {
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    width: clamp(130px, 25%, 170px) !important;
+    width: clamp(140px, 30%, 180px) !important;
 }
 
 /* =======================================================
    4. LAYOUT PORTRAIT
    ======================================================= */
 @media screen and (orientation: portrait) {
-    .container {
-        padding-top: 5vh;
-        padding-bottom: 2vh;
+    .header-zone {
+        padding-top: 25px;
     }
 
     .duel-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        justify-content: space-evenly !important;
-        width: 95% !important;
-        max-width: 500px !important;
+        justify-content: center !important;
+        width: 100% !important;
+        max-width: 480px !important;
         flex: 1 1 auto !important;
-        gap: 1.5vh !important;
+        gap: 12px !important;
     }
 
     .track-card {
         width: 100% !important;
-        padding: 1.2vh 3vw !important;
+        padding: 10px 14px !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 3vw !important;
+        gap: 14px !important;
     }
 
     .pochette-wrapper, .pochette {
-        width: clamp(65px, 11vh, 100px) !important;
-        height: clamp(65px, 11vh, 100px) !important;
+        width: clamp(70px, 10vh, 95px) !important;
+        height: clamp(70px, 10vh, 95px) !important;
         flex-shrink: 0 !important;
     }
 
@@ -303,28 +311,28 @@ a.central-rank-btn {
         flex: 1 !important;
     }
 
-    .track-info h2 { font-size: clamp(0.85rem, 1.8vh, 1.1rem) !important; margin: 0.2vh 0 !important; font-weight: 700 !important; }
+    .track-info h2 { font-size: clamp(0.85rem, 1.8vh, 1.05rem) !important; margin: 2px 0 !important; font-weight: 700 !important; }
     .track-info h3 { font-size: clamp(0.72rem, 1.4vh, 0.85rem) !important; color: var(--text-muted) !important; }
-    .elo-display { font-size: clamp(0.7rem, 1.3vh, 0.82rem) !important; margin-top: 0.4vh !important; color: var(--neon-green) !important; }
+    .elo-display { font-size: clamp(0.7rem, 1.3vh, 0.82rem) !important; margin-top: 3px !important; color: var(--neon-green) !important; }
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: clamp(50px, 8vh, 70px) 1fr !important;
+        grid-template-columns: 60px 1fr !important;
         grid-template-areas: 
             "circle pause"
             "circle tie"
             "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 280px !important;
-        gap: 0.6vh 3vw !important;
+        max-width: 270px !important;
+        gap: 6px 12px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: clamp(50px, 8vh, 70px) !important;
-        height: clamp(50px, 8vh, 70px) !important;
-        font-size: clamp(0.9rem, 2vh, 1.3rem) !important;
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.1rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -341,12 +349,11 @@ a.central-rank-btn {
 }
 
 /* =======================================================
-   5. LAYOUT PAYSAGE (TAILLE DES BOUTONS STRICTEMENT ÉGALE)
+   5. LAYOUT PAYSAGE (PAYSAGE OUVERT ET FERMÉ)
    ======================================================= */
 @media screen and (orientation: landscape) {
-    .container {
-        padding-top: 4vh;
-        padding-bottom: 2vh;
+    .header-zone {
+        padding-top: 5px;
     }
 
     .duel-zone {
@@ -355,15 +362,15 @@ a.central-rank-btn {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 1100px !important;
+        max-width: 1000px !important;
         flex: 1 1 auto !important;
-        gap: 2vw !important;
+        gap: 16px !important;
     }
 
     .track-card {
         flex: 1 1 0 !important;
-        max-width: 38% !important;
-        padding: 1.5vh 1.5vw !important;
+        max-width: 380px !important;
+        padding: 12px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -371,9 +378,9 @@ a.central-rank-btn {
     }
 
     .pochette-wrapper, .pochette {
-        width: clamp(75px, 26vh, 200px) !important;
-        height: clamp(75px, 26vh, 200px) !important;
-        margin-bottom: 1vh !important;
+        width: clamp(75px, 24vh, 180px) !important;
+        height: clamp(75px, 24vh, 180px) !important;
+        margin-bottom: 6px !important;
         flex-shrink: 0 !important;
     }
 
@@ -382,24 +389,24 @@ a.central-rank-btn {
         width: 100% !important;
     }
 
-    .track-info h2 { font-size: clamp(0.8rem, 2.2vh, 1.2rem) !important; margin: 0.3vh 0 !important; font-weight: 700 !important; }
-    .track-info h3 { font-size: clamp(0.7rem, 1.8vh, 0.88rem) !important; color: var(--text-muted) !important; }
-    .elo-display { font-size: clamp(0.68rem, 1.6vh, 0.82rem) !important; margin-top: 0.4vh !important; color: var(--neon-green) !important; }
+    .track-info h2 { font-size: clamp(0.8rem, 2vh, 1.15rem) !important; margin: 2px 0 !important; font-weight: 700 !important; }
+    .track-info h3 { font-size: clamp(0.7rem, 1.6vh, 0.85rem) !important; color: var(--text-muted) !important; }
+    .elo-display { font-size: clamp(0.68rem, 1.5vh, 0.8rem) !important; margin-top: 2px !important; color: var(--neon-green) !important; }
 
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 1vh !important;
-        width: clamp(120px, 14vw, 160px) !important;
+        gap: 8px !important;
+        width: clamp(120px, 15vw, 160px) !important;
         flex-shrink: 0 !important;
     }
 
     .vs-circle {
-        width: clamp(40px, 8vh, 70px) !important;
-        height: clamp(40px, 8vh, 70px) !important;
-        font-size: clamp(0.85rem, 2.2vh, 1.3rem) !important;
+        width: clamp(40px, 8vh, 65px) !important;
+        height: clamp(40px, 8vh, 65px) !important;
+        font-size: clamp(0.85rem, 2vh, 1.2rem) !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -407,110 +414,12 @@ a.central-rank-btn {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 0 15px var(--neon-green-glow) !important;
-    }
-
-    /* FORÇAGE DE LA LARGEUR À 100% DE LA VS-ZONE POUR QUE TOUS LES BOUTONS SOIENT IDENTIQUES */
-    .vs-zone > #play-pause-btn,
-    .vs-zone > form,
-    .vs-zone > a.central-rank-btn {
-        width: 100% !important;
-    }
-
-    .pause-btn, .tie-btn, .central-rank-btn, a.central-rank-btn {
-        width: 100% !important;
-        min-width: 100% !important;
-        max-width: 100% !important;
+        box-shadow: 0 0 12px var(--neon-green-glow) !important;
     }
 }
 
 /* =======================================================
-   6. STYLES PAGE LOGIN (CARTE HABILLÉE ET CENTRÉE)
-   ======================================================= */
-.login-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-    width: 100%;
-    padding: 20px;
-}
-
-.login-card {
-    background: var(--card-bg);
-    border: 1px solid rgba(0, 255, 102, 0.2);
-    border-radius: 24px;
-    padding: 40px 30px;
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 255, 102, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-}
-
-.login-icon {
-    font-size: 3rem;
-    margin-bottom: -10px;
-}
-
-.login-subtitle {
-    color: var(--text-muted);
-    font-size: 0.92rem;
-    line-height: 1.4;
-}
-
-.login-features {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    margin: 10px 0;
-}
-
-.feature-item {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    padding: 10px;
-    border-radius: 12px;
-    font-size: 0.85rem;
-    color: var(--text-color);
-}
-
-.login-btn {
-    background: var(--neon-green);
-    color: #0d0d0d;
-    font-weight: 800;
-    font-size: 0.95rem;
-    padding: 14px 24px;
-    border-radius: 30px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 0 15px var(--neon-green-glow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    width: 100%;
-    justify-content: center;
-    margin-top: 10px;
-}
-
-.login-btn:hover {
-    transform: scale(1.03);
-    box-shadow: 0 0 25px var(--neon-green-glow);
-}
-
-.spotify-dot {
-    width: 10px;
-    height: 10px;
-    background-color: #0d0d0d;
-    border-radius: 50%;
-}
-
-/* =======================================================
-   7. CLASSEMENT & STATS
+   6. PAGES CLASSEMENT, STATS, PLAYLISTS
    ======================================================= */
 .ranking-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 55px 14px 40px 14px; }
 .nav-btn { display: inline-flex !important; align-items: center; justify-content: center; background: #181818 !important; color: var(--neon-green) !important; border: 1px solid var(--neon-green) !important; padding: 8px 16px !important; border-radius: 20px !important; font-weight: 600 !important; text-decoration: none !important; }
@@ -524,7 +433,7 @@ a.central-rank-btn {
 .rank-elo { font-size: 0.9rem !important; font-weight: 700 !important; color: var(--neon-green) !important; margin-left: auto !important; }
 
 /* =======================================================
-   8. FEEDBACK VISUEL IMMÉDIAT LORS DU VOTE
+   7. FEEDBACK VISUEL IMMÉDIAT
    ======================================================= */
 .track-card.voted-winner {
     border-color: var(--neon-green) !important;
