@@ -1,21 +1,28 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion - Elotify Duel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="login-wrapper">
+        <div class="login-card">
+            <div class="login-icon">🎧</div>
+            <h1>ELOTIFY DUEL</h1>
+            <p class="login-subtitle">Classe tes morceaux Spotify préférés grâce au système de duels Elo.</p>
+            
+            <div class="login-features">
+                <div class="feature-item">⚡ Duels instantanés 1v1</div>
+                <div class="feature-item">📊 Classements en temps réel</div>
+                <div class="feature-item">🎨 Thèmes personnalisables</div>
+            </div>
 
-{% block content %}
-<div class="login-wrapper">
-    <div class="login-card">
-        <div class="login-icon">🎧</div>
-        <h1>ELOTIFY DUEL</h1>
-        <p class="login-subtitle">Classe tes morceaux Spotify préférés grâce au système de duels Elo.</p>
-        
-        <div class="login-features">
-            <div class="feature-item">⚡ Duels instantanés 1v1</div>
-            <div class="feature-item">📊 Classements en temps réel</div>
-            <div class="feature-item">🎨 Thèmes personnalisables</div>
+            <a href="/login" class="login-btn">
+                <span class="spotify-dot"></span> Se connecter avec Spotify
+            </a>
         </div>
-
-        <a href="/login" class="login-btn">
-            <span class="spotify-dot"></span> Se connecter avec Spotify
-        </a>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>
