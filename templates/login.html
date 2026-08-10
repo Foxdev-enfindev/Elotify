@@ -6,24 +6,21 @@
     <title>Connexion - Elotify Duel</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-    <div class="login-wrapper">
-        <div class="login-card">
-            <div class="login-icon">🎧</div>
-            <h1>ELOTIFY DUEL</h1>
-            <p class="login-subtitle">Classe tes morceaux Spotify préférés grâce au système de duels Elo.</p>
-            
-            <div class="login-features">
-                <div class="feature-item">⚡ Duels instantanés 1v1</div>
-                <div class="feature-item">📊 Classements en temps réel</div>
-                <div class="feature-item">🎨 Thèmes personnalisables</div>
-            </div>
-
-            <!-- Utilisation directe de l'URL générée par SpotifyOAuth dans app.py -->
-            <a href="{{ auth_url }}" class="login-btn">
-                <span class="spotify-dot"></span> Se connecter avec Spotify
-            </a>
+<body style="background:#0d0d0d; color:#fff; font-family:sans-serif; min-height:100vh; display:flex; align-items:center; justify-content:center; margin:0;">
+    <div style="background:#181818; border:1px solid #00ff66; border-radius:20px; padding:30px 20px; max-width:380px; width:90%; text-align:center; box-shadow:0 0 20px rgba(0,255,102,0.2);">
+        <div style="font-size:2.5rem; margin-bottom:10px;">🎧</div>
+        <h1 style="color:#00ff66; font-size:1.8rem; margin-bottom:10px; text-shadow:0 0 10px rgba(0,255,102,0.4);">ELOTIFY DUEL</h1>
+        <p style="color:#b3b3b3; font-size:0.9rem; margin-bottom:20px;">Classe tes morceaux Spotify préférés grâce aux duels Elo.</p>
+        
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:25px; text-align:left;">
+            <div style="background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; font-size:0.85rem;">⚡ Duels instantanés 1v1</div>
+            <div style="background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; font-size:0.85rem;">📊 Classements en temps réel</div>
+            <div style="background:rgba(255,255,255,0.05); padding:8px 12px; border-radius:8px; font-size:0.85rem;">🎨 Thèmes personnalisables</div>
         </div>
+
+        <a href="{{ auth_url }}" style="background:#00ff66; color:#0d0d0d; font-weight:bold; padding:12px 20px; border-radius:25px; text-decoration:none; display:block; font-size:0.95rem; box-shadow:0 0 12px rgba(0,255,102,0.4);">
+            Se connecter avec Spotify
+        </a>
     </div>
 </body>
 </html>
