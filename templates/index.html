@@ -44,7 +44,6 @@
 
             <h1>⚔️ ELOTIFY DUEL ⚔️</h1>
 
-            <!-- EMPLACEMENT AVEC HAUTEUR RÉSERVÉE CONSTANTE -->
             <div class="result-banner-wrapper">
                 <div class="result-banner {% if not dernier_resultat %}hidden{% endif %}">
                     {{ dernier_resultat if dernier_resultat else '&nbsp;' }}
@@ -132,7 +131,11 @@
             const cardB = document.getElementById('card-b');
 
             if (currentPlaying === trackKey) {
-                document.getElementById('form-' + trackKey).submit();
+                // Déclenche l'animation visuelle de victoire/défaite puis soumet le formulaire
+                triggerVoteAnimation(trackKey);
+                setTimeout(() => {
+                    document.getElementById('form-' + trackKey).submit();
+                }, 150); // Petit délai de 150ms pour laisser le feedback visuel s'afficher
             } else {
                 currentPlaying = trackKey;
                 if (trackKey === 'a') {
@@ -146,6 +149,29 @@
                 fetch('/listen/' + trackUri, { method: 'POST' })
                     .catch(err => console.error('Erreur changement piste :', err));
             }
+        }
+
+        function triggerVoteAnimation(winner) {
+            const cardA = document.getElementById('card-a');
+            const cardB = document.getElementById('card-b');
+            const vsZone = document.getElementById('vsZone');
+
+            vsZone.classList.add('voting-in-progress');
+
+            if (winner === 'a') {
+                cardA.classList.add('voted-winner');
+                cardB.classList.add('voted-loser');
+            } else if (winner === 'b') {
+                cardB.classList.add('voted-winner');
+                cardA.classList.add('voted-loser');
+            } else {
+                cardA.classList.add('voted-winner');
+                cardB.classList.add('voted-winner');
+            }
+        }
+
+        function handleVote(event, winner) {
+            triggerVoteAnimation(winner);
         }
 
         function togglePause() {
@@ -178,25 +204,6 @@
         function setTheme(theme) {
             document.documentElement.setAttribute('data-theme', theme);
             localStorage.setItem('elotify_theme', theme);
-        }
-
-        function handleVote(event, winner) {
-            const cardA = document.getElementById('card-a');
-            const cardB = document.getElementById('card-b');
-            const vsZone = document.getElementById('vsZone');
-
-            vsZone.classList.add('voting-in-progress');
-
-            if (winner === 'a') {
-                cardA.classList.add('voted-winner');
-                cardB.classList.add('voted-loser');
-            } else if (winner === 'b') {
-                cardB.classList.add('voted-winner');
-                cardA.classList.add('voted-loser');
-            } else {
-                cardA.classList.add('voted-winner');
-                cardB.classList.add('voted-winner');
-            }
         }
     </script>
 </body>
