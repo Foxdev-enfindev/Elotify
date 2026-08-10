@@ -33,12 +33,14 @@ def get_db_connection():
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 def init_db():
-    """Initialise la table dans Neon si elle n'existe pas encore."""
+    """Initialise les tables dans Neon si elles n'existent pas encore."""
     if not DATABASE_URL:
         return
     try:
         conn = get_db_connection()
         cur = conn.cursor()
+        
+        # Table des scores Elo
         cur.execute("""
             CREATE TABLE IF NOT EXISTS tracks_scores (
                 playlist_id VARCHAR(255),
@@ -50,6 +52,15 @@ def init_db():
                 PRIMARY KEY (playlist_id, track_id)
             );
         """)
+        
+        # Table des préférences utilisateurs (playlist active par compte)
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS user_preferences (
+                user_id VARCHAR(255) PRIMARY KEY,
+                active_playlist_id VARCHAR(255)
+            );
+        """)
+        
         conn.commit()
         cur.close()
         conn.close()
@@ -96,6 +107,7 @@ def get_user_profile_cached(sp):
         image_url = images[0]['url'] if images else None
         
         profile = {
+            'id': user_info.get('id'),
             'display_name': user_info.get('display_name', 'Utilisateur'),
             'image': image_url
         }
@@ -107,6 +119,40 @@ def get_user_profile_cached(sp):
     except Exception as e:
         print(f"⚠️ Erreur récupération profil : {e}")
         return session.get('user_profile')
+
+# --- GESTION DE LA PLAYLIST ACTIVE EN BDD (PAR COMPTE SPOTIFY) ---
+def get_user_active_playlist_db(user_id):
+    if not DATABASE_URL or not user_id:
+        return None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT active_playlist_id FROM user_preferences WHERE user_id = %s;", (user_id,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        return row[0] if row else None
+    except Exception as e:
+        print(f"⚠️ Erreur lecture playlist active BDD : {e}")
+        return None
+
+def set_user_active_playlist_db(user_id, playlist_id):
+    if not DATABASE_URL or not user_id or not playlist_id:
+        return
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO user_preferences (user_id, active_playlist_id)
+            VALUES (%s, %s)
+            ON CONFLICT (user_id)
+            DO UPDATE SET active_playlist_id = EXCLUDED.active_playlist_id;
+        """, (user_id, playlist_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"⚠️ Erreur sauvegarde playlist active BDD : {e}")
 
 # --- GESTION DU SCORE ELO & BDD ---
 def calculate_elo(elo_a, elo_b, outcome_a, k=32):
@@ -121,7 +167,14 @@ def calculate_elo(elo_a, elo_b, outcome_a, k=32):
     return new_elo_a, new_elo_b
 
 def load_local_scores():
-    playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
+    playlist_id = session.get('selected_playlist_id')
+    if not playlist_id and DATABASE_URL:
+        sp = get_spotify_client()
+        if sp:
+            profile = get_user_profile_cached(sp)
+            if profile and profile.get('id'):
+                playlist_id = get_user_active_playlist_db(profile['id'])
+
     if not playlist_id or not DATABASE_URL:
         return session.get('local_scores_fallback', {})
 
@@ -150,7 +203,6 @@ def load_local_scores():
         return session.get('local_scores_fallback', {})
 
 def _save_to_db_async(playlist_id, scores_to_update):
-    """Effectue l'écriture dans Neon de façon asynchrone (en arrière-plan)."""
     if not DATABASE_URL or not playlist_id:
         return
 
@@ -180,7 +232,7 @@ def _save_to_db_async(playlist_id, scores_to_update):
         print(f"⚠️ Erreur sauvegarde asynchrone BDD Neon : {e}")
 
 def save_local_scores(scores_to_update):
-    playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
+    playlist_id = session.get('selected_playlist_id')
     if not playlist_id:
         return
 
@@ -206,28 +258,29 @@ def login():
 def callback():
     sp_oauth = get_spotify_oauth()
     
-    saved_playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
-    
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
     
     if token_info:
-        response = redirect(url_for('index') if saved_playlist_id else url_for('liste_playlists'))
-        if saved_playlist_id:
-            session['selected_playlist_id'] = saved_playlist_id
+        sp = spotipy.Spotify(auth=token_info['access_token'])
+        profile = get_user_profile_cached(sp)
+        
+        # Récupération de la playlist active liée au compte Spotify
+        active_playlist = get_user_active_playlist_db(profile.get('id')) if profile else None
+        
+        if active_playlist:
+            session['selected_playlist_id'] = active_playlist
             session.permanent = True
-            response.set_cookie('elotify_playlist_id', saved_playlist_id, max_age=30*24*3600)
-        return response
+            return redirect(url_for('index'))
+            
+        return redirect(url_for('liste_playlists'))
         
     return redirect(url_for('login'))
 
 @app.route('/logout')
 def logout():
     session.clear()
-    response = redirect(url_for('login'))
-    # Efface le cookie de playlist lors de la déconnexion
-    response.delete_cookie('elotify_playlist_id')
-    return response
+    return redirect(url_for('login'))
 
 # --- ROUTE SELECTION PLAYLIST ---
 @app.route('/playlists')
@@ -268,13 +321,22 @@ def liste_playlists():
 
 @app.route('/select_playlist/<playlist_id>')
 def select_playlist(playlist_id):
+    sp = get_spotify_client()
+    if not sp:
+        return redirect(url_for('login'))
+
+    profile = get_user_profile_cached(sp)
+    user_id = profile.get('id') if profile else None
+
     session.permanent = True
     session['selected_playlist_id'] = playlist_id
     session.pop('tracks_cache', None)
     
-    response = Flask.make_response(app, '<script>window.location.replace("/");</script>')
-    response.set_cookie('elotify_playlist_id', playlist_id, max_age=30*24*3600)
-    return response
+    # Sauvegarde la playlist choisie en BDD pour ce compte Spotify
+    if user_id:
+        set_user_active_playlist_db(user_id, playlist_id)
+        
+    return '<script>window.location.replace("/");</script>'
 
 # --- ROUTE PRINCIPALE (DUEL) ---
 @app.route('/')
@@ -286,13 +348,22 @@ def index():
     if not sp:
         return redirect(url_for('login'))
 
-    playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
+    profile = get_user_profile_cached(sp)
+    user_id = profile.get('id') if profile else None
+
+    # Tente de lire en session ou en BDD Neon
+    playlist_id = session.get('selected_playlist_id')
+    if not playlist_id and user_id:
+        playlist_id = get_user_active_playlist_db(user_id)
+        if playlist_id:
+            session['selected_playlist_id'] = playlist_id
+
     if not playlist_id:
         return redirect(url_for('liste_playlists'))
 
-    session['selected_playlist_id'] = playlist_id
     scores = load_local_scores()
 
+    # Rechargement automatique de la playlist si la session a été vidée
     if 'tracks_cache' not in session or not session['tracks_cache']:
         try:
             raw_items = []
@@ -360,7 +431,7 @@ def index():
         track_a=track_a, 
         track_b=track_b, 
         dernier_resultat=dernier_resultat,
-        user=get_user_profile_cached(sp)
+        user=profile
     )
 
 # --- ROUTE VOTE ---
@@ -488,7 +559,10 @@ def stats():
     if not sp:
         return redirect(url_for('login'))
 
-    playlist_id = session.get('selected_playlist_id') or request.cookies.get('elotify_playlist_id')
+    profile = get_user_profile_cached(sp)
+    user_id = profile.get('id') if profile else None
+
+    playlist_id = session.get('selected_playlist_id') or get_user_active_playlist_db(user_id)
     if not playlist_id:
         return redirect(url_for('liste_playlists'))
 
@@ -509,7 +583,7 @@ def stats():
         'stats.html', 
         sorted_artists=sorted_artists, 
         total_tracks=len(tracks), 
-        user=get_user_profile_cached(sp)
+        user=profile
     )
 
 if __name__ == '__main__':
