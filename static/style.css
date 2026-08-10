@@ -66,10 +66,10 @@ body.duel-body {
 }
 
 .user-profile-container {
-    position: absolute;
-    top: 0;
-    right: 0;
-    z-index: 1000;
+    position: fixed !important;
+    top: 15px !important;
+    right: 20px !important;
+    z-index: 9999 !important;
 }
 
 .profile-trigger {
