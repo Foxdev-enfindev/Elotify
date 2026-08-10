@@ -9,7 +9,7 @@
 <body class="duel-body">
     <div class="container">
         
-        <!-- EN-TÊTE FIXE ET BANNIÈRE DE RÉSULTAT -->
+        <!-- EN-TÊTE FIXE -->
         <div class="header-zone">
             {% if user %}
             <div class="user-profile-container">
@@ -44,19 +44,18 @@
 
             <h1>⚔️ ELOTIFY DUEL ⚔️</h1>
 
+            <!-- EMPLACEMENT AVEC HAUTEUR RÉSERVÉE CONSTANTE -->
             <div class="result-banner-wrapper">
-                {% if dernier_resultat %}
-                    <div class="result-banner">{{ dernier_resultat }}</div>
-                {% else %}
-                    <div class="result-banner hidden"></div>
-                {% endif %}
+                <div class="result-banner {% if not dernier_resultat %}hidden{% endif %}">
+                    {{ dernier_resultat if dernier_resultat else '&nbsp;' }}
+                </div>
             </div>
         </div>
 
         <!-- ZONE DE DUEL PRINCIPALE -->
         <div class="duel-zone">
             
-            <!-- MORCEAU 1 (Actif par défaut au chargement) -->
+            <!-- MORCEAU 1 -->
             <div class="track-card active" id="card-a">
                 <div class="pochette-wrapper" onclick="onCardClick('a', '{{ track_a.uri }}')">
                     <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
@@ -118,29 +117,24 @@
     </div>
 
     <script>
-        let currentPlaying = 'a'; // Morceau 1 en cours par défaut
+        let currentPlaying = 'a';
 
         window.addEventListener('DOMContentLoaded', () => {
             const savedTheme = localStorage.getItem('elotify_theme') || 'green';
             setTheme(savedTheme);
 
-            // Lecture automatique du premier morceau
             fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
                 .catch(err => console.error('Erreur lecture initial :', err));
         });
 
-        // GESTION DU CLIC SUR LA CARTE (LECTURE OU VOTE)
         function onCardClick(trackKey, trackUri) {
             const cardA = document.getElementById('card-a');
             const cardB = document.getElementById('card-b');
 
             if (currentPlaying === trackKey) {
-                // Si la carte est DÉJÀ active, le clic valide le vote !
                 document.getElementById('form-' + trackKey).submit();
             } else {
-                // Si la carte n'est pas active, on bascule la musique et le surlignage néon
                 currentPlaying = trackKey;
-                
                 if (trackKey === 'a') {
                     cardA.classList.add('active');
                     cardB.classList.remove('active');
@@ -149,7 +143,6 @@
                     cardA.classList.remove('active');
                 }
 
-                // Lancement de la musique Spotify
                 fetch('/listen/' + trackUri, { method: 'POST' })
                     .catch(err => console.error('Erreur changement piste :', err));
             }

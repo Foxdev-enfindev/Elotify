@@ -21,29 +21,26 @@ html, body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    width: 100%;
-    min-height: 100vh;
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
 }
 
-/* VERROUILLAGE STRICT POUR LA PAGE DUEL UNIQUEMENT */
 body.duel-body {
-    height: 100vh !important;
-    height: 100dvh !important;
-    overflow: hidden !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* =======================================================
-   2. EN-TÊTE FIXE ET BANNIÈRE (AUCUN CHEVAUCHEMENT)
+   2. EN-TÊTE FIXE & EMPLACEMENT BANNIÈRE RÉSERVÉ
    ======================================================= */
 .container {
-    width: 100%;
-    max-width: 1100px;
+    width: 100vw;
     height: 100vh;
     height: 100dvh;
-    padding: 10px 14px;
+    padding: 8px 12px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -57,7 +54,7 @@ body.duel-body {
     flex-direction: column;
     align-items: center;
     position: relative;
-    padding-top: 35px; /* Laisse l'espace pour le bouton profil au-dessus */
+    padding-top: 32px;
 }
 
 .user-profile-container {
@@ -108,26 +105,28 @@ body.duel-body {
 .dot-green { background: #00ff66; } .dot-cyan { background: #00f0ff; } .dot-pink { background: #ff007f; } .dot-orange { background: #ff9900; }
 
 h1 {
-    font-size: clamp(1.1rem, 2.2vh, 1.7rem);
+    font-size: clamp(1.1rem, 2.2vh, 1.8rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 10px var(--neon-green-glow);
     letter-spacing: 2px;
-    margin: 0 0 4px 0;
+    margin: 0;
     text-align: center;
 }
 
-/* BANNIÈRE DE RÉSULTAT LARGE ET VISIBLE */
+/* HAUTEUR STRICTEMENT RÉSERVÉE : N'IMPACTE NULLEMENT LE RESTE DU LAYOUT */
 .result-banner-wrapper {
-    min-height: 28px;
+    height: 32px;
+    min-height: 32px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 4px;
 }
 
 .result-banner {
-    background: rgba(0, 255, 102, 0.1) !important;
+    background: rgba(0, 255, 102, 0.12) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
     padding: 3px 14px !important;
@@ -136,18 +135,22 @@ h1 {
     font-weight: 600 !important;
     font-size: clamp(0.72rem, 1.3vh, 0.85rem) !important;
     box-shadow: 0 0 10px var(--neon-green-glow) !important;
-    width: auto !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
     max-width: 95% !important;
+    visibility: visible;
 }
 
 .result-banner.hidden {
     visibility: hidden !important;
     border-color: transparent !important;
     background: transparent !important;
+    box-shadow: none !important;
 }
 
 /* =======================================================
-   3. CARTES ET BOUTONS DE DUEL
+   3. CARTES ET BOUTONS
    ======================================================= */
 .track-card {
     background: var(--card-bg);
@@ -165,7 +168,6 @@ h1 {
 .pochette-wrapper { position: relative; border-radius: 12px; overflow: hidden; cursor: pointer; }
 .pochette { width: 100%; height: 100%; object-fit: cover; }
 .vote-form { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-.vote-btn-overlay { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.2); border: none; cursor: pointer; }
 
 .vs-zone form { width: 100% !important; }
 
@@ -222,7 +224,7 @@ h1 {
         justify-content: center !important;
         width: 100% !important;
         max-width: 450px !important;
-        gap: 10px !important;
+        gap: 8px !important;
         flex: 1 !important;
     }
 
@@ -237,7 +239,7 @@ h1 {
 
     .pochette-wrapper, .pochette { width: 75px !important; height: 75px !important; flex-shrink: 0 !important; }
     .track-info { text-align: left !important; flex: 1 !important; }
-    .track-info h2 { font-size: 0.9rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
+    .track-info h2 { font-size: 0.88rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
     .track-info h3 { font-size: 0.75rem !important; color: var(--text-muted) !important; }
     .elo-display { font-size: 0.72rem !important; margin-top: 2px !important; color: var(--neon-green) !important; }
 
@@ -271,10 +273,10 @@ h1 {
 }
 
 /* =======================================================
-   5. LAYOUT PAYSAGE (BOUTON QUITTER 100% VERROUILLÉ À L'ÉCRAN)
+   5. LAYOUT PAYSAGE (PAYSAGE OUVERT ET FERMÉ)
    ======================================================= */
 @media screen and (orientation: landscape) {
-    .header-zone { padding-top: 30px; }
+    .header-zone { padding-top: 25px; }
 
     .duel-zone {
         display: flex !important;
@@ -297,7 +299,6 @@ h1 {
         justify-content: center !important;
     }
 
-    /* Pochette ultra-compacte en paysage pour empêcher le rejet du bouton Quitter */
     .pochette-wrapper, .pochette {
         width: clamp(60px, 18vh, 100px) !important;
         height: clamp(60px, 18vh, 100px) !important;
@@ -335,102 +336,7 @@ h1 {
 }
 
 /* =======================================================
-   6. STYLES SPÉCIFIQUES PAGE DE SORTIE (QUIT.HTML)
-   ======================================================= */
-body.quit-body {
-    overflow-y: auto !important;
-    min-height: 100vh !important;
-    padding: 20px 10px !important;
-    display: flex !important;
-    justify-content: center !important;
-}
-
-.quit-page-container {
-    width: 100%;
-    max-width: 550px;
-    margin: 0 auto;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.quit-subtitle {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    margin: 8px 0 20px 0;
-}
-
-.top5-list {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 25px;
-}
-
-.top5-card {
-    background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.top5-rank {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--neon-green);
-    min-width: 30px;
-}
-
-.top5-img {
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    object-fit: cover;
-}
-
-.top5-info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    flex: 1;
-}
-
-.top5-name {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: #fff;
-}
-
-.top5-artist {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-}
-
-.top5-elo {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--neon-green);
-    margin-left: auto;
-}
-
-.resume-btn {
-    background: var(--neon-green);
-    color: #0d0d0d;
-    font-weight: 800;
-    padding: 12px 24px;
-    border-radius: 25px;
-    text-decoration: none;
-    font-size: 0.9rem;
-    box-shadow: 0 0 12px var(--neon-green-glow);
-}
-
-/* =======================================================
-   7. FEEDBACK VISUEL DE VOTE
+   6. FEEDBACK VISUEL DE VOTE
    ======================================================= */
 .track-card.voted-winner {
     border-color: var(--neon-green) !important;
