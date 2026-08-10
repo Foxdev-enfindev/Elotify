@@ -33,7 +33,7 @@ body.duel-body {
 }
 
 /* =======================================================
-   2. CONTENEUR FIXE CADRÉ (VERROUILLAGE STRICT DU VIEWPORT)
+   2. CONTENEUR FIXE
    ======================================================= */
 .container {
     position: fixed !important;
@@ -41,7 +41,7 @@ body.duel-body {
     bottom: 0 !important;
     left: 0 !important;
     right: 0 !important;
-    padding: 6px 12px;
+    padding: 10px 16px;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
@@ -56,7 +56,7 @@ body.duel-body {
     flex-direction: column;
     align-items: center;
     position: relative;
-    padding-top: 26px;
+    padding-top: 32px;
     flex-shrink: 0 !important;
 }
 
@@ -73,15 +73,15 @@ body.duel-body {
     gap: 6px;
     background: rgba(24, 24, 24, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 3px 8px;
+    padding: 5px 12px;
     border-radius: 20px;
     cursor: pointer;
 }
 
-.user-avatar, .user-avatar-placeholder { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
-.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; }
-.user-name { font-size: 0.75rem; font-weight: 600; }
-.arrow-down { font-size: 0.6rem; color: var(--text-muted); }
+.user-avatar, .user-avatar-placeholder { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
+.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+.user-name { font-size: 0.8rem; font-weight: 600; }
+.arrow-down { font-size: 0.65rem; color: var(--text-muted); }
 
 .profile-dropdown {
     display: none;
@@ -91,7 +91,7 @@ body.duel-body {
     background: var(--card-bg);
     border: 1px solid #333;
     border-radius: 12px;
-    width: 170px;
+    width: 180px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     overflow: hidden;
 }
@@ -107,36 +107,37 @@ body.duel-body {
 .theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; }
 .dot-green { background: #00ff66; } .dot-cyan { background: #00f0ff; } .dot-pink { background: #ff007f; } .dot-orange { background: #ff9900; }
 
+/* TITRE PLUS GROS ET PLUS IMPOSANT */
 h1 {
-    font-size: clamp(1rem, 2vh, 1.4rem);
+    font-size: clamp(1.3rem, 2.8vh, 2rem);
     font-weight: 800;
     color: var(--neon-green);
-    text-shadow: 0 0 10px var(--neon-green-glow);
-    letter-spacing: 2px;
-    margin: 0;
+    text-shadow: 0 0 12px var(--neon-green-glow);
+    letter-spacing: 2.5px;
+    margin: 2px 0 6px 0;
     text-align: center;
 }
 
+/* BANNIÈRE DE RÉSULTAT AGRANDIE */
 .result-banner-wrapper {
-    height: 28px;
-    min-height: 28px;
+    height: 38px;
+    min-height: 38px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 2px;
 }
 
 .result-banner {
     background: rgba(0, 255, 102, 0.12) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 2px 12px !important;
-    border-radius: 14px !important;
+    padding: 5px 18px !important;
+    border-radius: 20px !important;
     text-align: center !important;
-    font-weight: 600 !important;
-    font-size: clamp(0.68rem, 1.2vh, 0.82rem) !important;
-    box-shadow: 0 0 10px var(--neon-green-glow) !important;
+    font-weight: 700 !important;
+    font-size: clamp(0.78rem, 1.5vh, 0.95rem) !important;
+    box-shadow: 0 0 12px var(--neon-green-glow) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
@@ -156,17 +157,17 @@ h1 {
 .track-card {
     background: var(--card-bg);
     border: 2px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     box-sizing: border-box;
 }
 
 .track-card.active, .track-card:hover {
     border-color: var(--neon-green) !important;
-    box-shadow: 0 0 15px var(--neon-green-glow) !important;
+    box-shadow: 0 0 18px var(--neon-green-glow) !important;
 }
 
-.pochette-wrapper { position: relative; border-radius: 10px; overflow: hidden; cursor: pointer; }
+.pochette-wrapper { position: relative; border-radius: 12px; overflow: hidden; cursor: pointer; }
 .pochette { width: 100%; height: 100%; object-fit: cover; }
 .vote-form { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
@@ -176,10 +177,10 @@ h1 {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 5px 0 !important;
-    border-radius: 14px !important;
+    padding: 7px 0 !important;
+    border-radius: 16px !important;
     font-weight: 800 !important;
-    font-size: 0.72rem !important;
+    font-size: 0.78rem !important;
     cursor: pointer !important;
     text-decoration: none !important;
     display: flex !important;
@@ -195,24 +196,24 @@ h1 {
     justify-content: center;
     align-items: center;
     flex-shrink: 0 !important;
-    padding-bottom: 2px;
+    padding-bottom: 4px;
 }
 
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 6px 0 !important;
-    border-radius: 14px !important;
-    font-size: 0.78rem !important;
+    padding: 8px 0 !important;
+    border-radius: 16px !important;
+    font-size: 0.82rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
-    box-shadow: 0 0 8px rgba(255, 51, 102, 0.4) !important;
+    box-shadow: 0 0 10px rgba(255, 51, 102, 0.4) !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    width: 120px !important;
+    width: 130px !important;
 }
 
 /* =======================================================
@@ -225,42 +226,43 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 440px !important;
-        gap: 6px !important;
+        max-width: 460px !important;
+        gap: 12px !important;
         flex: 1 1 auto !important;
         min-height: 0 !important;
     }
 
     .track-card {
         width: 100% !important;
-        padding: 6px 10px !important;
+        padding: 10px 14px !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 10px !important;
+        gap: 14px !important;
     }
 
-    .pochette-wrapper, .pochette { width: clamp(50px, 7.5vh, 70px) !important; height: clamp(50px, 7.5vh, 70px) !important; flex-shrink: 0 !important; }
+    /* Pochette re-boostée */
+    .pochette-wrapper, .pochette { width: clamp(75px, 11vh, 100px) !important; height: clamp(75px, 11vh, 100px) !important; flex-shrink: 0 !important; }
     .track-info { text-align: left !important; flex: 1 !important; }
-    .track-info h2 { font-size: 0.82rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
-    .track-info h3 { font-size: 0.72rem !important; color: var(--text-muted) !important; }
-    .elo-display { font-size: 0.68rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
+    .track-info h2 { font-size: 0.92rem !important; margin: 2px 0 !important; font-weight: 700 !important; }
+    .track-info h3 { font-size: 0.8rem !important; color: var(--text-muted) !important; }
+    .elo-display { font-size: 0.75rem !important; margin-top: 3px !important; color: var(--neon-green) !important; }
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 50px 1fr !important;
+        grid-template-columns: 58px 1fr !important;
         grid-template-areas: "circle pause" "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 240px !important;
-        gap: 3px 8px !important;
+        max-width: 260px !important;
+        gap: 4px 10px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 0.95rem !important;
+        width: 58px !important;
+        height: 58px !important;
+        font-size: 1.05rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -279,7 +281,7 @@ h1 {
    5. LAYOUT PAYSAGE (PAYSAGE OUVERT ET FERMÉ)
    ======================================================= */
 @media screen and (orientation: landscape) {
-    .header-zone { padding-top: 15px; }
+    .header-zone { padding-top: 20px; }
 
     .duel-zone {
         display: flex !important;
@@ -287,16 +289,16 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 850px !important;
-        gap: 10px !important;
+        max-width: 900px !important;
+        gap: 14px !important;
         flex: 1 1 auto !important;
         min-height: 0 !important;
     }
 
     .track-card {
         flex: 1 !important;
-        max-width: 280px !important;
-        padding: 4px 6px !important;
+        max-width: 320px !important;
+        padding: 8px 10px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -304,31 +306,31 @@ h1 {
     }
 
     .pochette-wrapper, .pochette {
-        width: clamp(45px, 13vh, 80px) !important;
-        height: clamp(45px, 13vh, 80px) !important;
-        margin-bottom: 2px !important;
+        width: clamp(70px, 20vh, 120px) !important;
+        height: clamp(70px, 20vh, 120px) !important;
+        margin-bottom: 4px !important;
         flex-shrink: 0 !important;
     }
 
     .track-info { text-align: center !important; width: 100% !important; }
-    .track-info h2 { font-size: 0.75rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
-    .track-info h3 { font-size: 0.65rem !important; color: var(--text-muted) !important; }
-    .elo-display { font-size: 0.62rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
+    .track-info h2 { font-size: 0.82rem !important; margin: 1px 0 !important; font-weight: 700 !important; }
+    .track-info h3 { font-size: 0.72rem !important; color: var(--text-muted) !important; }
+    .elo-display { font-size: 0.68rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
 
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 3px !important;
-        width: 100px !important;
+        gap: 5px !important;
+        width: 115px !important;
         flex-shrink: 0 !important;
     }
 
     .vs-circle {
-        width: 32px !important;
-        height: 32px !important;
-        font-size: 0.75rem !important;
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 0.82rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
