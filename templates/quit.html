@@ -45,11 +45,11 @@
         </div>
         {% endif %}
 
-        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%;">
-            <a href="{{ url_for('index') }}" class="nav-btn" style="padding: 12px 20px; font-size: 0.9rem; text-decoration: none; border-radius: 25px;">
+        <div style="display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: center;">
+            <a href="{{ url_for('index') }}" class="nav-btn" style="padding: 12px 20px; font-size: 0.9rem; text-decoration: none; border-radius: 25px; width: 100%; max-width: 280px; box-sizing: border-box;">
                 ⚔️ Reprendre le duel
             </a>
-            <a href="{{ url_for('liste_playlists') }}" class="pause-btn" style="padding: 12px 20px; font-size: 0.9rem; text-decoration: none; border-radius: 25px; text-align: center;">
+            <a href="{{ url_for('liste_playlists') }}" class="pause-btn" style="padding: 12px 20px; font-size: 0.9rem; text-decoration: none; border-radius: 25px; width: 100%; max-width: 280px; min-width: 280px; box-sizing: border-box; text-align: center;">
                 📁 Changer de playlist
             </a>
         </div>

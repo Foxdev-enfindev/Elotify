@@ -239,13 +239,13 @@ h1 {
 }
 
 /* =======================================================
-   BOUTONS ET CERCLAGE NÉON (ANCIENNE DA)
+   BOUTONS CENTRAUX NÉON (DIMENSIONS IDENTIQUES STRICTES)
    ======================================================= */
 .pause-btn, .tie-btn, .central-rank-btn {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 10px 18px !important;
+    padding: 10px 0 !important;
     border-radius: 20px !important;
     font-weight: 800 !important;
     font-size: 0.85rem !important;
@@ -256,6 +256,11 @@ h1 {
     justify-content: center !important;
     box-shadow: 0 0 12px var(--neon-green-glow) !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    width: 170px !important;
+    min-width: 170px !important;
+    max-width: 170px !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
 }
 
 .pause-btn:hover, .tie-btn:hover, .central-rank-btn:hover {
@@ -267,7 +272,7 @@ h1 {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 8px 24px !important;
+    padding: 8px 28px !important;
     border-radius: 20px !important;
     font-size: 0.88rem !important;
     font-weight: 800 !important;
@@ -384,7 +389,7 @@ h1 {
     }
 
     .vs-circle {
-        width: 80px !important; /* CERCLE GÉANT ANCIENNE DA */
+        width: 80px !important;
         height: 80px !important;
         font-size: 1.5rem !important;
         background: var(--neon-green) !important;
@@ -395,11 +400,6 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         box-shadow: 0 0 20px var(--neon-green-glow) !important;
-    }
-
-    .pause-btn, .tie-btn, .central-rank-btn {
-        width: 100% !important;
-        max-width: 160px !important;
     }
 
     .quit-wrapper {
@@ -538,9 +538,9 @@ h1 {
 }
 
 /* =======================================================
-   6. ÉCRAN FERMÉ (SMARTPHONE PORTRAIT FERMÉ < 480px)
+   6. ÉCRAN FERMÉ (SMARTPHONE / FOLD FERMÉ JUSQU'À 550px)
    ======================================================= */
-@media screen and (max-width: 479px) {
+@media screen and (max-width: 550px) {
     body.duel-body .container {
         position: absolute !important;
         top: 0 !important;
@@ -549,7 +549,7 @@ h1 {
         right: 0 !important;
         margin: auto !important;
         height: 100% !important;
-        padding: 75px 12px 12px 12px !important;
+        padding: 70px 12px 10px 12px !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-evenly !important;
@@ -563,13 +563,13 @@ h1 {
     }
 
     .result-banner {
-        height: 34px !important;
-        min-height: 34px !important;
-        max-height: 34px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
         padding: 2px 8px !important;
         font-size: 0.72rem !important;
         margin: 0 auto !important;
-        max-width: calc(100% - 110px) !important;
+        max-width: calc(100% - 100px) !important;
     }
 
     .duel-zone {
@@ -580,7 +580,7 @@ h1 {
         width: 100% !important;
     }
 
-    /* Cartes compactes en ligne */
+    /* Cartes compactes horizontales */
     .track-card {
         padding: 8px 12px !important;
         flex-direction: row !important;
@@ -628,7 +628,7 @@ h1 {
         color: var(--neon-green) !important; 
     }
 
-    /* Restructuration de la zone VS centrale (Cercle à gauche, boutons fluo à droite) */
+    /* Restructuration de la zone VS centrale */
     .vs-zone {
         display: grid !important;
         grid-template-columns: auto 1fr !important;
@@ -640,7 +640,7 @@ h1 {
         justify-items: center !important;
         width: 100% !important;
         gap: 4px 10px !important;
-        margin: 4px 0 !important;
+        margin: 2px 0 !important;
         padding: 0 10px !important;
         box-sizing: border-box !important;
     }
@@ -663,14 +663,16 @@ h1 {
         box-shadow: 0 0 15px var(--neon-green-glow) !important;
     }
 
-    .vs-zone > #play-pause-btn { grid-area: pause !important; width: 100% !important; max-width: 175px !important; }
-    .vs-zone > form { grid-area: tie !important; width: 100% !important; max-width: 175px !important; }
-    .vs-zone > .rank-wrapper { grid-area: rank !important; width: 100% !important; max-width: 175px !important; position: static !important; }
+    .vs-zone > #play-pause-btn { grid-area: pause !important; width: 100% !important; }
+    .vs-zone > form { grid-area: tie !important; width: 100% !important; }
+    .vs-zone > .rank-wrapper { grid-area: rank !important; width: 100% !important; position: static !important; }
 
-    /* Boutons centraux fluo avec texte sombre */
+    /* Boutons centraux de taille identique */
     .pause-btn, .tie-btn, .central-rank-btn {
         width: 100% !important;
-        padding: 5px 10px !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
+        padding: 6px 0 !important;
         font-size: 0.75rem !important;
         font-weight: 800 !important;
         border-radius: 12px !important;
@@ -697,9 +699,9 @@ h1 {
 }
 
 /* =======================================================
-   7. ÉCRAN OUVERT (FOLD DÉPLIÉ / TABLETTE DE 480px À 900px)
+   7. ÉCRAN OUVERT (FOLD DÉPLIÉ / TABLETTE DE 551px À 900px)
    ======================================================= */
-@media screen and (min-width: 480px) and (max-width: 900px) {
+@media screen and (min-width: 551px) and (max-width: 900px) {
     body.duel-body .container {
         position: absolute !important;
         top: 0 !important;
@@ -781,7 +783,7 @@ h1 {
         gap: 10px !important;
         margin: 0 !important;
         flex-shrink: 0 !important;
-        min-width: 140px !important;
+        min-width: 180px !important;
     }
 
     .vs-circle {
@@ -799,10 +801,12 @@ h1 {
     }
 
     .pause-btn, .tie-btn, .central-rank-btn {
-        padding: 6px 12px !important;
+        padding: 6px 0 !important;
         font-size: 0.75rem !important;
         border-radius: 20px !important;
-        width: 100% !important;
+        width: 150px !important;
+        min-width: 150px !important;
+        max-width: 150px !important;
     }
 
     .quit-wrapper {
