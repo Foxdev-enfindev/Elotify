@@ -185,9 +185,9 @@ h1 {
 .vote-btn-overlay { width: 100%; height: 100%; background: rgba(0, 0, 0, 0.2); border: none; cursor: pointer; }
 
 /* =======================================================
-   3. FOCUS : ÉCRAN MOBILES ET FOLD FERMÉ (< 600px)
+   3. FOCUS : ÉCRAN MOBILES ET FOLD FERMÉ PORTRAIT (< 600px)
    ======================================================= */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 600px) and (orientation: portrait) {
     body.duel-body .container {
         position: absolute !important;
         top: 0 !important;
@@ -196,7 +196,7 @@ h1 {
         right: 0 !important;
         margin: auto !important;
         height: 100% !important;
-        padding: 45px 12px 18px 12px !important; /* Marge du haut réduite pour remonter tout le bloc */
+        padding: 45px 12px 18px 12px !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-evenly !important;
@@ -226,7 +226,6 @@ h1 {
         width: 100% !important;
     }
 
-    /* Cartes agrandies */
     .track-card {
         padding: 10px 14px !important;
         display: flex !important;
@@ -247,7 +246,6 @@ h1 {
         box-shadow: 0 0 20px var(--neon-green-glow) !important;
     }
 
-    /* Pochettes agrandies à 85px */
     .pochette-wrapper, .pochette {
         width: 85px !important;
         height: 85px !important;
@@ -266,7 +264,6 @@ h1 {
     .track-info h3 { font-size: 0.8rem !important; }
     .elo-display { font-size: 0.78rem !important; margin-top: 3px !important; color: var(--neon-green) !important; }
 
-    /* ZONE VS : ROND AGRANDI + BOUTONS ÉLARGIS */
     .vs-zone {
         display: grid !important;
         grid-template-columns: 62px 1fr !important;
@@ -304,7 +301,6 @@ h1 {
     .vs-zone > form { grid-area: tie !important; width: 100% !important; }
     .vs-zone > .rank-wrapper { grid-area: rank !important; width: 100% !important; position: static !important; }
 
-    /* Style des 3 boutons centraux élargis */
     .pause-btn, 
     .tie-btn, 
     .central-rank-btn, 
@@ -346,9 +342,140 @@ h1 {
 }
 
 /* =======================================================
-   4. AUTRES FORMATS (DESKTOP / TABLETTE)
+   4. ADAPTATION SPÉCIFIQUE : MOBILES EN MODE PAYSAGE (LANDSCAPE)
    ======================================================= */
-@media screen and (min-width: 601px) {
+@media screen and (orientation: landscape) and (max-height: 600px) {
+    body.duel-body .container {
+        position: absolute !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        margin: auto !important;
+        height: 100% !important;
+        padding: 10px 8px 4px 8px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        box-sizing: border-box !important;
+    }
+
+    .result-banner {
+        height: 24px !important;
+        min-height: 24px !important;
+        padding: 1px 8px !important;
+        font-size: 0.68rem !important;
+        margin: 0 auto 2px auto !important;
+        width: auto !important;
+        max-width: 60% !important;
+    }
+
+    h1 {
+        font-size: 1rem !important;
+        margin: 0 !important;
+    }
+
+    .duel-zone {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        flex: 1 1 auto !important;
+    }
+
+    .track-card {
+        flex: 0 1 210px !important;
+        width: 210px !important;
+        max-width: 210px !important;
+        padding: 6px 8px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+        background: var(--card-bg) !important;
+        border: 2px solid transparent !important;
+        border-radius: 12px !important;
+    }
+
+    .track-card.active {
+        border-color: var(--neon-green) !important;
+        box-shadow: 0 0 12px var(--neon-green-glow) !important;
+    }
+
+    .pochette-wrapper, .pochette {
+        width: clamp(55px, 22vh, 95px) !important;
+        height: clamp(55px, 22vh, 95px) !important;
+        margin-bottom: 2px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .track-info {
+        text-align: center !important;
+        width: 100% !important;
+    }
+
+    .track-info h2 { font-size: 0.8rem !important; margin: 1px 0 !important; }
+    .track-info h3 { font-size: 0.68rem !important; }
+    .elo-display { font-size: 0.65rem !important; margin-top: 1px !important; color: var(--neon-green) !important; }
+
+    .vs-zone {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        margin: 0 !important;
+        flex-shrink: 0 !important;
+        min-width: 110px !important;
+    }
+
+    .vs-circle {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        font-size: 0.85rem !important;
+        background: var(--neon-green) !important;
+        color: #0d0d0d !important;
+        font-weight: 900 !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 0 8px var(--neon-green-glow) !important;
+    }
+
+    .pause-btn, 
+    .tie-btn, 
+    .central-rank-btn, 
+    a.central-rank-btn {
+        padding: 3px 0 !important;
+        font-size: 0.68rem !important;
+        border-radius: 10px !important;
+        width: 110px !important;
+        min-width: 110px !important;
+        max-width: 110px !important;
+    }
+
+    .quit-wrapper { margin-top: 0 !important; }
+
+    .quit-btn {
+        width: 110px !important;
+        min-width: 110px !important;
+        max-width: 110px !important;
+        padding: 3px 0 !important;
+        font-size: 0.7rem !important;
+    }
+}
+
+/* =======================================================
+   5. DESKTOP / TABLETTES ÉCRAN LARGE (≥ 601px EN PORTRAIT)
+   ======================================================= */
+@media screen and (min-width: 601px) and (min-height: 601px) {
     body.duel-body { display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; padding: 20px !important; }
     body.duel-body .container { position: static !important; width: 100% !important; max-width: 1100px !important; height: auto !important; }
     .duel-zone { display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: center !important; gap: 30px !important; }
@@ -361,7 +488,7 @@ h1 {
 }
 
 /* =======================================================
-   5. PAGES CLASSEMENT, STATS, PLAYLISTS
+   6. PAGES CLASSEMENT, STATS, PLAYLISTS
    ======================================================= */
 .ranking-container { width: 100%; max-width: 800px; margin: 0 auto; padding: 55px 14px 40px 14px; }
 .nav-btn { display: inline-flex !important; align-items: center; justify-content: center; background: #181818 !important; color: var(--neon-green) !important; border: 1px solid var(--neon-green) !important; padding: 8px 16px !important; border-radius: 20px !important; font-weight: 600 !important; text-decoration: none !important; }
