@@ -239,9 +239,12 @@ h1 {
 }
 
 /* =======================================================
-   BOUTONS CENTRAUX NÉON (DIMENSIONS IDENTIQUES STRICTES)
+   BOUTONS CENTRAUX NÉON & QUITTER (RÈGLES ET DIMS UNIFORMES)
    ======================================================= */
-.pause-btn, .tie-btn, .central-rank-btn {
+.pause-btn, 
+.tie-btn, 
+.central-rank-btn, 
+a.central-rank-btn {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
@@ -263,22 +266,34 @@ h1 {
     text-align: center !important;
 }
 
-.pause-btn:hover, .tie-btn:hover, .central-rank-btn:hover {
+.pause-btn:hover, 
+.tie-btn:hover, 
+.central-rank-btn:hover, 
+a.central-rank-btn:hover {
     transform: scale(1.04) !important;
     box-shadow: 0 0 20px var(--neon-green-glow) !important;
 }
 
+/* BOUTON QUITTER : MÊMES DIMENSIONS QUE LES BOUTONS CENTRAUX */
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 8px 28px !important;
+    padding: 10px 0 !important;
     border-radius: 20px !important;
-    font-size: 0.88rem !important;
+    font-size: 0.85rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 12px rgba(255, 51, 102, 0.4) !important;
     transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    width: 170px !important;
+    min-width: 170px !important;
+    max-width: 170px !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .quit-btn:hover {
@@ -538,9 +553,9 @@ h1 {
 }
 
 /* =======================================================
-   6. ÉCRAN FERMÉ (SMARTPHONE / FOLD FERMÉ JUSQU'À 550px)
+   6. ÉCRAN FERMÉ (SMARTPHONE / FOLD FERMÉ JUSQU'À 580px)
    ======================================================= */
-@media screen and (max-width: 550px) {
+@media screen and (max-width: 580px) {
     body.duel-body .container {
         position: absolute !important;
         top: 0 !important;
@@ -549,7 +564,7 @@ h1 {
         right: 0 !important;
         margin: auto !important;
         height: 100% !important;
-        padding: 70px 12px 10px 12px !important;
+        padding: 70px 10px 10px 10px !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-evenly !important;
@@ -580,7 +595,7 @@ h1 {
         width: 100% !important;
     }
 
-    /* Cartes compactes horizontales */
+    /* Cartes compactes horizontales rangées */
     .track-card {
         padding: 8px 12px !important;
         flex-direction: row !important;
@@ -630,29 +645,24 @@ h1 {
 
     /* Restructuration de la zone VS centrale */
     .vs-zone {
-        display: grid !important;
-        grid-template-columns: auto 1fr !important;
-        grid-template-areas: 
-            "vs pause"
-            "vs tie"
-            "vs rank" !important;
+        display: flex !important;
+        flex-direction: row !important;
         align-items: center !important;
-        justify-items: center !important;
+        justify-content: center !important;
         width: 100% !important;
-        gap: 4px 10px !important;
+        gap: 12px !important;
         margin: 2px 0 !important;
-        padding: 0 10px !important;
+        padding: 0 !important;
         box-sizing: border-box !important;
     }
 
     .vs-circle {
-        grid-area: vs !important;
         width: 58px !important;
         height: 58px !important;
         min-width: 58px !important;
         min-height: 58px !important;
         font-size: 1.1rem !important;
-        margin: 0 6px 0 0 !important;
+        margin: 0 !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -663,15 +673,20 @@ h1 {
         box-shadow: 0 0 15px var(--neon-green-glow) !important;
     }
 
-    .vs-zone > #play-pause-btn { grid-area: pause !important; width: 100% !important; }
-    .vs-zone > form { grid-area: tie !important; width: 100% !important; }
-    .vs-zone > .rank-wrapper { grid-area: rank !important; width: 100% !important; position: static !important; }
+    .vs-buttons-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
 
-    /* Boutons centraux de taille identique */
-    .pause-btn, .tie-btn, .central-rank-btn {
-        width: 100% !important;
-        min-width: 100% !important;
-        max-width: 100% !important;
+    /* Boutons centraux de taille compacte identique */
+    .pause-btn, 
+    .tie-btn, 
+    .central-rank-btn, 
+    a.central-rank-btn {
+        width: 140px !important;
+        min-width: 140px !important;
+        max-width: 140px !important;
         padding: 6px 0 !important;
         font-size: 0.75rem !important;
         font-weight: 800 !important;
@@ -691,7 +706,10 @@ h1 {
     }
     
     .quit-btn { 
-        padding: 6px 20px !important; 
+        width: 140px !important;
+        min-width: 140px !important;
+        max-width: 140px !important;
+        padding: 6px 0 !important; 
         font-size: 0.8rem !important; 
     }
     
@@ -699,9 +717,9 @@ h1 {
 }
 
 /* =======================================================
-   7. ÉCRAN OUVERT (FOLD DÉPLIÉ / TABLETTE DE 551px À 900px)
+   7. ÉCRAN OUVERT / TABLETTE / PAYSAGE (DE 581px À 900px ET PAYSAGE)
    ======================================================= */
-@media screen and (min-width: 551px) and (max-width: 900px) {
+@media screen and (min-width: 581px) and (max-width: 900px), screen and (max-height: 600px) and (orientation: landscape) {
     body.duel-body .container {
         position: absolute !important;
         top: 0 !important;
@@ -711,7 +729,7 @@ h1 {
         margin: auto !important;
         height: 100% !important;
         max-width: 900px !important;
-        padding: 50px 15px 15px 15px !important;
+        padding: 45px 15px 10px 15px !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-evenly !important;
@@ -720,15 +738,17 @@ h1 {
     }
 
     h1 {
-        font-size: 1.4rem !important;
+        font-size: 1.3rem !important;
         margin: 0 !important;
     }
 
     .result-banner {
         margin: 0 auto !important;
-        padding: 4px 14px !important;
-        font-size: 0.78rem !important;
+        padding: 2px 14px !important;
+        font-size: 0.75rem !important;
         max-width: calc(100% - 150px) !important;
+        height: 32px !important;
+        min-height: 32px !important;
     }
 
     .duel-zone {
@@ -736,15 +756,15 @@ h1 {
         flex-direction: row !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 20px !important;
+        gap: 16px !important;
         width: 100% !important;
         flex: 0 0 auto !important;
     }
 
     .track-card {
         flex: 1 1 0 !important;
-        max-width: 320px !important;
-        padding: 14px !important;
+        max-width: 280px !important;
+        padding: 10px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -760,9 +780,9 @@ h1 {
     }
 
     .pochette-wrapper, .pochette {
-        width: clamp(130px, 18vh, 180px) !important;
-        height: clamp(130px, 18vh, 180px) !important;
-        margin-bottom: 8px !important;
+        width: clamp(100px, 20vh, 150px) !important;
+        height: clamp(100px, 20vh, 150px) !important;
+        margin-bottom: 6px !important;
         flex-shrink: 0 !important;
     }
 
@@ -771,25 +791,25 @@ h1 {
         width: 100% !important;
     }
 
-    .track-info h2 { font-size: 1rem !important; margin: 3px 0 2px 0 !important; }
-    .track-info h3 { font-size: 0.82rem !important; }
-    .elo-display { font-size: 0.8rem !important; margin-top: 4px !important; color: var(--neon-green); }
+    .track-info h2 { font-size: 0.9rem !important; margin: 2px 0 1px 0 !important; }
+    .track-info h3 { font-size: 0.78rem !important; }
+    .elo-display { font-size: 0.75rem !important; margin-top: 2px !important; color: var(--neon-green); }
 
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 10px !important;
+        gap: 8px !important;
         margin: 0 !important;
         flex-shrink: 0 !important;
-        min-width: 180px !important;
+        min-width: 150px !important;
     }
 
     .vs-circle {
-        width: 60px !important;
-        height: 60px !important;
-        font-size: 1.1rem !important;
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 1rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -800,13 +820,16 @@ h1 {
         box-shadow: 0 0 15px var(--neon-green-glow) !important;
     }
 
-    .pause-btn, .tie-btn, .central-rank-btn {
-        padding: 6px 0 !important;
+    .pause-btn, 
+    .tie-btn, 
+    .central-rank-btn, 
+    a.central-rank-btn {
+        padding: 5px 0 !important;
         font-size: 0.75rem !important;
         border-radius: 20px !important;
-        width: 150px !important;
-        min-width: 150px !important;
-        max-width: 150px !important;
+        width: 140px !important;
+        min-width: 140px !important;
+        max-width: 140px !important;
     }
 
     .quit-wrapper {
@@ -815,8 +838,11 @@ h1 {
     }
 
     .quit-btn {
-        padding: 6px 18px !important;
-        font-size: 0.82rem !important;
+        width: 140px !important;
+        min-width: 140px !important;
+        max-width: 140px !important;
+        padding: 5px 0 !important;
+        font-size: 0.8rem !important;
     }
 }
 
