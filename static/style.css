@@ -166,9 +166,17 @@ h1 {
     box-sizing: border-box;
 }
 
-.track-card.active, .track-card:hover {
+/* 1. Carte en cours de lecture / sélectionnée */
+.track-card.active {
     border-color: var(--neon-green) !important;
     box-shadow: 0 0 22px var(--neon-green-glow) !important;
+}
+
+/* 2. Survol discret pour la carte inactive (indique qu'on peut cliquer) */
+.track-card:not(.active):hover {
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1) !important;
+    cursor: pointer;
 }
 
 .pochette-wrapper { position: relative; border-radius: 12px; overflow: hidden; cursor: pointer; }
