@@ -226,6 +226,39 @@ h1 {
     font-size: 0.82rem !important;
 }
 
+/* BOUTONS DE SAUT TIMECODE */
+.seek-controls {
+    display: none; /* Masqué par défaut */
+    gap: 6px;
+    margin-top: 6px;
+    width: 100%;
+}
+
+/* Visible UNIQUEMENT sur la carte active */
+.track-card.active .seek-controls {
+    display: flex !important;
+}
+
+.seek-btn {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-color);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 4px 0;
+    border-radius: 12px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.seek-btn:hover, .seek-btn:active {
+    background: var(--neon-green);
+    color: #0d0d0d;
+    border-color: var(--neon-green);
+    box-shadow: 0 0 8px var(--neon-green-glow);
+}
+
 .vs-zone form { width: 100% !important; }
 
 .pause-btn, .tie-btn, .central-rank-btn, a.central-rank-btn {

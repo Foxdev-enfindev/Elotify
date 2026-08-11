@@ -588,6 +588,27 @@ def toggle_pause():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/seek_offset/<int:offset_seconds>', methods=['POST'])
+def seek_offset(offset_seconds):
+    sp = get_spotify_client()
+    if not sp:
+        return jsonify({"error": "Non authentifié"}), 401
+    try:
+        playback = sp.current_playback()
+        if playback and playback.get('is_playing') and playback.get('progress_ms') is not None:
+            current_ms = playback['progress_ms']
+            target_ms = max(0, current_ms + (offset_seconds * 1000))
+            sp.seek_track(position_ms=target_ms)
+            return jsonify({'status': 'success', 'new_position_ms': target_ms})
+        else:
+            return jsonify({'warning': 'Lance une piste sur Spotify pour ajuster le timecode.'})
+    except SpotifyException as e:
+        if e.http_status == 404:
+            return jsonify({'warning': 'Ouvre Spotify sur ton appareil pour ajuster la lecture.'}), 200
+        return jsonify({'error': str(e)}), 500
+    except Exception as e:
+        return jsonify({'warning': 'Impossible d\'ajuster le timecode (Spotify inactif).'})
+
 # --- ROUTE CLASSEMENT & API TOP 5 ---
 @app.route('/classement')
 def classement():
