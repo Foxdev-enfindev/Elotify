@@ -60,8 +60,8 @@
         <div class="duel-zone">
             
             <!-- MORCEAU 1 -->
-            <div class="track-card active" id="card-a">
-                <div class="pochette-wrapper" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
+            <div class="track-card active" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
+                <div class="pochette-wrapper">
                     <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
                     <form action="{{ url_for('vote') }}" method="POST" id="form-a" class="vote-form" onsubmit="handleVote(event, 'a')">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
@@ -94,8 +94,8 @@
             </div>
 
             <!-- MORCEAU 2 -->
-            <div class="track-card" id="card-b">
-                <div class="pochette-wrapper" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
+            <div class="track-card" id="card-b" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
+                <div class="pochette-wrapper">
                     <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="pochette">
                     <form action="{{ url_for('vote') }}" method="POST" id="form-b" class="vote-form" onsubmit="handleVote(event, 'b')">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
