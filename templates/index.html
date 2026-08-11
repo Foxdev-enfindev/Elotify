@@ -131,7 +131,7 @@
                         showSpotifyWarning("⚠️ " + data.warning);
                     }
                 })
-                .catch(err => console.error('Erreur lecture initial :', err));
+                .catch(err => console.error('Erreur lecture initiale :', err));
         });
 
         function showSpotifyWarning(msg) {
@@ -151,11 +151,13 @@
             const cardB = document.getElementById('card-b');
 
             if (currentPlaying === trackKey) {
+                // Si la carte cliquée est déjà en cours de lecture : on valide le vote
                 triggerVoteAnimation(trackKey);
                 setTimeout(() => {
                     document.getElementById('form-' + trackKey).submit();
                 }, 150);
             } else {
+                // Si on clique sur l'autre carte : bascule la lecture et l'affichage actif
                 currentPlaying = trackKey;
                 if (trackKey === 'a') {
                     cardA.classList.add('active');
