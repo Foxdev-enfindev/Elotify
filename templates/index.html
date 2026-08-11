@@ -133,7 +133,7 @@
 
         <!-- BOUTON QUITTER EN BAS DES CARTES -->
         <div class="quit-wrapper">
-            <a href="{{ url_for('quit_app') }}" class="quit-btn">🚪 Quitter</a>
+            <a href="{{ url_for('quit_app') }}" class="quit-btn" onclick="disableCardsOnQuit()">🚪 Quitter</a>
         </div>
 
     </div>
@@ -205,6 +205,16 @@
             } else {
                 switchActiveCard(trackKey, trackUri);
             }
+        }
+
+        function disableCardsOnQuit() {
+            const cardA = document.getElementById('card-a');
+            const cardB = document.getElementById('card-b');
+            const vsZone = document.getElementById('vsZone');
+
+            vsZone.classList.add('voting-in-progress');
+            cardA.classList.add('voted-loser');
+            cardB.classList.add('voted-loser');
         }
 
         function seekOffset(event, seconds) {

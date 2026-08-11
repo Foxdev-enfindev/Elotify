@@ -550,7 +550,7 @@ body.playlists-body {
 }
 
 /* =======================================================
-   7. STYLES CORRIGÉS PAGE CLASSEMENT
+   7. STYLES CORRIGÉS PAGE CLASSEMENT & STATS
    ======================================================= */
 body.classement-body {
     overflow-y: auto !important;
@@ -786,19 +786,14 @@ body.quit-body {
 }
 
 .full-rank-btn {
-    background: var(--card-bg) !important;
-    color: var(--text-color) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    font-weight: 700 !important;
+    background: var(--neon-green) !important;
+    color: #0d0d0d !important;
+    font-weight: 800 !important;
     padding: 10px 20px !important;
     border-radius: 20px !important;
     text-decoration: none !important;
     font-size: 0.85rem !important;
-}
-
-.full-rank-btn:hover {
-    border-color: var(--neon-green) !important;
-    color: var(--neon-green) !important;
+    box-shadow: 0 0 10px var(--neon-green-glow) !important;
 }
 
 /* =======================================================

@@ -54,9 +54,9 @@
                 <span class="ranking-rank">#{{ loop.index }}</span>
                 <div class="ranking-info">
                     <span class="ranking-name">{{ artist }}</span>
-                    <span class="ranking-artist">{{ count }} titre{% if count > 1 %}s{% endif %} dans la playlist</span>
+                    <span class="ranking-artist">{{ ((count / total_tracks) * 100) | round(1) }}% de la playlist</span>
                 </div>
-                <span class="ranking-elo">{{ ((count / total_tracks) * 100) | round(1) }}%</span>
+                <span class="ranking-elo">{{ count }} titre{% if count > 1 %}s{% endif %}</span>
             </div>
             {% endfor %}
         </div>
