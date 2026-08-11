@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="duel-body">
+
+    <!-- BANDEAU NOTIFICATION SPOTIFY INACTIF -->
+    <div id="spotify-toast" class="toast hidden"></div>
+
     <div class="container">
         
         <!-- EN-TÊTE FIXE -->
@@ -121,8 +125,26 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.warning) {
+                        showSpotifyWarning("⚠️ " + data.warning);
+                    }
+                })
                 .catch(err => console.error('Erreur lecture initial :', err));
         });
+
+        function showSpotifyWarning(msg) {
+            const toast = document.getElementById('spotify-toast');
+            toast.innerText = msg;
+            toast.classList.remove('hidden');
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 4000);
+        }
 
         function onCardClick(trackKey, trackUri) {
             const cardA = document.getElementById('card-a');
@@ -144,6 +166,12 @@
                 }
 
                 fetch('/listen/' + trackUri, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.warning) {
+                            showSpotifyWarning("⚠️ " + data.warning);
+                        }
+                    })
                     .catch(err => console.error('Erreur changement piste :', err));
             }
         }
@@ -176,7 +204,9 @@
                 .then(res => res.json())
                 .then(data => {
                     const btn = document.getElementById('play-pause-btn');
-                    if (data.status === 'paused') {
+                    if (data.warning) {
+                        showSpotifyWarning("⚠️ " + data.warning);
+                    } else if (data.status === 'paused') {
                         btn.innerText = '▶ Jouer';
                     } else if (data.status === 'playing') {
                         btn.innerText = '⏸ Pause';
