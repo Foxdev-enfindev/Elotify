@@ -61,7 +61,7 @@
             
             <!-- MORCEAU 1 -->
             <div class="track-card active" id="card-a">
-                <div class="pochette-wrapper" onclick="onCardClick('a', '{{ track_a.uri }}')">
+                <div class="pochette-wrapper" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
                     <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
                     <form action="{{ url_for('vote') }}" method="POST" id="form-a" class="vote-form" onsubmit="handleVote(event, 'a')">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
@@ -95,7 +95,7 @@
 
             <!-- MORCEAU 2 -->
             <div class="track-card" id="card-b">
-                <div class="pochette-wrapper" onclick="onCardClick('b', '{{ track_b.uri }}')">
+                <div class="pochette-wrapper" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
                     <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="pochette">
                     <form action="{{ url_for('vote') }}" method="POST" id="form-b" class="vote-form" onsubmit="handleVote(event, 'b')">
                         <input type="hidden" name="id_a" value="{{ track_a.id }}">
@@ -122,6 +122,7 @@
 
     <script>
         let currentPlaying = 'a';
+        const isDesktop = window.matchMedia('(pointer: fine)').matches;
 
         window.addEventListener('DOMContentLoaded', () => {
             fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
@@ -146,35 +147,45 @@
             }, 4000);
         }
 
-        function onCardClick(trackKey, trackUri) {
+        function switchActiveCard(trackKey, trackUri) {
             const cardA = document.getElementById('card-a');
             const cardB = document.getElementById('card-b');
 
+            currentPlaying = trackKey;
+            if (trackKey === 'a') {
+                cardA.classList.add('active');
+                cardB.classList.remove('active');
+            } else {
+                cardB.classList.add('active');
+                cardA.classList.remove('active');
+            }
+
+            fetch('/listen/' + trackUri, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.warning) {
+                        showSpotifyWarning("⚠️ " + data.warning);
+                    }
+                })
+                .catch(err => console.error('Erreur changement piste :', err));
+        }
+
+        function onCardHover(trackKey, trackUri) {
+            if (!isDesktop) return;
+
+            if (currentPlaying !== trackKey) {
+                switchActiveCard(trackKey, trackUri);
+            }
+        }
+
+        function onCardClick(trackKey, trackUri) {
             if (currentPlaying === trackKey) {
-                // Si la carte cliquée est déjà en cours de lecture : on valide le vote
                 triggerVoteAnimation(trackKey);
                 setTimeout(() => {
                     document.getElementById('form-' + trackKey).submit();
                 }, 150);
             } else {
-                // Si on clique sur l'autre carte : bascule la lecture et l'affichage actif
-                currentPlaying = trackKey;
-                if (trackKey === 'a') {
-                    cardA.classList.add('active');
-                    cardB.classList.remove('active');
-                } else {
-                    cardB.classList.add('active');
-                    cardA.classList.remove('active');
-                }
-
-                fetch('/listen/' + trackUri, { method: 'POST' })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.warning) {
-                            showSpotifyWarning("⚠️ " + data.warning);
-                        }
-                    })
-                    .catch(err => console.error('Erreur changement piste :', err));
+                switchActiveCard(trackKey, trackUri);
             }
         }
 
