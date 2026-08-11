@@ -155,8 +155,15 @@ h1 {
 }
 
 /* =======================================================
-   3. CARTES ET TYPOGRAPHIE DUEL
+   3. CARTES ET SLOTS MORCEAUX DUEL
    ======================================================= */
+.track-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
 .track-card {
     background: var(--card-bg);
     border: 2px solid rgba(255, 255, 255, 0.08);
@@ -165,6 +172,7 @@ h1 {
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
+    width: 100%;
 }
 
 .track-card.active {
@@ -226,37 +234,45 @@ h1 {
     font-size: 0.82rem !important;
 }
 
-/* BOUTONS DE SAUT TIMECODE */
+/* BOUTONS TIMECODE EXTÉRIEURS SOUS LA CARTE (ESPACE RÉSERVÉ RIDEAU SANS DÉCALAGE) */
 .seek-controls {
-    display: none; /* Masqué par défaut */
-    gap: 6px;
-    margin-top: 6px;
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
     width: 100%;
+    visibility: hidden; /* Espace réservé en permanence sous chaque carte */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
 }
 
-/* Visible UNIQUEMENT sur la carte active */
-.track-card.active .seek-controls {
-    display: flex !important;
+/* Visibles UNIQUEMENT sous la carte active */
+.track-card.active + .seek-controls {
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
 .seek-btn {
     flex: 1;
-    background: rgba(255, 255, 255, 0.08);
-    color: var(--text-color);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 4px 0;
-    border-radius: 12px;
-    font-size: 0.68rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.15s ease;
+    background: var(--neon-green) !important;
+    color: #0d0d0d !important;
+    border: none !important;
+    padding: 6px 0 !important;
+    border-radius: 14px !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 8px var(--neon-green-glow) !important;
+    transition: transform 0.1s ease, filter 0.15s ease !important;
 }
 
-.seek-btn:hover, .seek-btn:active {
-    background: var(--neon-green);
-    color: #0d0d0d;
-    border-color: var(--neon-green);
-    box-shadow: 0 0 8px var(--neon-green-glow);
+.seek-btn:hover {
+    filter: brightness(1.15);
+}
+
+.seek-btn:active {
+    transform: scale(0.96);
 }
 
 .vs-zone form { width: 100% !important; }
@@ -314,8 +330,12 @@ h1 {
         justify-content: center !important;
         width: 100% !important;
         max-width: 450px !important;
-        gap: 16px !important;
+        gap: 12px !important;
         flex: 0 1 auto !important;
+    }
+
+    .track-slot {
+        width: 100% !important;
     }
 
     .track-card {
@@ -372,7 +392,7 @@ h1 {
     .duel-zone {
         display: flex !important;
         flex-direction: row !important;
-        align-items: center !important;
+        align-items: flex-start !important;
         justify-content: center !important;
         width: 100% !important;
         max-width: 900px !important;
@@ -380,9 +400,12 @@ h1 {
         flex: 0 1 auto !important;
     }
 
-    .track-card {
+    .track-slot {
         flex: 1 !important;
         max-width: 320px !important;
+    }
+
+    .track-card {
         padding: 12px 14px !important;
         display: flex !important;
         flex-direction: column !important;
@@ -407,6 +430,7 @@ h1 {
         gap: 8px !important;
         width: 125px !important;
         flex-shrink: 0 !important;
+        margin-top: 20px !important;
     }
 
     .vs-circle {

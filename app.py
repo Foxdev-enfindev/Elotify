@@ -588,16 +588,17 @@ def toggle_pause():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/seek_offset/<int:offset_seconds>', methods=['POST'])
+@app.route('/seek_offset/<offset_seconds>', methods=['POST'])
 def seek_offset(offset_seconds):
     sp = get_spotify_client()
     if not sp:
         return jsonify({"error": "Non authentifié"}), 401
     try:
+        offset_sec = int(offset_seconds)
         playback = sp.current_playback()
         if playback and playback.get('is_playing') and playback.get('progress_ms') is not None:
             current_ms = playback['progress_ms']
-            target_ms = max(0, current_ms + (offset_seconds * 1000))
+            target_ms = max(0, current_ms + (offset_sec * 1000))
             sp.seek_track(position_ms=target_ms)
             return jsonify({'status': 'success', 'new_position_ms': target_ms})
         else:

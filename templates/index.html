@@ -59,27 +59,28 @@
         <!-- ZONE DE DUEL PRINCIPALE -->
         <div class="duel-zone">
             
-            <!-- MORCEAU 1 -->
-            <div class="track-card active" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
-                <div class="pochette-wrapper">
-                    <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
-                    <form action="{{ url_for('vote') }}" method="POST" id="form-a" class="vote-form" onsubmit="handleVote(event, 'a')">
-                        <input type="hidden" name="id_a" value="{{ track_a.id }}">
-                        <input type="hidden" name="id_b" value="{{ track_b.id }}">
-                        <input type="hidden" name="outcome" value="1.0">
-                    </form>
-                </div>
-                <div class="track-info">
-                    <span class="track-badge">TITRE 1</span>
-                    <h2 class="track-title">{{ track_a.name }}</h2>
-                    <p class="track-artist">{{ track_a.artist }}</p>
-                    <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
-                    
-                    <!-- CONTRÔLES TIMECODE (-10s / +10s) -->
-                    <div class="seek-controls">
-                        <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">⏪ -10s</button>
-                        <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s ⏩</button>
+            <!-- CONTENEUR MORCEAU 1 -->
+            <div class="track-slot">
+                <div class="track-card active" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
+                    <div class="pochette-wrapper">
+                        <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
+                        <form action="{{ url_for('vote') }}" method="POST" id="form-a" class="vote-form" onsubmit="handleVote(event, 'a')">
+                            <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                            <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                            <input type="hidden" name="outcome" value="1.0">
+                        </form>
                     </div>
+                    <div class="track-info">
+                        <span class="track-badge">TITRE 1</span>
+                        <h2 class="track-title">{{ track_a.name }}</h2>
+                        <p class="track-artist">{{ track_a.artist }}</p>
+                        <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
+                    </div>
+                </div>
+                <!-- BOUTONS SOUS LA CARTE (SÉPARÉS) -->
+                <div class="seek-controls" id="seek-a">
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">⏪ -10s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s ⏩</button>
                 </div>
             </div>
 
@@ -99,27 +100,28 @@
                 <a href="{{ url_for('classement') }}" class="central-rank-btn">📊 Classement</a>
             </div>
 
-            <!-- MORCEAU 2 -->
-            <div class="track-card" id="card-b" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
-                <div class="pochette-wrapper">
-                    <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="pochette">
-                    <form action="{{ url_for('vote') }}" method="POST" id="form-b" class="vote-form" onsubmit="handleVote(event, 'b')">
-                        <input type="hidden" name="id_a" value="{{ track_a.id }}">
-                        <input type="hidden" name="id_b" value="{{ track_b.id }}">
-                        <input type="hidden" name="outcome" value="0.0">
-                    </form>
-                </div>
-                <div class="track-info">
-                    <span class="track-badge">TITRE 2</span>
-                    <h2 class="track-title">{{ track_b.name }}</h2>
-                    <p class="track-artist">{{ track_b.artist }}</p>
-                    <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
-
-                    <!-- CONTRÔLES TIMECODE (-10s / +10s) -->
-                    <div class="seek-controls">
-                        <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">⏪ -10s</button>
-                        <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s ⏩</button>
+            <!-- CONTENEUR MORCEAU 2 -->
+            <div class="track-slot">
+                <div class="track-card" id="card-b" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
+                    <div class="pochette-wrapper">
+                        <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="pochette">
+                        <form action="{{ url_for('vote') }}" method="POST" id="form-b" class="vote-form" onsubmit="handleVote(event, 'b')">
+                            <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                            <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                            <input type="hidden" name="outcome" value="0.0">
+                        </form>
                     </div>
+                    <div class="track-info">
+                        <span class="track-badge">TITRE 2</span>
+                        <h2 class="track-title">{{ track_b.name }}</h2>
+                        <p class="track-artist">{{ track_b.artist }}</p>
+                        <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
+                    </div>
+                </div>
+                <!-- BOUTONS SOUS LA CARTE (SÉPARÉS) -->
+                <div class="seek-controls" id="seek-b">
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">⏪ -10s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s ⏩</button>
                 </div>
             </div>
 
@@ -202,7 +204,7 @@
         }
 
         function seekOffset(event, seconds) {
-            event.stopPropagation(); // Évite de valider un vote en cliquant sur le bouton !
+            event.stopPropagation();
             fetch('/seek_offset/' + seconds, { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
