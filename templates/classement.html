@@ -1,26 +1,15 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ current_theme if current_theme else session.get('theme', 'green') }}">
+<html lang="fr" data-theme="{{ session.get('theme', 'green') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elotify K-Pop - Classement</title>
+    <title>Classement - Elotify</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
-    
-    <!-- Restauration du thème au chargement -->
-    <script>
-        (function() {
-            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
-            document.documentElement.setAttribute('data-theme', savedTheme);
-        })();
-    </script>
 </head>
-<body>
-
-    <!-- --- BLOC PROFIL & MENU DÉROULANT --- -->
-    {% if user %}
-    <div class="user-profile-container" id="profileMenuContainer">
-        <div class="profile-trigger" onclick="toggleDropdown(event)">
+<body class="classement-body">
+    <div class="user-profile-container">
+        {% if user %}
+        <div class="profile-trigger" onclick="toggleProfileDropdown()">
             {% if user.image %}
                 <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
             {% else %}
@@ -29,72 +18,49 @@
             <span class="user-name">{{ user.display_name }}</span>
             <span class="arrow-down">▼</span>
         </div>
-        <div class="profile-dropdown" id="profileDropdown">
-            <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
-            <a href="{{ url_for('stats') }}">🎤 Stats Groupes</a>
-            <hr>
-            <!-- SÉLECTEUR DE THÈME -->
-            <div class="theme-selector-wrapper">
-                <span class="theme-label">Thème :</span>
-                <div class="theme-dots">
-                    <button type="button" class="theme-dot dot-green" onclick="setTheme('green')" title="Vert Néon"></button>
-                    <button type="button" class="theme-dot dot-cyan" onclick="setTheme('cyan')" title="Cyan Cyber"></button>
-                    <button type="button" class="theme-dot dot-pink" onclick="setTheme('pink')" title="Rose Neon"></button>
-                    <button type="button" class="theme-dot dot-orange" onclick="setTheme('orange')" title="Orange Amber"></button>
-                </div>
-            </div>
-            <hr>
-            <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
-        </div>
-    </div>
-    {% endif %}
-
-    <div class="container ranking-container">
         
-        <div style="margin-bottom: 20px; text-align: left;">
-            <a href="{{ url_for('index') }}" class="nav-btn">⚔️ Retour aux Duels</a>
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="{{ url_for('index') }}">⚔️ Duels</a>
+            <a href="{{ url_for('liste_playlists') }}">🎵 Mes Playlists</a>
+            <a href="{{ url_for('stats') }}">📊 Statistiques</a>
+            <hr>
+            <a href="{{ url_for('logout') }}" style="color: var(--danger-color);">Déconnexion</a>
         </div>
+        {% endif %}
+    </div>
 
-        <h1>📊 CLASSEMENT GÉNÉRAL 📊</h1>
+    <div class="classement-container">
+        <div class="classement-header">
+            <h1>🏆 CLASSEMENT GÉNÉRAL 🏆</h1>
+            <a href="{{ url_for('index') }}" class="back-btn">⚔️ Retour aux duels</a>
+        </div>
 
         <div class="ranking-list">
             {% for track in tracks %}
-            <div class="ranking-item">
-                <div class="rank-number">#{{ loop.index }}</div>
-                
-                {% if track.image_url %}
-                    <img src="{{ track.image_url }}" alt="Pochette" class="rank-img">
-                {% else %}
-                    <div class="rank-img rank-img-placeholder">🎵</div>
-                {% endif %}
-                
-                <div class="rank-details">
-                    <span class="rank-name">{{ track.name }}</span>
-                    <span class="rank-artist">{{ track.artist }}</span>
+            <div class="ranking-card">
+                <span class="ranking-rank">#{{ loop.index }}</span>
+                <img src="{{ track.image_url }}" alt="{{ track.name }}" class="ranking-img">
+                <div class="ranking-info">
+                    <span class="ranking-name">{{ track.name }}</span>
+                    <span class="ranking-artist">{{ track.artist }}</span>
                 </div>
-                
-                <div class="rank-elo">{{ track.elo }} pts</div>
+                <span class="ranking-elo">{{ track.elo }} pts</span>
             </div>
             {% endfor %}
         </div>
     </div>
 
     <script>
-        function setTheme(themeName) {
-            document.documentElement.setAttribute('data-theme', themeName);
-            localStorage.setItem('elotify_theme', themeName);
-        }
-
-        function toggleDropdown(event) {
-            event.stopPropagation();
-            const dropdown = document.getElementById('profileDropdown');
-            if (dropdown) dropdown.classList.toggle('show');
+        function toggleProfileDropdown() {
+            document.getElementById('profileDropdown').classList.toggle('show');
         }
 
         window.onclick = function(event) {
-            const dropdown = document.getElementById('profileDropdown');
-            if (dropdown && dropdown.classList.contains('show')) {
-                dropdown.classList.remove('show');
+            if (!event.target.closest('.user-profile-container')) {
+                const dropdown = document.getElementById('profileDropdown');
+                if (dropdown && dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
             }
         }
     </script>
