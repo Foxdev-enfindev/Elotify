@@ -61,6 +61,12 @@ def init_db():
                 theme VARCHAR(50) DEFAULT 'green'
             );
         """)
+
+        # Migration : Forcer l'ajout de la colonne theme si la table existait déjà
+        cur.execute("""
+            ALTER TABLE user_preferences 
+            ADD COLUMN IF NOT EXISTS theme VARCHAR(50) DEFAULT 'green';
+        """)
         
         conn.commit()
         cur.close()
@@ -287,25 +293,32 @@ def logout():
 @app.route('/set_theme/<theme_name>', methods=['POST'])
 def set_theme_route(theme_name):
     session['theme'] = theme_name
-    sp = get_spotify_client()
-    if sp:
-        profile = get_user_profile_cached(sp)
-        user_id = profile.get('id') if profile else None
-        if user_id and DATABASE_URL:
-            try:
-                conn = get_db_connection()
-                cur = conn.cursor()
-                cur.execute("""
-                    INSERT INTO user_preferences (user_id, theme)
-                    VALUES (%s, %s)
-                    ON CONFLICT (user_id)
-                    DO UPDATE SET theme = EXCLUDED.theme;
-                """, (user_id, theme_name))
-                conn.commit()
-                cur.close()
-                conn.close()
-            except Exception as e:
-                print(f"⚠️ Erreur sauvegarde thème BDD : {e}")
+    
+    user_profile = session.get('user_profile')
+    user_id = user_profile.get('id') if user_profile else None
+    
+    if not user_id:
+        sp = get_spotify_client()
+        if sp:
+            profile = get_user_profile_cached(sp)
+            user_id = profile.get('id') if profile else None
+
+    if user_id and DATABASE_URL:
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("""
+                INSERT INTO user_preferences (user_id, theme)
+                VALUES (%s, %s)
+                ON CONFLICT (user_id)
+                DO UPDATE SET theme = EXCLUDED.theme;
+            """, (user_id, theme_name))
+            conn.commit()
+            cur.close()
+            conn.close()
+        except Exception as e:
+            print(f"⚠️ Erreur sauvegarde thème BDD : {e}")
+
     return jsonify({"status": "success", "theme": theme_name})
 
 # --- ROUTE SELECTION PLAYLIST ---
@@ -376,7 +389,7 @@ def index():
     profile = get_user_profile_cached(sp)
     user_id = profile.get('id') if profile else None
 
-    # Chargement du thème utilisateur
+    # Chargement du thème utilisateur depuis la BDD
     current_theme = session.get('theme', 'green')
     if DATABASE_URL and user_id:
         try:
