@@ -1,22 +1,24 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ current_theme if current_theme else session.get('theme', 'green') }}">
+<html lang="fr" data-theme="{{ session.get('theme', 'green') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>À bientôt - Elotify Duel</title>
+    <title>Session Terminée - Elotify</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="quit-body">
     <div class="quit-page-container">
-        <h1>👋 À BIENTÔT ! 👋</h1>
-        <p class="quit-subtitle">Musique en pause. Voici le Top 5 actuel de ta playlist :</p>
+        <h1>👋 MERCI D'AVOIR JOUÉ !</h1>
+        <p class="quit-subtitle">Voici le Top 5 de ta session actuelle :</p>
 
         <div class="top5-list">
             {% for track in top5 %}
             <div class="top5-card">
                 <span class="top5-rank">#{{ loop.index }}</span>
-                <img src="{{ track.image_url }}" alt="{{ track.name }}" class="top5-img">
+                {% if track.image_url %}
+                    <img src="{{ track.image_url }}" alt="{{ track.name }}" class="top5-img">
+                {% endif %}
                 <div class="top5-info">
                     <span class="top5-name">{{ track.name }}</span>
                     <span class="top5-artist">{{ track.artist }}</span>
@@ -26,7 +28,10 @@
             {% endfor %}
         </div>
 
-        <a href="{{ url_for('index') }}" class="resume-btn">▶ Reprendre les duels</a>
+        <div class="quit-actions-group">
+            <a href="{{ url_for('index') }}" class="resume-btn">⚔️ Reprendre les duels</a>
+            <a href="{{ url_for('classement') }}" class="full-rank-btn">📊 Classement complet</a>
+        </div>
     </div>
 </body>
 </html>

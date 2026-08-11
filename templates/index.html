@@ -77,10 +77,12 @@
                         <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
                     </div>
                 </div>
-                <!-- BOUTONS SOUS LA CARTE (SÉPARÉS) -->
+                <!-- BOUTONS DE TIMECODE (-30s -10s +10s +30s) -->
                 <div class="seek-controls" id="seek-a">
-                    <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">⏪ -10s</button>
-                    <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s ⏩</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 30)">+30s</button>
                 </div>
             </div>
 
@@ -118,10 +120,12 @@
                         <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
                     </div>
                 </div>
-                <!-- BOUTONS SOUS LA CARTE (SÉPARÉS) -->
+                <!-- BOUTONS DE TIMECODE (-30s -10s +10s +30s) -->
                 <div class="seek-controls" id="seek-b">
-                    <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">⏪ -10s</button>
-                    <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s ⏩</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 30)">+30s</button>
                 </div>
             </div>
 

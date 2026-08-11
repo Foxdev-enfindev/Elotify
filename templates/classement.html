@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classement - Elotify</title>
+    <title>Classement Général - Elotify</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body class="classement-body">
+
+    {% if user %}
     <div class="user-profile-container">
-        {% if user %}
         <div class="profile-trigger" onclick="toggleProfileDropdown()">
             {% if user.image %}
                 <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
@@ -25,22 +26,39 @@
             <a href="{{ url_for('liste_playlists') }}">🎵 Mes Playlists</a>
             <a href="{{ url_for('stats') }}">📊 Statistiques</a>
             <hr>
+            <div class="theme-selector-wrapper">
+                <span class="theme-label">Thème d'accent :</span>
+                <div class="theme-dots">
+                    <div class="theme-dot dot-green" onclick="setTheme('green')"></div>
+                    <div class="theme-dot dot-cyan" onclick="setTheme('cyan')"></div>
+                    <div class="theme-dot dot-pink" onclick="setTheme('pink')"></div>
+                    <div class="theme-dot dot-orange" onclick="setTheme('orange')"></div>
+                </div>
+            </div>
+            <hr>
             <a href="{{ url_for('logout') }}" style="color: var(--danger-color);">Déconnexion</a>
         </div>
-        {% endif %}
     </div>
+    {% endif %}
 
     <div class="classement-container">
         <div class="classement-header">
             <h1>🏆 CLASSEMENT GÉNÉRAL 🏆</h1>
-            <a href="{{ url_for('index') }}" class="back-btn">⚔️ Retour aux duels</a>
+            <div class="nav-btn-group">
+                <a href="{{ url_for('index') }}" class="back-btn">⚔️ Retour aux duels</a>
+                <a href="{{ url_for('quit_app') }}" class="quit-btn">🚪 Quitter</a>
+            </div>
         </div>
 
         <div class="ranking-list">
             {% for track in tracks %}
             <div class="ranking-card">
                 <span class="ranking-rank">#{{ loop.index }}</span>
-                <img src="{{ track.image_url }}" alt="{{ track.name }}" class="ranking-img">
+                {% if track.image_url %}
+                    <img src="{{ track.image_url }}" alt="{{ track.name }}" class="ranking-img">
+                {% else %}
+                    <div class="ranking-img-placeholder">🎵</div>
+                {% endif %}
                 <div class="ranking-info">
                     <span class="ranking-name">{{ track.name }}</span>
                     <span class="ranking-artist">{{ track.artist }}</span>
@@ -63,6 +81,12 @@
                     dropdown.classList.remove('show');
                 }
             }
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            fetch('/set_theme/' + theme, { method: 'POST' })
+                .catch(err => console.error('Erreur sauvegarde thème BDD :', err));
         }
     </script>
 </body>
