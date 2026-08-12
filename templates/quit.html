@@ -10,8 +10,8 @@
 </head>
 <body class="quit-body">
     <div class="quit-page-container">
-        <h1>👋 MERCI D'AVOIR JOUÉ !</h1>
-        <p class="quit-subtitle">Voici le Top 5 de ta session actuelle :</p>
+        <h1>SESSION TERMINÉE</h1>
+        <p class="quit-subtitle">Voici le Top 5 de ta playlist « {{ playlist_name }} » :</p>
 
         <div class="top5-list">
             {% for track in top5 %}
@@ -29,7 +29,9 @@
             {% endfor %}
         </div>
 
-        <div class="quit-actions-group">
+        <p class="close-notice">Tu peux maintenant fermer la page.</p>
+
+        <div class="quit-actions-group" style="margin-top: 18px;">
             <a href="{{ url_for('index') }}" class="resume-btn">⚔️ Reprendre les duels</a>
             <a href="{{ url_for('classement') }}" class="full-rank-btn">📊 Classement complet</a>
         </div>

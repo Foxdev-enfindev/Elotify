@@ -111,6 +111,40 @@ def get_user_profile_cached(sp):
     except Exception:
         return session.get('user_profile')
 
+# --- HELPERS PERSISTANCE BDD ---
+def get_user_active_playlist_db(user_id):
+    if not DATABASE_URL or not user_id:
+        return None
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT active_playlist_id FROM user_preferences WHERE user_id = %s;", (user_id,))
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+        return row[0] if row else None
+    except Exception as e:
+        print(f"⚠️ Erreur lecture playlist active BDD : {e}")
+        return None
+
+def save_user_active_playlist_db(user_id, playlist_id):
+    if not DATABASE_URL or not user_id or not playlist_id:
+        return
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO user_preferences (user_id, active_playlist_id)
+            VALUES (%s, %s)
+            ON CONFLICT (user_id) 
+            DO UPDATE SET active_playlist_id = EXCLUDED.active_playlist_id;
+        """, (user_id, playlist_id))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"⚠️ Erreur enregistrement playlist active BDD : {e}")
+
 def load_local_scores():
     if 'scores_cache' in session and session['scores_cache']:
         return session['scores_cache']
@@ -189,7 +223,6 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# --- ROUTE PLAYLISTS CORRIGÉE (COMPTAGE DES TITRES) ---
 @app.route('/playlists')
 def liste_playlists():
     sp = get_spotify_client()
@@ -202,7 +235,6 @@ def liste_playlists():
             if not pl: 
                 continue
             
-            # Gestion robuste du comptage des titres Spotify (API V1/V2)
             total = 0
             if 'tracks' in pl and isinstance(pl['tracks'], dict):
                 total = pl['tracks'].get('total', 0)
@@ -226,6 +258,13 @@ def select_playlist(playlist_id):
     session['selected_playlist_id'] = playlist_id
     session.pop('tracks_cache', None)
     session.pop('scores_cache', None)
+
+    sp = get_spotify_client()
+    if sp:
+        profile = get_user_profile_cached(sp)
+        if profile and profile.get('id'):
+            threading.Thread(target=save_user_active_playlist_db, args=(profile['id'], playlist_id), daemon=True).start()
+
     return '<script>window.location.replace("/");</script>'
 
 @app.route('/')
@@ -234,8 +273,15 @@ def index():
     if not sp: 
         return redirect(url_for('login'))
     profile = get_user_profile_cached(sp)
+    user_id = profile.get('id') if profile else None
 
+    # Recouvrement playlist depuis la BDD si session vidée
     playlist_id = session.get('selected_playlist_id')
+    if not playlist_id and user_id:
+        playlist_id = get_user_active_playlist_db(user_id)
+        if playlist_id:
+            session['selected_playlist_id'] = playlist_id
+
     if not playlist_id: 
         return redirect(url_for('liste_playlists'))
 
@@ -393,11 +439,23 @@ def quit_app():
             sp.pause_playback()
         except Exception: 
             pass
+
+    playlist_id = session.get('selected_playlist_id')
+    playlist_name = "ta playlist"
+
+    if sp and playlist_id:
+        try:
+            pl_info = sp.playlist(playlist_id, fields='name')
+            playlist_name = pl_info.get('name', 'ta playlist')
+        except Exception:
+            pass
+
     scores = load_local_scores()
     tracks = list(scores.values())
     tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
+    
     session.pop('tracks_cache', None)
-    return render_template('quit.html', top5=tracks[:5])
+    return render_template('quit.html', top5=tracks[:5], playlist_name=playlist_name)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

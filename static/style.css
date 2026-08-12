@@ -955,3 +955,11 @@ body.playlists-body, body.classement-body, body.quit-body {
 
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast.hidden { display: none; }
+
+.close-notice {
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    font-style: italic;
+    margin-top: 6px;
+    text-align: center;
+}
