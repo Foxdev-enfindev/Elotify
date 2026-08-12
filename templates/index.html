@@ -1,148 +1,190 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bg-mode="dark" data-theme="green">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elotify Duel</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </head>
-<body class="duel-body {{ 'theme-' + current_theme if current_theme else '' }}">
+<body class="duel-body">
 
-    <!-- MENU UTILISATEUR PROPRE EN HAUT À DROITE -->
-    {% if user %}
-    <div class="user-menu-wrapper">
-        <button class="user-profile-btn">
-            {% if user.image %}
-                <img src="{{ user.image }}" alt="Profil" class="user-profile-img">
-            {% endif %}
-            <span>{{ user.display_name }} ▼</span>
-        </button>
-        <div class="user-dropdown-content">
-            <a href="{{ url_for('liste_playlists') }}" style="color: #fff; text-decoration: none; font-size: 0.85rem;">🎵 Mes Playlists</a>
-            <a href="{{ url_for('stats') }}" style="color: #fff; text-decoration: none; font-size: 0.85rem;">📊 Mes Statistiques</a>
-            <a href="{{ url_for('classement') }}" style="color: #fff; text-decoration: none; font-size: 0.85rem;">🏆 Classement</a>
-            <hr style="border-color: #333; margin: 4px 0;">
-            <span style="font-size: 0.75rem; color: #888;">Thème :</span>
-            <div style="display: flex; gap: 6px; margin-top: 2px;">
-                <button onclick="setTheme('green')" style="background: #1db954; border:none; width:18px; height:18px; border-radius:50%; cursor:pointer;"></button>
-                <button onclick="setTheme('purple')" style="background: #a855f7; border:none; width:18px; height:18px; border-radius:50%; cursor:pointer;"></button>
-                <button onclick="setTheme('blue')" style="background: #3b82f6; border:none; width:18px; height:18px; border-radius:50%; cursor:pointer;"></button>
-                <button onclick="setTheme('red')" style="background: #ef4444; border:none; width:18px; height:18px; border-radius:50%; cursor:pointer;"></button>
-            </div>
-            <hr style="border-color: #333; margin: 4px 0;">
-            <a href="{{ url_for('logout') }}" style="color: #ff4757; text-decoration: none; font-size: 0.85rem;">Déconnexion</a>
-        </div>
-    </div>
-    {% endif %}
+    <div id="spotify-toast" class="toast hidden"></div>
 
     <div class="container">
-        <!-- EN-TÊTE SANS &nbsp; BRUT -->
+        
         <div class="header-zone">
-            <h1 class="header-title">⚔️ ELOTIFY DUEL ⚔️</h1>
+            {% include 'includes/user_menu.html' %}
+
+            <h1>⚔️ ELOTIFY DUEL ⚔️</h1>
+
             <div class="result-banner-wrapper">
-                {% if dernier_resultat %}
-                    <div class="result-banner">{{ dernier_resultat }}</div>
-                {% endif %}
+                <div class="result-banner {% if not dernier_resultat %}hidden{% endif %}">
+                    {{ dernier_resultat if dernier_resultat else '&nbsp;' }}
+                </div>
             </div>
         </div>
 
-        <!-- ZONE DES CARTES DU DUEL -->
         <div class="duel-zone">
-            
-            <!-- TITRE A -->
+            <!-- PISTE A -->
             <div class="track-slot">
-                <div class="track-card">
-                    {% if track_a.image_url %}
-                        <div class="pochette-wrapper">
-                            <img src="{{ track_a.image_url }}" alt="Pochette" class="pochette" onclick="playTrack('{{ track_a.uri }}')">
-                        </div>
-                    {% endif %}
+                <div class="track-card active" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
+                    <div class="pochette-wrapper">
+                        <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
+                        <form action="{{ url_for('vote') }}" method="POST" id="form-a" class="vote-form" onsubmit="handleVote(event, 'a')">
+                            <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                            <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                            <input type="hidden" name="outcome" value="1.0">
+                        </form>
+                    </div>
                     <div class="track-info">
-                        <div class="track-title">{{ track_a.name }}</div>
-                        <div class="track-artist">{{ track_a.artist }}</div>
-                        <div class="track-elo">Elo : {{ track_a.elo }}</div>
-                        
-                        <div class="seek-controls">
-                            <button class="seek-btn" onclick="seekOffset(-10)">-10s</button>
-                            <button class="seek-btn" onclick="togglePause()">⏸</button>
-                            <button class="seek-btn" onclick="seekOffset(10)">+10s</button>
-                        </div>
+                        <span class="track-badge">TITRE 1</span>
+                        <h2 class="track-title">{{ track_a.name }}</h2>
+                        <p class="track-artist">{{ track_a.artist }}</p>
+                        <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
                     </div>
                 </div>
-                
-                <form action="{{ url_for('vote') }}" method="POST" style="margin-top: 8px;">
-                    <input type="hidden" name="id_a" value="{{ track_a.id }}">
-                    <input type="hidden" name="id_b" value="{{ track_b.id }}">
-                    <input type="hidden" name="outcome" value="1.0">
-                    <button type="submit" class="tie-btn" style="background: var(--neon-green); color: #0d0d0d;">Voter pour ce titre</button>
-                </form>
+                <div class="seek-controls" id="seek-a">
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
+                    <button type="button" class="seek-btn pause-btn-inline" onclick="togglePause(event)">⏸</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 30)">+30s</button>
+                </div>
             </div>
 
-            <!-- ZONE CENTRALE VS & MATCH NUL -->
-            <div class="vs-zone">
+            <!-- VS ZONE -->
+            <div class="vs-zone" id="vsZone">
                 <div class="vs-circle">VS</div>
-                
-                <form action="{{ url_for('vote') }}" method="POST">
+                <form action="{{ url_for('vote') }}" method="POST" onsubmit="handleVote(event, 'tie')">
                     <input type="hidden" name="id_a" value="{{ track_a.id }}">
                     <input type="hidden" name="id_b" value="{{ track_b.id }}">
                     <input type="hidden" name="outcome" value="0.5">
                     <button type="submit" class="tie-btn">🤝 Match Nul</button>
                 </form>
-
                 <a href="{{ url_for('classement') }}" class="central-rank-btn">📊 Classement</a>
             </div>
 
-            <!-- TITRE B -->
+            <!-- PISTE B -->
             <div class="track-slot">
-                <div class="track-card">
-                    {% if track_b.image_url %}
-                        <div class="pochette-wrapper">
-                            <img src="{{ track_b.image_url }}" alt="Pochette" class="pochette" onclick="playTrack('{{ track_b.uri }}')">
-                        </div>
-                    {% endif %}
+                <div class="track-card" id="card-b" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
+                    <div class="pochette-wrapper">
+                        <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="pochette">
+                        <form action="{{ url_for('vote') }}" method="POST" id="form-b" class="vote-form" onsubmit="handleVote(event, 'b')">
+                            <input type="hidden" name="id_a" value="{{ track_a.id }}">
+                            <input type="hidden" name="id_b" value="{{ track_b.id }}">
+                            <input type="hidden" name="outcome" value="0.0">
+                        </form>
+                    </div>
                     <div class="track-info">
-                        <div class="track-title">{{ track_b.name }}</div>
-                        <div class="track-artist">{{ track_b.artist }}</div>
-                        <div class="track-elo">Elo : {{ track_b.elo }}</div>
-                        
-                        <div class="seek-controls">
-                            <button class="seek-btn" onclick="seekOffset(-10)">-10s</button>
-                            <button class="seek-btn" onclick="togglePause()">⏸</button>
-                            <button class="seek-btn" onclick="seekOffset(10)">+10s</button>
-                        </div>
+                        <span class="track-badge">TITRE 2</span>
+                        <h2 class="track-title">{{ track_b.name }}</h2>
+                        <p class="track-artist">{{ track_b.artist }}</p>
+                        <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
                     </div>
                 </div>
-
-                <form action="{{ url_for('vote') }}" method="POST" style="margin-top: 8px;">
-                    <input type="hidden" name="id_a" value="{{ track_a.id }}">
-                    <input type="hidden" name="id_b" value="{{ track_b.id }}">
-                    <input type="hidden" name="outcome" value="0.0">
-                    <button type="submit" class="tie-btn" style="background: var(--neon-green); color: #0d0d0d;">Voter pour ce titre</button>
-                </form>
+                <div class="seek-controls" id="seek-b">
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
+                    <button type="button" class="seek-btn pause-btn-inline" onclick="togglePause(event)">⏸</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s</button>
+                    <button type="button" class="seek-btn" onclick="seekOffset(event, 30)">+30s</button>
+                </div>
             </div>
-
         </div>
 
-        <!-- BOUTON QUITTER EN BAS -->
         <div class="quit-wrapper">
-            <a href="{{ url_for('quit_app') }}" class="quit-btn">🚪 Quitter la session</a>
+            <a href="{{ url_for('quit_app') }}" class="quit-btn" onclick="disableCardsOnQuit()">🚪 Quitter</a>
         </div>
     </div>
 
-    <!-- SCRIPTS LECTEUR ET THÈMES -->
     <script>
-        function playTrack(uri) {
-            fetch('/listen/' + encodeURIComponent(uri), { method: 'POST' });
+        let currentPlaying = 'a';
+        const isDesktop = window.matchMedia('(pointer: fine)').matches;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
+                .catch(err => console.error('Erreur lecture initiale :', err));
+        });
+
+        function showSpotifyWarning(msg) {
+            const toast = document.getElementById('spotify-toast');
+            toast.innerText = msg;
+            toast.classList.remove('hidden');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 4000);
         }
-        function togglePause() {
-            fetch('/toggle-pause', { method: 'POST' });
+
+        function switchActiveCard(trackKey, trackUri) {
+            const cardA = document.getElementById('card-a');
+            const cardB = document.getElementById('card-b');
+            currentPlaying = trackKey;
+            if (trackKey === 'a') {
+                cardA.classList.add('active'); cardB.classList.remove('active');
+            } else {
+                cardB.classList.add('active'); cardA.classList.remove('active');
+            }
+            fetch('/listen/' + trackUri, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
+                .catch(err => console.error('Erreur changement piste :', err));
         }
-        function seekOffset(seconds) {
-            fetch('/seek_offset/' + seconds, { method: 'POST' });
+
+        function onCardHover(trackKey, trackUri) {
+            if (!isDesktop) return;
+            if (currentPlaying !== trackKey) switchActiveCard(trackKey, trackUri);
         }
-        function setTheme(themeName) {
-            fetch('/set_theme/' + themeName, { method: 'POST' })
-                .then(() => location.reload());
+
+        function onCardClick(trackKey, trackUri) {
+            if (currentPlaying === trackKey) {
+                triggerVoteAnimation(trackKey);
+                setTimeout(() => { document.getElementById('form-' + trackKey).submit(); }, 150);
+            } else {
+                switchActiveCard(trackKey, trackUri);
+            }
+        }
+
+        function disableCardsOnQuit() {
+            document.getElementById('vsZone').classList.add('voting-in-progress');
+            document.getElementById('card-a').classList.add('voted-loser');
+            document.getElementById('card-b').classList.add('voted-loser');
+        }
+
+        function seekOffset(event, seconds) {
+            event.stopPropagation();
+            fetch('/seek_offset/' + seconds, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
+                .catch(err => console.error('Erreur timecode :', err));
+        }
+
+        function triggerVoteAnimation(winner) {
+            const cardA = document.getElementById('card-a');
+            const cardB = document.getElementById('card-b');
+            document.getElementById('vsZone').classList.add('voting-in-progress');
+            if (winner === 'a') { cardA.classList.add('voted-winner'); cardB.classList.add('voted-loser'); }
+            else if (winner === 'b') { cardB.classList.add('voted-winner'); cardA.classList.add('voted-loser'); }
+            else { cardA.classList.add('voted-winner'); cardB.classList.add('voted-winner'); }
+        }
+
+        function handleVote(event, winner) { triggerVoteAnimation(winner); }
+
+        function togglePause(event) {
+            if (event) event.stopPropagation();
+            fetch('/toggle-pause', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    const btns = document.querySelectorAll('.pause-btn-inline');
+                    if (data.warning) showSpotifyWarning("⚠️ " + data.warning);
+                    else btns.forEach(btn => btn.innerText = (data.status === 'paused') ? '▶' : '⏸');
+                })
+                .catch(err => console.error('Erreur pause :', err));
         }
     </script>
 </body>

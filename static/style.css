@@ -13,6 +13,7 @@
     --neon-green-glow: rgba(29, 185, 84, 0.4);
 }
 
+/* Thèmes alternatifs */
 body.theme-purple {
     --neon-green: #a855f7;
     --neon-green-glow: rgba(168, 85, 247, 0.4);
@@ -60,54 +61,8 @@ body.duel-body {
 }
 
 /* =======================================================
-   3. MENU UTILISATEUR & HEADER
+   3. EN-TÊTE & BANNIÈRE DE RÉSULTAT
    ======================================================= */
-.user-menu-wrapper {
-    position: absolute;
-    top: 12px;
-    right: 16px;
-    z-index: 1000;
-}
-
-.user-profile-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: transparent;
-    border: none;
-    color: var(--text-color);
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.9rem;
-}
-
-.user-profile-img {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--neon-green);
-}
-
-.user-dropdown-content {
-    display: none;
-    position: absolute;
-    right: 0;
-    top: 45px;
-    background-color: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-    min-width: 180px;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.user-menu-wrapper:hover .user-dropdown-content {
-    display: flex;
-}
-
 .header-zone {
     display: flex;
     flex-direction: column;
@@ -213,6 +168,7 @@ body.duel-body {
     color: var(--neon-green);
 }
 
+/* Controls Timecode */
 .seek-controls {
     display: flex;
     gap: 6px;
@@ -381,6 +337,7 @@ body.duel-body {
     }
 }
 
+/* Optimisation Écrans très bas en paysage (Ex: Z Flip) */
 @media screen and (orientation: landscape) and (max-height: 480px) {
     body.duel-body {
         padding-top: 32px !important;
