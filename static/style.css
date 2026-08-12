@@ -375,19 +375,25 @@ h1 {
 }
 
 /* =======================================================
-   4. LAYOUT PORTRAIT (COMPACTÉ POUR TENIR EN HAUTEUR)
+   4. LAYOUT PORTRAIT (AÉRÉ AVEC ESPACEMENT OPTIMISÉ)
    ======================================================= */
 @media screen and (orientation: portrait) {
     body.duel-body {
-        padding: 45px 10px 10px 10px !important; /* Dégagement haut ajusté */
+        padding: 50px 14px 16px 14px !important;
     }
 
     .container {
-        gap: 8px !important; /* Réduction de l'écart vertical global */
+        gap: 16px !important; /* Donne de l'air entre l'en-tête, le duel et le bouton quitter */
     }
 
     .header-zone {
         padding-top: 0 !important;
+        gap: 8px !important;
+    }
+
+    .result-banner-wrapper {
+        min-height: 28px !important;
+        margin-top: 2px !important;
     }
 
     .duel-zone {
@@ -397,7 +403,7 @@ h1 {
         justify-content: center !important;
         width: 100% !important;
         max-width: 680px !important;
-        gap: 8px !important; /* Réduit l'espace entre carte A / VS / carte B */
+        gap: 14px !important; /* Marge nette entre Carte A, contrôles VS et Carte B */
     }
 
     .track-slot {
@@ -406,46 +412,59 @@ h1 {
 
     .track-card {
         width: 100% !important;
-        padding: 10px 14px !important; /* Padding interne resserré */
+        padding: 8px 14px !important; /* Padding resserré pour affiner la hauteur de la carte */
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         gap: 14px !important;
+        min-height: auto !important;
     }
 
-    /* Pochette légèrement réduite pour gagner en hauteur */
+    /* Pochette plus compacte pour libérer de l'espace vertical */
     .pochette-wrapper, .pochette-wrapper .pochette { 
-        width: clamp(75px, 14vw, 110px) !important; 
-        height: clamp(75px, 14vw, 110px) !important; 
+        width: clamp(68px, 12vw, 92px) !important; 
+        height: clamp(68px, 12vw, 92px) !important; 
         flex-shrink: 0 !important; 
+        border-radius: 10px !important;
     }
 
     .track-info { text-align: left !important; flex: 1 !important; }
 
+    .track-title {
+        font-size: 1.05rem !important;
+        margin: 1px 0 2px 0 !important;
+    }
+
+    .track-artist {
+        font-size: 0.85rem !important;
+        margin-bottom: 2px !important;
+    }
+
     .seek-controls {
-        margin-top: 4px !important;
-        gap: 4px !important;
+        margin-top: 6px !important;
+        gap: 6px !important;
     }
 
     .seek-btn {
-        padding: 6px 0 !important;
+        padding: 5px 0 !important;
+        font-size: 0.78rem !important;
     }
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 58px 1fr !important;
+        grid-template-columns: 52px 1fr !important;
         grid-template-areas: "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
         max-width: 280px !important;
-        gap: 4px 10px !important;
+        gap: 6px 12px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 56px !important;
-        height: 56px !important;
-        font-size: 1.1rem !important;
+        width: 52px !important;
+        height: 52px !important;
+        font-size: 1.05rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -459,12 +478,17 @@ h1 {
     .vs-zone > form { grid-area: tie !important; }
     .vs-zone > a.central-rank-btn { grid-area: rank !important; }
 
+    .tie-btn, .central-rank-btn, a.central-rank-btn {
+        padding: 7px 0 !important;
+        font-size: 0.82rem !important;
+    }
+
     .quit-wrapper {
-        margin-top: 2px !important;
+        margin-top: 6px !important;
     }
 
     .quit-btn {
-        padding: 8px 20px !important;
+        padding: 8px 22px !important;
         font-size: 0.85rem !important;
     }
 }
