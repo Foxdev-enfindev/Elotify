@@ -280,23 +280,23 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 450px !important;
+        max-width: 90% !important; /* Libère la largeur sur le Fold au lieu des 450px fixes */
         gap: 16px !important;
         flex: 0 1 auto !important;
     }
 
     .track-card {
         width: 100% !important;
-        padding: 10px 14px !important;
+        padding: 14px 18px !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 14px !important;
+        gap: 16px !important;
     }
 
     .pochette-wrapper, .pochette-wrapper .pochette { 
-        width: clamp(72px, 10.5vh, 95px) !important; 
-        height: clamp(72px, 10.5vh, 95px) !important; 
+        width: 120px !important; /* Agrandit un peu la pochette pour le confort visuel */
+        height: 120px !important; 
         flex-shrink: 0 !important; 
     }
 
@@ -308,7 +308,7 @@ h1 {
         grid-template-areas: "circle pause" "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 270px !important;
+        max-width: 300px !important;
         gap: 5px 12px !important;
     }
 
