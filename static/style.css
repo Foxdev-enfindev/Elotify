@@ -33,48 +33,38 @@ html, body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    width: 100%;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 body.duel-body {
-    overflow: hidden !important;
-    position: fixed;
-    width: 100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 16px;
 }
 
 /* =======================================================
    3. CONTENEUR PRINCIPAL DUEL
    ======================================================= */
 .container {
-    position: fixed !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    padding: 12px 16px;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: clamp(10px, 2.5vh, 24px) !important;
-    box-sizing: border-box;
-    overflow: hidden !important;
+    width: 95%;
+    max-width: 950px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
 }
 
 .header-zone {
     width: 100%;
-    max-width: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
-    flex-shrink: 0 !important;
 }
 
 .user-profile-container {
@@ -90,15 +80,15 @@ body.duel-body {
     gap: 6px;
     background: var(--card-bg);
     border: 1px solid rgba(150, 150, 150, 0.2);
-    padding: 5px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.user-avatar, .user-avatar-placeholder { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
-.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #fff; }
-.user-name { font-size: 0.82rem; font-weight: 600; color: var(--text-color); }
+.user-avatar, .user-avatar-placeholder { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #fff; }
+.user-name { font-size: 0.88rem; font-weight: 600; color: var(--text-color); }
 .arrow-down { font-size: 0.65rem; color: var(--text-muted); }
 
 .profile-dropdown {
@@ -109,13 +99,13 @@ body.duel-body {
     background: var(--card-bg);
     border: 1px solid rgba(150, 150, 150, 0.2);
     border-radius: 12px;
-    width: 210px;
+    width: 220px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     overflow: hidden;
 }
 
 .profile-dropdown.show { display: block; }
-.profile-dropdown a { display: block; padding: 10px 14px; color: var(--text-color); text-decoration: none; font-size: 0.85rem; }
+.profile-dropdown a { display: block; padding: 10px 14px; color: var(--text-color); text-decoration: none; font-size: 0.88rem; }
 .profile-dropdown a:hover { background: rgba(150, 150, 150, 0.12); color: var(--neon-green); }
 .profile-dropdown hr { border: none; border-top: 1px solid rgba(150, 150, 150, 0.15); margin: 0; }
 
@@ -135,7 +125,7 @@ body.duel-body {
     color: var(--text-color);
     padding: 6px 0;
     border-radius: 8px;
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     font-weight: 700;
     cursor: pointer;
     transition: background 0.15s ease;
@@ -150,18 +140,18 @@ body.duel-body {
 }
 
 .theme-selector-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
-.theme-label { font-size: 0.72rem; color: var(--text-muted); }
+.theme-label { font-size: 0.75rem; color: var(--text-muted); }
 .theme-dots { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
 .theme-dot { 
-    width: 18px; 
-    height: 18px; 
+    width: 20px; 
+    height: 20px; 
     border-radius: 50%; 
     border: 2px solid rgba(150,150,150,0.3); 
     cursor: pointer; 
     display: flex; 
     align-items: center; 
     justify-content: center;
-    font-size: 0.65rem;
+    font-size: 0.7rem;
 }
 
 .dot-green { background: #00ff66; } 
@@ -173,18 +163,17 @@ body.duel-body {
 .dot-random { background: linear-gradient(135deg, #00ff66, #00f0ff, #ff007f, #ff9900); border: none !important; }
 
 h1 {
-    font-size: clamp(1.3rem, 2.6vh, 2rem);
+    font-size: clamp(1.5rem, 3.5vw, 2.2rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 12px var(--neon-green-glow);
-    letter-spacing: 2.5px;
+    letter-spacing: 2px;
     margin: 0;
     text-align: center;
 }
 
 .result-banner-wrapper {
-    height: 34px;
-    min-height: 34px;
+    min-height: 36px;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -196,16 +185,15 @@ h1 {
     background: rgba(0, 255, 102, 0.12) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 5px 18px !important;
+    padding: 6px 20px !important;
     border-radius: 20px !important;
     text-align: center !important;
     font-weight: 700 !important;
-    font-size: clamp(0.78rem, 1.5vh, 0.92rem) !important;
+    font-size: 0.92rem !important;
     box-shadow: 0 0 12px var(--neon-green-glow) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-width: 92% !important;
 }
 
 .result-banner.hidden {
@@ -217,7 +205,15 @@ h1 {
 
 /* =======================================================
    4. CARTES ET SLOTS MORCEAUX DUEL
-   ======================================================= */
+   ========================================================= */
+.duel-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 16px;
+}
+
 .track-slot {
     display: flex;
     flex-direction: column;
@@ -251,51 +247,44 @@ h1 {
     display: inline-block;
     background: rgba(150, 150, 150, 0.15);
     color: var(--text-muted);
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    padding: 2px 10px;
+    padding: 3px 12px;
     border-radius: 12px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 
 .track-title {
-    font-size: clamp(0.88rem, 1.7vh, 1.1rem) !important;
+    font-size: 1.15rem !important;
     font-weight: 800 !important;
     color: var(--text-color) !important;
     line-height: 1.25;
-    margin: 2px 0 3px 0 !important;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    margin: 2px 0 4px 0 !important;
 }
 
 .track-artist {
-    font-size: clamp(0.75rem, 1.3vh, 0.85rem) !important;
+    font-size: 0.9rem !important;
     color: var(--text-muted) !important;
     font-weight: 500 !important;
-    margin-bottom: 3px !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-bottom: 4px !important;
 }
 
 .elo-display {
-    font-size: 0.72rem !important;
+    font-size: 0.82rem !important;
     color: var(--text-muted) !important;
 }
 
 .elo-display strong {
     color: var(--neon-green) !important;
-    font-size: 0.82rem !important;
+    font-size: 0.95rem !important;
 }
 
-/* BOUTONS TIMECODE EXTÉRIEURS SOUS LA CARTE */
+/* BOUTONS TIMECODE */
 .seek-controls {
     display: flex;
-    gap: 4px;
+    gap: 6px;
     margin-top: 8px;
     width: 100%;
     visibility: hidden;
@@ -310,35 +299,22 @@ h1 {
     pointer-events: auto !important;
 }
 
-.track-card.voted-winner + .seek-controls,
-.track-card.voted-loser + .seek-controls,
-.vs-zone.voting-in-progress ~ .track-slot .seek-controls {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-
 .seek-btn {
     flex: 1 1 0px !important;
     min-width: 0 !important;
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 6px 0 !important;
+    padding: 8px 0 !important;
     border-radius: 12px !important;
-    font-size: 0.72rem !important;
+    font-size: 0.8rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 8px var(--neon-green-glow) !important;
-    transition: transform 0.1s ease, filter 0.15s ease !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
 }
-
-.pause-btn-inline { font-size: 0.85rem !important; }
-.seek-btn:hover { filter: brightness(1.15); }
-.seek-btn:active { transform: scale(0.95); }
 
 .vs-zone form { width: 100% !important; }
 
@@ -346,10 +322,10 @@ h1 {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 7px 0 !important;
+    padding: 9px 0 !important;
     border-radius: 16px !important;
     font-weight: 800 !important;
-    font-size: 0.78rem !important;
+    font-size: 0.85rem !important;
     cursor: pointer !important;
     text-decoration: none !important;
     display: flex !important;
@@ -364,16 +340,15 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0 !important;
 }
 
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 8px 18px !important;
-    border-radius: 18px !important;
-    font-size: 0.82rem !important;
+    padding: 10px 24px !important;
+    border-radius: 20px !important;
+    font-size: 0.9rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 12px rgba(255, 51, 102, 0.4) !important;
@@ -384,7 +359,7 @@ h1 {
 }
 
 /* =======================================================
-   5. LAYOUT PORTRAIT (VALEURS D'ORIGINE : STACK VERTICAL)
+   5. LAYOUT PORTRAIT / DÉPLIÉ (EMPILEMENT VERTICAL SANS BRIDAGE)
    ======================================================= */
 @media screen and (max-aspect-ratio: 13/10), screen and (orientation: portrait) {
     .duel-zone {
@@ -393,25 +368,26 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 500px !important;
-        gap: 12px !important;
-        flex: 0 1 auto !important;
-    }
-
-    .track-slot { width: 100% !important; }
-
-    .track-card {
-        width: 100% !important;
-        padding: 10px 14px !important;
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
         gap: 14px !important;
     }
 
+    .track-slot {
+        width: 100% !important;
+    }
+
+    .track-card {
+        width: 100% !important;
+        padding: 14px 18px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        gap: 16px !important;
+    }
+
+    /* Pochette s'adaptant à l'écran du Fold */
     .pochette-wrapper, .pochette-wrapper .pochette { 
-        width: clamp(72px, 10.5vh, 95px) !important; 
-        height: clamp(72px, 10.5vh, 95px) !important; 
+        width: 110px !important; 
+        height: 110px !important; 
         flex-shrink: 0 !important; 
     }
 
@@ -419,19 +395,19 @@ h1 {
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 60px 1fr !important;
+        grid-template-columns: 64px 1fr !important;
         grid-template-areas: "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 250px !important;
-        gap: 6px 12px !important;
+        max-width: 320px !important;
+        gap: 6px 14px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 58px !important;
-        height: 58px !important;
-        font-size: 1.15rem !important;
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.2rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -456,18 +432,16 @@ h1 {
         align-items: flex-start !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 900px !important;
-        gap: 20px !important;
-        flex: 0 1 auto !important;
+        gap: 24px !important;
     }
 
     .track-slot {
         flex: 1 !important;
-        max-width: 320px !important;
+        max-width: 360px !important;
     }
 
     .track-card {
-        padding: 12px 14px !important;
+        padding: 16px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -475,9 +449,9 @@ h1 {
     }
 
     .pochette-wrapper, .pochette-wrapper .pochette {
-        width: clamp(85px, 22vh, 135px) !important;
-        height: clamp(85px, 22vh, 135px) !important;
-        margin-bottom: 8px !important;
+        width: clamp(120px, 25vh, 170px) !important;
+        height: clamp(120px, 25vh, 170px) !important;
+        margin-bottom: 10px !important;
         flex-shrink: 0 !important;
     }
 
@@ -488,16 +462,16 @@ h1 {
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 8px !important;
-        width: 125px !important;
+        gap: 10px !important;
+        width: 140px !important;
         flex-shrink: 0 !important;
-        margin-top: 20px !important;
+        margin-top: 35px !important;
     }
 
     .vs-circle {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 1rem !important;
+        width: 58px !important;
+        height: 58px !important;
+        font-size: 1.15rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -510,30 +484,27 @@ h1 {
 }
 
 /* =======================================================
-   7. STYLES PAGES SECONDAIRES
+   7. STYLES PAGES SECONDAIRES & LOGIN
    ======================================================= */
-body.playlists-body {
-    overflow-y: auto !important;
+body.playlists-body, body.classement-body, body.quit-body {
     min-height: 100vh !important;
-    height: auto !important;
-    padding: 40px 20px !important;
+    padding: 30px 15px !important;
     display: flex !important;
     justify-content: center !important;
-    position: static !important;
 }
 
-.playlists-container {
-    width: 100%;
-    max-width: 1100px;
+.playlists-container, .classement-container, .quit-page-container {
+    width: 95%;
+    max-width: 800px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.playlists-header { text-align: center; margin-bottom: 30px; width: 100%; }
-.playlists-header h1 {
-    font-size: clamp(1.4rem, 3vh, 2.2rem);
+.playlists-header, .classement-header { text-align: center; margin-bottom: 25px; width: 100%; }
+.playlists-header h1, .classement-header h1 {
+    font-size: clamp(1.5rem, 3.5vw, 2.2rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 12px var(--neon-green-glow);
@@ -542,10 +513,9 @@ body.playlists-body {
 
 .playlists-grid {
     display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) !important;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
     gap: 20px !important;
     width: 100% !important;
-    padding-bottom: 40px;
 }
 
 .playlist-card {
@@ -559,16 +529,9 @@ body.playlists-body {
     text-decoration: none;
     color: var(--text-color);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.playlist-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--neon-green);
-    box-shadow: 0 6px 20px var(--neon-green-glow);
-}
-
-.playlist-img, .playlist-img-placeholder {
+.playlist-img {
     width: 100% !important;
     aspect-ratio: 1 / 1 !important;
     border-radius: 10px;
@@ -576,116 +539,32 @@ body.playlists-body {
     margin-bottom: 10px;
 }
 
-.playlist-img-placeholder {
-    background: rgba(150, 150, 150, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-}
-
-.playlist-info { text-align: center; display: flex; flex-direction: column; gap: 3px; width: 100%; }
-.playlist-name { font-size: 0.88rem; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-.playlist-tracks { font-size: 0.75rem; color: var(--text-muted); }
-
-body.classement-body {
-    overflow-y: auto !important;
-    min-height: 100vh !important;
-    padding: 30px 15px !important;
-    display: flex !important;
-    justify-content: center !important;
-    position: static !important;
-}
-
-.classement-container {
-    width: 100%;
-    max-width: 650px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.classement-header { text-align: center; margin-bottom: 25px; width: 100%; }
-.classement-header h1 {
-    font-size: clamp(1.4rem, 3vh, 2.2rem);
-    font-weight: 800;
-    color: var(--neon-green);
-    text-shadow: 0 0 12px var(--neon-green-glow);
-    margin-bottom: 12px;
-}
-
-.back-btn {
-    display: inline-block;
-    background: var(--neon-green) !important;
-    color: #0d0d0d !important;
-    font-weight: 800 !important;
-    padding: 8px 18px !important;
-    border-radius: 20px !important;
-    text-decoration: none !important;
-    font-size: 0.85rem !important;
-    box-shadow: 0 0 10px var(--neon-green-glow) !important;
-    transition: transform 0.15s ease !important;
-}
-
-.back-btn:hover { transform: translateY(-2px); }
-
-.ranking-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-.ranking-card {
+.ranking-list, .top5-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.ranking-card, .top5-card {
     background: var(--card-bg);
     border: 1px solid rgba(150, 150, 150, 0.15);
     border-radius: 12px;
-    padding: 10px 16px;
+    padding: 12px 18px;
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.ranking-rank { font-size: 1.1rem; font-weight: 800; color: var(--neon-green); min-width: 45px; text-align: left; }
-.ranking-img { width: 52px !important; height: 52px !important; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
-.ranking-info { display: flex; flex-direction: column; text-align: left; flex: 1; overflow: hidden; }
-.ranking-name { font-size: 0.92rem; font-weight: 700; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ranking-artist { font-size: 0.78rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.ranking-elo { font-size: 0.95rem; font-weight: 700; color: var(--neon-green); margin-left: auto; flex-shrink: 0; }
-
-body.quit-body {
-    overflow-y: auto !important;
-    min-height: 100vh !important;
-    padding: 20px 10px !important;
-    display: flex !important;
-    justify-content: center !important;
-    position: static !important;
-}
-
-.quit-page-container {
     width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
-.quit-subtitle { color: var(--text-muted); font-size: 0.88rem; margin: 6px 0 16px 0; }
-.top5-list { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
-.top5-card { background: var(--card-bg); border: 1px solid rgba(150, 150, 150, 0.15); border-radius: 12px; padding: 8px 12px; display: flex; align-items: center; gap: 12px; }
-.top5-rank { font-size: 1rem; font-weight: 800; color: var(--neon-green); min-width: 25px; }
-.top5-img { width: 48px !important; height: 48px !important; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
-.top5-info { display: flex; flex-direction: column; text-align: left; flex: 1; }
-.top5-name { font-size: 0.88rem; font-weight: 700; color: var(--text-color); }
-.top5-artist { font-size: 0.75rem; color: var(--text-muted); }
-.top5-elo { font-size: 0.88rem; font-weight: 700; color: var(--neon-green); margin-left: auto; }
+.ranking-img, .top5-img { width: 54px !important; height: 54px !important; border-radius: 8px; object-fit: cover; }
+.ranking-info, .top5-info { display: flex; flex-direction: column; text-align: left; flex: 1; }
+.ranking-name, .top5-name { font-size: 0.95rem; font-weight: 700; color: var(--text-color); }
+.ranking-artist, .top5-artist { font-size: 0.82rem; color: var(--text-muted); }
+.ranking-elo, .top5-elo { font-size: 0.98rem; font-weight: 700; color: var(--neon-green); margin-left: auto; }
 
-.resume-btn, .full-rank-btn {
+.back-btn, .resume-btn, .full-rank-btn {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     font-weight: 800 !important;
-    padding: 10px 20px !important;
+    padding: 10px 22px !important;
     border-radius: 20px !important;
     text-decoration: none !important;
-    font-size: 0.85rem !important;
+    font-size: 0.88rem !important;
     box-shadow: 0 0 10px var(--neon-green-glow) !important;
 }
 
@@ -700,13 +579,10 @@ body.quit-body {
     border-radius: 25px;
     font-weight: 700;
     font-size: 0.85rem;
-    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.4);
     z-index: 10000;
     opacity: 0;
     transition: all 0.3s ease;
     pointer-events: none;
-    text-align: center;
-    max-width: 90vw;
 }
 
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
