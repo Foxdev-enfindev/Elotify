@@ -234,16 +234,16 @@ h1 {
     font-size: 0.82rem !important;
 }
 
-/* BOUTONS TIMECODE EXTÉRIEURS SOUS LA CARTE (-30s, -10s, +10s, +30s) */
+/* BOUTONS TIMECODE EXTÉRIEURS SOUS LA CARTE (ÉGALISÉS PARFAITEMENT) */
 .seek-controls {
     display: flex;
-    gap: 5px;
+    gap: 4px;
     margin-top: 8px;
     width: 100%;
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
 .track-card.active + .seek-controls {
@@ -252,18 +252,35 @@ h1 {
     pointer-events: auto !important;
 }
 
+/* MASQUAGE IMMÉDIAT APRÈS UN VOTE */
+.track-card.voted-winner + .seek-controls,
+.track-card.voted-loser + .seek-controls,
+.vs-zone.voting-in-progress ~ .track-slot .seek-controls {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
 .seek-btn {
-    flex: 1;
+    flex: 1 1 0px !important;
+    min-width: 0 !important;
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 5px 0 !important;
+    padding: 6px 0 !important;
     border-radius: 12px !important;
-    font-size: 0.68rem !important;
+    font-size: 0.72rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 8px var(--neon-green-glow) !important;
     transition: transform 0.1s ease, filter 0.15s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.pause-btn-inline {
+    font-size: 0.85rem !important;
 }
 
 .seek-btn:hover {
@@ -276,7 +293,7 @@ h1 {
 
 .vs-zone form { width: 100% !important; }
 
-.pause-btn, .tie-btn, .central-rank-btn, a.central-rank-btn {
+.tie-btn, .central-rank-btn, a.central-rank-btn {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
@@ -355,19 +372,19 @@ h1 {
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 72px 1fr !important;
-        grid-template-areas: "circle pause" "circle tie" "circle rank" !important;
+        grid-template-columns: 60px 1fr !important;
+        grid-template-areas: "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 270px !important;
-        gap: 5px 12px !important;
+        max-width: 250px !important;
+        gap: 6px 12px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 72px !important;
-        height: 72px !important;
-        font-size: 1.25rem !important;
+        width: 58px !important;
+        height: 58px !important;
+        font-size: 1.15rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -378,7 +395,6 @@ h1 {
         box-shadow: 0 0 12px var(--neon-green-glow) !important;
     }
 
-    .vs-zone > #play-pause-btn { grid-area: pause !important; }
     .vs-zone > form { grid-area: tie !important; }
     .vs-zone > a.central-rank-btn { grid-area: rank !important; }
 }

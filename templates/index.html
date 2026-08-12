@@ -77,10 +77,11 @@
                         <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
                     </div>
                 </div>
-                <!-- BOUTONS DE TIMECODE (-30s -10s +10s +30s) -->
+                <!-- BARRE DE CONTRÔLES ÉGALISÉE (5 BOUTONS D'ÉGALE TAILLE) -->
                 <div class="seek-controls" id="seek-a">
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
+                    <button type="button" class="seek-btn pause-btn-inline" onclick="togglePause(event)">⏸</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, 30)">+30s</button>
                 </div>
@@ -89,8 +90,6 @@
             <!-- CONTRÔLES CENTRAUX -->
             <div class="vs-zone" id="vsZone">
                 <div class="vs-circle">VS</div>
-
-                <button type="button" class="pause-btn" id="play-pause-btn" onclick="togglePause()">⏸ Pause</button>
 
                 <form action="{{ url_for('vote') }}" method="POST" onsubmit="handleVote(event, 'tie')">
                     <input type="hidden" name="id_a" value="{{ track_a.id }}">
@@ -120,10 +119,11 @@
                         <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
                     </div>
                 </div>
-                <!-- BOUTONS DE TIMECODE (-30s -10s +10s +30s) -->
+                <!-- BARRE DE CONTRÔLES ÉGALISÉE (5 BOUTONS D'ÉGALE TAILLE) -->
                 <div class="seek-controls" id="seek-b">
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
+                    <button type="button" class="seek-btn pause-btn-inline" onclick="togglePause(event)">⏸</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, 30)">+30s</button>
                 </div>
@@ -252,17 +252,18 @@
             triggerVoteAnimation(winner);
         }
 
-        function togglePause() {
+        function togglePause(event) {
+            if (event) event.stopPropagation();
             fetch('/toggle-pause', { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
-                    const btn = document.getElementById('play-pause-btn');
+                    const btns = document.querySelectorAll('.pause-btn-inline');
                     if (data.warning) {
                         showSpotifyWarning("⚠️ " + data.warning);
-                    } else if (data.status === 'paused') {
-                        btn.innerText = '▶ Jouer';
-                    } else if (data.status === 'playing') {
-                        btn.innerText = '⏸ Pause';
+                    } else {
+                        btns.forEach(btn => {
+                            btn.innerText = (data.status === 'paused') ? '▶' : '⏸';
+                        });
                     }
                 })
                 .catch(err => console.error('Erreur pause :', err));
