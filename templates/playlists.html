@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ session.get('theme', 'green') }}">
+<html lang="fr" data-bg-mode="dark" data-theme="green">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mes Playlists - Elotify</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </head>
 <body class="playlists-body">
 
@@ -23,15 +24,27 @@
         
         <div class="profile-dropdown" id="profileDropdown">
             <a href="{{ url_for('index') }}">⚔️ Duels</a>
-            <a href="{{ url_for('stats') }}">📊 Statistiques</a>
+            <a href="{{ url_for('stats') }}">📊 Mes Statistiques</a>
+            <a href="{{ url_for('classement') }}">🏆 Classement</a>
+            <hr>
+            <div class="mode-toggle-wrapper">
+                <span class="theme-label">Mode d'affichage :</span>
+                <div class="mode-toggle-btns">
+                    <button type="button" class="mode-btn" id="btn-mode-dark" onclick="setBgMode('dark')">🌙 Sombre</button>
+                    <button type="button" class="mode-btn" id="btn-mode-light" onclick="setBgMode('light')">☀️ Clair</button>
+                </div>
+            </div>
             <hr>
             <div class="theme-selector-wrapper">
-                <span class="theme-label">Thème d'accent :</span>
+                <span class="theme-label">Couleur d'accent :</span>
                 <div class="theme-dots">
-                    <div class="theme-dot dot-green" onclick="setTheme('green')"></div>
-                    <div class="theme-dot dot-cyan" onclick="setTheme('cyan')"></div>
-                    <div class="theme-dot dot-pink" onclick="setTheme('pink')"></div>
-                    <div class="theme-dot dot-orange" onclick="setTheme('orange')"></div>
+                    <div class="theme-dot dot-green" title="Vert" onclick="setAccentColor('green')"></div>
+                    <div class="theme-dot dot-cyan" title="Cyan" onclick="setAccentColor('cyan')"></div>
+                    <div class="theme-dot dot-pink" title="Rose" onclick="setAccentColor('pink')"></div>
+                    <div class="theme-dot dot-orange" title="Orange" onclick="setAccentColor('orange')"></div>
+                    <div class="theme-dot dot-purple" title="Violet" onclick="setAccentColor('purple')"></div>
+                    <div class="theme-dot dot-yellow" title="Jaune" onclick="setAccentColor('yellow')"></div>
+                    <div class="theme-dot dot-random" title="Couleur Aléatoire" onclick="setAccentColor('random')">🎲</div>
                 </div>
             </div>
             <hr>
@@ -42,46 +55,25 @@
 
     <div class="playlists-container">
         <div class="playlists-header">
-            <h1>🎵 MES PLAYLISTS 🎵</h1>
+            <h1>🎵 CHOISIS UNE PLAYLIST 🎵</h1>
             <a href="{{ url_for('index') }}" class="back-btn">⚔️ Retour aux duels</a>
         </div>
 
         <div class="playlists-grid">
             {% for playlist in playlists %}
             <a href="{{ url_for('select_playlist', playlist_id=playlist.id) }}" class="playlist-card">
-                {% if playlist.images and playlist.images[0].url %}
-                    <img src="{{ playlist.images[0].url }}" alt="{{ playlist.name }}" class="playlist-img">
+                {% if playlist.image_url %}
+                    <img src="{{ playlist.image_url }}" alt="{{ playlist.name }}" class="playlist-img">
                 {% else %}
                     <div class="playlist-img-placeholder">🎵</div>
                 {% endif %}
                 <div class="playlist-info">
                     <span class="playlist-name">{{ playlist.name }}</span>
-                    <span class="playlist-tracks">{{ playlist.total_tracks }} titres</span>
+                    <span class="playlist-tracks">{{ playlist.tracks_count }} titres</span>
                 </div>
             </a>
             {% endfor %}
         </div>
     </div>
-
-    <script>
-        function toggleProfileDropdown() {
-            document.getElementById('profileDropdown').classList.toggle('show');
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.closest('.user-profile-container')) {
-                const dropdown = document.getElementById('profileDropdown');
-                if (dropdown && dropdown.classList.contains('show')) {
-                    dropdown.classList.remove('show');
-                }
-            }
-        }
-
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            fetch('/set_theme/' + theme, { method: 'POST' })
-                .catch(err => console.error('Erreur sauvegarde thème BDD :', err));
-        }
-    </script>
 </body>
 </html>

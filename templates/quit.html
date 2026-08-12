@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ session.get('theme', 'green') }}">
+<html lang="fr" data-bg-mode="dark" data-theme="green">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Session Terminée - Elotify</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </head>
 <body class="quit-body">
     <div class="quit-page-container">

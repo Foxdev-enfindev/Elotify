@@ -1,20 +1,19 @@
 <!DOCTYPE html>
-<html lang="fr" data-bg-mode="{{ user_bg_mode if user_bg_mode else 'dark' }}" data-theme="{{ current_theme if current_theme else 'green' }}">
+<html lang="fr" data-bg-mode="dark" data-theme="green">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elotify Duel</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </head>
 <body class="duel-body">
 
-    <!-- BANDEAU NOTIFICATION SPOTIFY INACTIF -->
     <div id="spotify-toast" class="toast hidden"></div>
 
     <div class="container">
         
-        <!-- EN-TÊTE FIXE -->
         <div class="header-zone">
             {% if user %}
             <div class="user-profile-container">
@@ -31,9 +30,9 @@
                 <div class="profile-dropdown" id="profileDropdown">
                     <a href="{{ url_for('liste_playlists') }}">🎵 Mes Playlists</a>
                     <a href="{{ url_for('stats') }}">📊 Mes Statistiques</a>
+                    <a href="{{ url_for('classement') }}">🏆 Classement</a>
                     <hr>
                     
-                    <!-- BASCULEUR FOND CLAIR / SOMBRE -->
                     <div class="mode-toggle-wrapper">
                         <span class="theme-label">Mode d'affichage :</span>
                         <div class="mode-toggle-btns">
@@ -44,7 +43,6 @@
 
                     <hr>
 
-                    <!-- SÉLECTEUR DE COULEURS D'ACCENT -->
                     <div class="theme-selector-wrapper">
                         <span class="theme-label">Couleur d'accent :</span>
                         <div class="theme-dots">
@@ -73,10 +71,7 @@
             </div>
         </div>
 
-        <!-- ZONE DE DUEL PRINCIPALE -->
         <div class="duel-zone">
-            
-            <!-- CONTENEUR MORCEAU 1 -->
             <div class="track-slot">
                 <div class="track-card active" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
                     <div class="pochette-wrapper">
@@ -94,7 +89,6 @@
                         <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
                     </div>
                 </div>
-                <!-- BARRE DE CONTRÔLES ÉGALISÉE -->
                 <div class="seek-controls" id="seek-a">
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
@@ -104,21 +98,17 @@
                 </div>
             </div>
 
-            <!-- CONTRÔLES CENTRAUX -->
             <div class="vs-zone" id="vsZone">
                 <div class="vs-circle">VS</div>
-
                 <form action="{{ url_for('vote') }}" method="POST" onsubmit="handleVote(event, 'tie')">
                     <input type="hidden" name="id_a" value="{{ track_a.id }}">
                     <input type="hidden" name="id_b" value="{{ track_b.id }}">
                     <input type="hidden" name="outcome" value="0.5">
                     <button type="submit" class="tie-btn">🤝 Match Nul</button>
                 </form>
-
                 <a href="{{ url_for('classement') }}" class="central-rank-btn">📊 Classement</a>
             </div>
 
-            <!-- CONTENEUR MORCEAU 2 -->
             <div class="track-slot">
                 <div class="track-card" id="card-b" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
                     <div class="pochette-wrapper">
@@ -136,7 +126,6 @@
                         <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
                     </div>
                 </div>
-                <!-- BARRE DE CONTRÔLES ÉGALISÉE -->
                 <div class="seek-controls" id="seek-b">
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
@@ -145,70 +134,31 @@
                     <button type="button" class="seek-btn" onclick="seekOffset(event, 30)">+30s</button>
                 </div>
             </div>
-
         </div>
 
-        <!-- BOUTON QUITTER EN BAS DES CARTES -->
         <div class="quit-wrapper">
             <a href="{{ url_for('quit_app') }}" class="quit-btn" onclick="disableCardsOnQuit()">🚪 Quitter</a>
         </div>
-
     </div>
 
     <script>
         let currentPlaying = 'a';
         const isDesktop = window.matchMedia('(pointer: fine)').matches;
-        const availableAccentColors = ['green', 'cyan', 'pink', 'orange', 'purple', 'yellow'];
 
         window.addEventListener('DOMContentLoaded', () => {
-            // 1. Gestion du fond (Dark / Light) enregistrée ou stockée en localStorage
-            let savedBgMode = localStorage.getItem('elotify_bg_mode') || "{{ user_bg_mode if user_bg_mode else 'dark' }}";
-            setBgMode(savedBgMode, false);
-
-            // 2. Gestion de la couleur d'accentuation (avec tirage aléatoire à chaque duel si 'random')
-            let savedAccent = "{{ current_theme if current_theme else 'green' }}";
-            if (savedAccent === 'random') {
-                let randomColor = availableAccentColors[Math.floor(Math.random() * availableAccentColors.length)];
-                document.documentElement.setAttribute('data-theme', randomColor);
-            } else {
-                document.documentElement.setAttribute('data-theme', savedAccent);
-            }
-
             fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
-                    if (data.warning) {
-                        showSpotifyWarning("⚠️ " + data.warning);
-                    }
+                    if (data.warning) showSpotifyWarning("⚠️ " + data.warning);
                 })
                 .catch(err => console.error('Erreur lecture initiale :', err));
         });
-
-        function setBgMode(mode, save = true) {
-            document.documentElement.setAttribute('data-bg-mode', mode);
-            if (save) {
-                localStorage.setItem('elotify_bg_mode', mode);
-                fetch('/set_bg_mode/' + mode, { method: 'POST' }).catch(err => {});
-            }
-        }
-
-        function setAccentColor(color) {
-            if (color === 'random') {
-                let randomColor = availableAccentColors[Math.floor(Math.random() * availableAccentColors.length)];
-                document.documentElement.setAttribute('data-theme', randomColor);
-            } else {
-                document.documentElement.setAttribute('data-theme', color);
-            }
-            fetch('/set_theme/' + color, { method: 'POST' })
-                .catch(err => console.error('Erreur sauvegarde thème BDD :', err));
-        }
 
         function showSpotifyWarning(msg) {
             const toast = document.getElementById('spotify-toast');
             toast.innerText = msg;
             toast.classList.remove('hidden');
             toast.classList.add('show');
-            
             setTimeout(() => {
                 toast.classList.remove('show');
                 setTimeout(() => toast.classList.add('hidden'), 300);
@@ -218,89 +168,56 @@
         function switchActiveCard(trackKey, trackUri) {
             const cardA = document.getElementById('card-a');
             const cardB = document.getElementById('card-b');
-
             currentPlaying = trackKey;
             if (trackKey === 'a') {
-                cardA.classList.add('active');
-                cardB.classList.remove('active');
+                cardA.classList.add('active'); cardB.classList.remove('active');
             } else {
-                cardB.classList.add('active');
-                cardA.classList.remove('active');
+                cardB.classList.add('active'); cardA.classList.remove('active');
             }
-
             fetch('/listen/' + trackUri, { method: 'POST' })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.warning) {
-                        showSpotifyWarning("⚠️ " + data.warning);
-                    }
-                })
+                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
                 .catch(err => console.error('Erreur changement piste :', err));
         }
 
         function onCardHover(trackKey, trackUri) {
             if (!isDesktop) return;
-
-            if (currentPlaying !== trackKey) {
-                switchActiveCard(trackKey, trackUri);
-            }
+            if (currentPlaying !== trackKey) switchActiveCard(trackKey, trackUri);
         }
 
         function onCardClick(trackKey, trackUri) {
             if (currentPlaying === trackKey) {
                 triggerVoteAnimation(trackKey);
-                setTimeout(() => {
-                    document.getElementById('form-' + trackKey).submit();
-                }, 150);
+                setTimeout(() => { document.getElementById('form-' + trackKey).submit(); }, 150);
             } else {
                 switchActiveCard(trackKey, trackUri);
             }
         }
 
         function disableCardsOnQuit() {
-            const cardA = document.getElementById('card-a');
-            const cardB = document.getElementById('card-b');
-            const vsZone = document.getElementById('vsZone');
-
-            vsZone.classList.add('voting-in-progress');
-            cardA.classList.add('voted-loser');
-            cardB.classList.add('voted-loser');
+            document.getElementById('vsZone').classList.add('voting-in-progress');
+            document.getElementById('card-a').classList.add('voted-loser');
+            document.getElementById('card-b').classList.add('voted-loser');
         }
 
         function seekOffset(event, seconds) {
             event.stopPropagation();
             fetch('/seek_offset/' + seconds, { method: 'POST' })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.warning) {
-                        showSpotifyWarning("⚠️ " + data.warning);
-                    }
-                })
-                .catch(err => console.error('Erreur ajustement timecode :', err));
+                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
+                .catch(err => console.error('Erreur timecode :', err));
         }
 
         function triggerVoteAnimation(winner) {
             const cardA = document.getElementById('card-a');
             const cardB = document.getElementById('card-b');
-            const vsZone = document.getElementById('vsZone');
-
-            vsZone.classList.add('voting-in-progress');
-
-            if (winner === 'a') {
-                cardA.classList.add('voted-winner');
-                cardB.classList.add('voted-loser');
-            } else if (winner === 'b') {
-                cardB.classList.add('voted-winner');
-                cardA.classList.add('voted-loser');
-            } else {
-                cardA.classList.add('voted-winner');
-                cardB.classList.add('voted-winner');
-            }
+            document.getElementById('vsZone').classList.add('voting-in-progress');
+            if (winner === 'a') { cardA.classList.add('voted-winner'); cardB.classList.add('voted-loser'); }
+            else if (winner === 'b') { cardB.classList.add('voted-winner'); cardA.classList.add('voted-loser'); }
+            else { cardA.classList.add('voted-winner'); cardB.classList.add('voted-winner'); }
         }
 
-        function handleVote(event, winner) {
-            triggerVoteAnimation(winner);
-        }
+        function handleVote(event, winner) { triggerVoteAnimation(winner); }
 
         function togglePause(event) {
             if (event) event.stopPropagation();
@@ -308,28 +225,10 @@
                 .then(res => res.json())
                 .then(data => {
                     const btns = document.querySelectorAll('.pause-btn-inline');
-                    if (data.warning) {
-                        showSpotifyWarning("⚠️ " + data.warning);
-                    } else {
-                        btns.forEach(btn => {
-                            btn.innerText = (data.status === 'paused') ? '▶' : '⏸';
-                        });
-                    }
+                    if (data.warning) showSpotifyWarning("⚠️ " + data.warning);
+                    else btns.forEach(btn => btn.innerText = (data.status === 'paused') ? '▶' : '⏸');
                 })
                 .catch(err => console.error('Erreur pause :', err));
-        }
-
-        function toggleProfileDropdown() {
-            document.getElementById('profileDropdown').classList.toggle('show');
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.closest('.user-profile-container')) {
-                const dropdown = document.getElementById('profileDropdown');
-                if (dropdown && dropdown.classList.contains('show')) {
-                    dropdown.classList.remove('show');
-                }
-            }
         }
     </script>
 </body>
