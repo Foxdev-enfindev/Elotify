@@ -1,19 +1,31 @@
 /* =======================================================
-   1. VARIABLES & PALETTES THÈMES
+   1. VARIABLES DE FOND (MODE CLAIR vs SOMBRE)
    ======================================================= */
-:root, [data-theme="green"] {
+:root, [data-bg-mode="dark"] {
     --bg-color: #0d0d0d;
     --card-bg: #181818;
-    --neon-green: #00ff66;
-    --neon-green-glow: rgba(0, 255, 102, 0.4);
     --text-color: #ffffff;
     --text-muted: #b3b3b3;
     --danger-color: #ff3366;
 }
 
-[data-theme="cyan"] { --neon-green: #00f0ff; --neon-green-glow: rgba(0, 240, 255, 0.4); }
-[data-theme="pink"] { --neon-green: #ff007f; --neon-green-glow: rgba(255, 0, 127, 0.4); }
+[data-bg-mode="light"] {
+    --bg-color: #f1f3f6;
+    --card-bg: #ffffff;
+    --text-color: #0f172a;
+    --text-muted: #64748b;
+    --danger-color: #ef4444;
+}
+
+/* =======================================================
+   2. PALETTES D'ACCENTUATION (COULEURS)
+   ======================================================= */
+[data-theme="green"]  { --neon-green: #00ff66; --neon-green-glow: rgba(0, 255, 102, 0.4); }
+[data-theme="cyan"]   { --neon-green: #00f0ff; --neon-green-glow: rgba(0, 240, 255, 0.4); }
+[data-theme="pink"]   { --neon-green: #ff007f; --neon-green-glow: rgba(255, 0, 127, 0.4); }
 [data-theme="orange"] { --neon-green: #ff9900; --neon-green-glow: rgba(255, 153, 0, 0.4); }
+[data-theme="purple"] { --neon-green: #b026ff; --neon-green-glow: rgba(176, 38, 255, 0.4); }
+[data-theme="yellow"] { --neon-green: #ffe600; --neon-green-glow: rgba(255, 230, 0, 0.4); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -21,71 +33,63 @@ html, body {
     background-color: var(--bg-color);
     color: var(--text-color);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    width: 100%;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 body.duel-body {
-    overflow: hidden !important;
-    position: fixed;
-    width: 100%;
-    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 24px 16px;
 }
 
 /* =======================================================
-   2. CONTENEUR PRINCIPAL DUEL
+   3. CONTENEUR PRINCIPAL DUEL
    ======================================================= */
 .container {
-    position: fixed !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    padding: 12px 16px;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: center !important;
-    align-items: center !important;
-    gap: clamp(10px, 2.5vh, 24px) !important;
-    box-sizing: border-box;
-    overflow: hidden !important;
+    width: 95%;
+    max-width: 950px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
 }
 
 .header-zone {
     width: 100%;
-    max-width: 600px;
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
-    flex-shrink: 0 !important;
 }
 
 .user-profile-container {
     position: fixed !important;
-    top: 12px !important;
-    right: 16px !important;
+    top: 16px !important;
+    right: 20px !important;
     z-index: 9999 !important;
 }
 
 .profile-trigger {
     display: flex;
     align-items: center;
-    gap: 6px;
-    background: rgba(24, 24, 24, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 5px 12px;
+    gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid rgba(150, 150, 150, 0.2);
+    padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.user-avatar, .user-avatar-placeholder { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
-.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-.user-name { font-size: 0.82rem; font-weight: 600; }
-.arrow-down { font-size: 0.65rem; color: var(--text-muted); }
+.user-avatar, .user-avatar-placeholder { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #fff; }
+.user-name { font-size: 0.9rem; font-weight: 600; color: var(--text-color); }
+.arrow-down { font-size: 0.7rem; color: var(--text-muted); }
 
 .profile-dropdown {
     display: none;
@@ -93,26 +97,67 @@ body.duel-body {
     top: 110%;
     right: 0;
     background: var(--card-bg);
-    border: 1px solid #333;
+    border: 1px solid rgba(150, 150, 150, 0.2);
     border-radius: 12px;
-    width: 180px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    width: 220px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     overflow: hidden;
 }
 
 .profile-dropdown.show { display: block; }
-.profile-dropdown a { display: block; padding: 10px 14px; color: var(--text-color); text-decoration: none; font-size: 0.85rem; }
-.profile-dropdown a:hover { background: #282828; color: var(--neon-green); }
-.profile-dropdown hr { border: none; border-top: 1px solid #333; margin: 0; }
+.profile-dropdown a { display: block; padding: 10px 14px; color: var(--text-color); text-decoration: none; font-size: 0.88rem; }
+.profile-dropdown a:hover { background: rgba(150, 150, 150, 0.12); color: var(--neon-green); }
+.profile-dropdown hr { border: none; border-top: 1px solid rgba(150, 150, 150, 0.15); margin: 0; }
 
-.theme-selector-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 4px; }
-.theme-label { font-size: 0.72rem; color: var(--text-muted); }
-.theme-dots { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-.theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; }
-.dot-green { background: #00ff66; } .dot-cyan { background: #00f0ff; } .dot-pink { background: #ff007f; } .dot-orange { background: #ff9900; }
+.mode-toggle-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
+.mode-toggle-btns { display: flex; gap: 6px; }
+
+.mode-btn {
+    flex: 1;
+    background: rgba(150, 150, 150, 0.12);
+    border: 1px solid rgba(150, 150, 150, 0.2);
+    color: var(--text-color);
+    padding: 6px 0;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.mode-btn:hover { background: rgba(150, 150, 150, 0.25); }
+
+[data-bg-mode="dark"] #btn-mode-dark,
+[data-bg-mode="light"] #btn-mode-light {
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+}
+
+.theme-selector-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
+.theme-label { font-size: 0.75rem; color: var(--text-muted); }
+.theme-dots { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+.theme-dot { 
+    width: 20px; 
+    height: 20px; 
+    border-radius: 50%; 
+    border: 2px solid rgba(150,150,150,0.3); 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 0.7rem;
+}
+
+.dot-green { background: #00ff66; } 
+.dot-cyan { background: #00f0ff; } 
+.dot-pink { background: #ff007f; } 
+.dot-orange { background: #ff9900; }
+.dot-purple { background: #b026ff; }
+.dot-yellow { background: #ffe600; }
+.dot-random { background: linear-gradient(135deg, #00ff66, #00f0ff, #ff007f, #ff9900); border: none !important; }
 
 h1 {
-    font-size: clamp(1.3rem, 2.6vh, 2rem);
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 12px var(--neon-green-glow);
@@ -122,29 +167,24 @@ h1 {
 }
 
 .result-banner-wrapper {
-    height: 34px;
-    min-height: 34px;
+    min-height: 38px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 4px;
+    margin-top: 8px;
 }
 
 .result-banner {
     background: rgba(0, 255, 102, 0.12) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 5px 18px !important;
+    padding: 6px 22px !important;
     border-radius: 20px !important;
     text-align: center !important;
     font-weight: 700 !important;
-    font-size: clamp(0.78rem, 1.5vh, 0.92rem) !important;
+    font-size: 0.95rem !important;
     box-shadow: 0 0 12px var(--neon-green-glow) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 92% !important;
 }
 
 .result-banner.hidden {
@@ -155,16 +195,33 @@ h1 {
 }
 
 /* =======================================================
-   3. CARTES ET TYPOGRAPHIE DUEL
+   4. CARTES DUEL GRAND FORMAT (+50% HAUTEUR ET PADDING)
    ======================================================= */
+.duel-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 20px;
+}
+
+.track-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
 .track-card {
     background: var(--card-bg);
-    border: 2px solid rgba(255, 255, 255, 0.08);
-    border-radius: 18px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(150, 150, 150, 0.15);
+    border-radius: 20px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
+    width: 100%;
+    min-height: 180px !important; /* Hauteur minimale augmentée */
 }
 
 .track-card.active {
@@ -172,70 +229,95 @@ h1 {
     box-shadow: 0 0 22px var(--neon-green-glow) !important;
 }
 
-.track-card:not(.active):hover {
-    border-color: rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1) !important;
-}
+.track-card:not(.active):hover { border-color: rgba(150, 150, 150, 0.3) !important; }
 
-.pochette-wrapper { position: relative; border-radius: 12px; overflow: hidden; }
+.pochette-wrapper { position: relative; border-radius: 14px; overflow: hidden; }
 .pochette { width: 100%; height: 100%; object-fit: cover; }
 .vote-form { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
 .track-badge {
     display: inline-block;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(150, 150, 150, 0.15);
     color: var(--text-muted);
-    font-size: 0.65rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    padding: 2px 10px;
+    padding: 4px 14px;
     border-radius: 12px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    margin-bottom: 3px;
+    margin-bottom: 6px;
 }
 
 .track-title {
-    font-size: clamp(0.88rem, 1.7vh, 1.1rem) !important;
+    font-size: 1.25rem !important;
     font-weight: 800 !important;
-    color: #ffffff !important;
-    line-height: 1.25;
-    margin: 2px 0 3px 0 !important;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    color: var(--text-color) !important;
+    line-height: 1.3;
+    margin: 4px 0 6px 0 !important;
 }
 
 .track-artist {
-    font-size: clamp(0.75rem, 1.3vh, 0.85rem) !important;
+    font-size: 0.98rem !important;
     color: var(--text-muted) !important;
     font-weight: 500 !important;
-    margin-bottom: 3px !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    margin-bottom: 6px !important;
 }
 
 .elo-display {
-    font-size: 0.72rem !important;
+    font-size: 0.85rem !important;
     color: var(--text-muted) !important;
 }
 
 .elo-display strong {
     color: var(--neon-green) !important;
-    font-size: 0.82rem !important;
+    font-size: 1rem !important;
+}
+
+/* BOUTONS TIMECODE SURÉLEVÉS ET AÉRÉS */
+.seek-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    width: 100%;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.track-card.active + .seek-controls {
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.seek-btn {
+    flex: 1 1 0px !important;
+    min-width: 0 !important;
+    background: var(--neon-green) !important;
+    color: #0d0d0d !important;
+    border: none !important;
+    padding: 10px 0 !important;
+    border-radius: 12px !important;
+    font-size: 0.85rem !important;
+    font-weight: 800 !important;
+    cursor: pointer !important;
+    box-shadow: 0 0 8px var(--neon-green-glow) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .vs-zone form { width: 100% !important; }
 
-.pause-btn, .tie-btn, .central-rank-btn, a.central-rank-btn {
+.tie-btn, .central-rank-btn, a.central-rank-btn {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 7px 0 !important;
+    padding: 10px 0 !important;
     border-radius: 16px !important;
     font-weight: 800 !important;
-    font-size: 0.78rem !important;
+    font-size: 0.88rem !important;
     cursor: pointer !important;
     text-decoration: none !important;
     display: flex !important;
@@ -250,16 +332,16 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-shrink: 0 !important;
+    margin-top: 10px;
 }
 
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 8px 0 !important;
-    border-radius: 18px !important;
-    font-size: 0.82rem !important;
+    padding: 12px 28px !important;
+    border-radius: 20px !important;
+    font-size: 0.95rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 12px rgba(255, 51, 102, 0.4) !important;
@@ -267,36 +349,38 @@ h1 {
     align-items: center !important;
     justify-content: center !important;
     text-decoration: none !important;
-    width: 135px !important;
 }
 
 /* =======================================================
-   4. LAYOUT PORTRAIT (DUEL)
+   5. LAYOUT PORTRAIT / DÉPLIÉ (LARGEUR ET HAUTEUR MAXIMISÉES)
    ======================================================= */
-@media screen and (orientation: portrait) {
+@media screen and (max-aspect-ratio: 13/10), screen and (orientation: portrait) {
     .duel-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 450px !important;
-        gap: 16px !important;
-        flex: 0 1 auto !important;
+        gap: 18px !important;
+    }
+
+    .track-slot {
+        width: 100% !important;
     }
 
     .track-card {
         width: 100% !important;
-        padding: 10px 14px !important;
+        padding: 20px 24px !important; /* +50% d'espace interne */
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 14px !important;
+        gap: 20px !important;
     }
 
+    /* Pochette agrandie à 160px (+60% de surface) */
     .pochette-wrapper, .pochette-wrapper .pochette { 
-        width: clamp(72px, 10.5vh, 95px) !important; 
-        height: clamp(72px, 10.5vh, 95px) !important; 
+        width: 160px !important; 
+        height: 160px !important; 
         flex-shrink: 0 !important; 
     }
 
@@ -304,18 +388,18 @@ h1 {
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 72px 1fr !important;
-        grid-template-areas: "circle pause" "circle tie" "circle rank" !important;
+        grid-template-columns: 68px 1fr !important;
+        grid-template-areas: "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 270px !important;
-        gap: 5px 12px !important;
+        max-width: 360px !important;
+        gap: 8px 16px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 72px !important;
-        height: 72px !important;
+        width: 64px !important;
+        height: 64px !important;
         font-size: 1.25rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
@@ -327,30 +411,30 @@ h1 {
         box-shadow: 0 0 12px var(--neon-green-glow) !important;
     }
 
-    .vs-zone > #play-pause-btn { grid-area: pause !important; }
     .vs-zone > form { grid-area: tie !important; }
     .vs-zone > a.central-rank-btn { grid-area: rank !important; }
 }
 
 /* =======================================================
-   5. LAYOUT PAYSAGE (DUEL)
+   6. LAYOUT PAYSAGE (PC & ÉCRANS LARGES)
    ======================================================= */
-@media screen and (orientation: landscape) {
+@media screen and (min-aspect-ratio: 13/10) and (orientation: landscape) {
     .duel-zone {
         display: flex !important;
         flex-direction: row !important;
-        align-items: center !important;
+        align-items: flex-start !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 900px !important;
-        gap: 20px !important;
-        flex: 0 1 auto !important;
+        gap: 24px !important;
+    }
+
+    .track-slot {
+        flex: 1 !important;
+        max-width: 380px !important;
     }
 
     .track-card {
-        flex: 1 !important;
-        max-width: 320px !important;
-        padding: 12px 14px !important;
+        padding: 20px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -358,9 +442,9 @@ h1 {
     }
 
     .pochette-wrapper, .pochette-wrapper .pochette {
-        width: clamp(85px, 22vh, 135px) !important;
-        height: clamp(85px, 22vh, 135px) !important;
-        margin-bottom: 8px !important;
+        width: 180px !important;
+        height: 180px !important;
+        margin-bottom: 12px !important;
         flex-shrink: 0 !important;
     }
 
@@ -371,15 +455,16 @@ h1 {
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 8px !important;
-        width: 125px !important;
+        gap: 12px !important;
+        width: 150px !important;
         flex-shrink: 0 !important;
+        margin-top: 45px !important;
     }
 
     .vs-circle {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 1rem !important;
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.2rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -392,341 +477,65 @@ h1 {
 }
 
 /* =======================================================
-   6. STYLES CORRIGÉS PAGE PLAYLISTS
+   7. STYLES CORRIGÉS PAGE QUIT ET PAGES SECONDAIRES
    ======================================================= */
-body.playlists-body {
-    overflow-y: auto !important;
+body.playlists-body, body.classement-body, body.quit-body {
     min-height: 100vh !important;
     padding: 30px 15px !important;
     display: flex !important;
     justify-content: center !important;
-    position: static !important;
 }
 
-.playlists-container {
-    width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.playlists-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-    gap: 20px !important;
-    margin-top: 25px !important;
-    width: 100% !important;
-}
-
-.playlist-card {
-    background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: var(--text-color);
-    transition: transform 0.2s ease, border-color 0.2s ease;
-}
-
-.playlist-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--neon-green);
-    box-shadow: 0 6px 20px var(--neon-green-glow);
-}
-
-.playlist-img {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 1 / 1 !important;
-    max-width: 220px !important;
-    max-height: 220px !important;
-    border-radius: 10px;
-    object-fit: cover;
-    margin-bottom: 10px;
-}
-
-.playlist-name {
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin-bottom: 4px;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-}
-
-.playlist-tracks {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-}
-
-/* =======================================================
-   7. STYLES CORRIGÉS PAGE CLASSEMENT
-   ======================================================= */
-body.classement-body {
-    overflow-y: auto !important;
-    min-height: 100vh !important;
-    padding: 30px 15px !important;
-    display: flex !important;
-    justify-content: center !important;
-    position: static !important;
-}
-
-.classement-container {
-    width: 100%;
-    max-width: 650px;
+.playlists-container, .classement-container, .quit-page-container {
+    width: 95%;
+    max-width: 800px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.classement-header {
-    text-align: center;
-    margin-bottom: 25px;
-    width: 100%;
-}
-
-.classement-header h1 {
-    font-size: clamp(1.4rem, 3vh, 2.2rem);
-    font-weight: 800;
-    color: var(--neon-green);
-    text-shadow: 0 0 12px var(--neon-green-glow);
-    margin-bottom: 12px;
-}
-
-.back-btn {
-    display: inline-block;
-    background: var(--card-bg);
-    border: 1px solid var(--neon-green);
-    color: var(--neon-green);
-    font-weight: 700;
-    padding: 8px 18px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-size: 0.85rem;
-    box-shadow: 0 0 8px var(--neon-green-glow);
-    transition: all 0.2s ease;
-}
-
-.back-btn:hover {
-    background: var(--neon-green);
-    color: #0d0d0d;
-}
-
-.ranking-list {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.ranking-card {
-    background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 10px 16px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.ranking-rank {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--neon-green);
-    min-width: 45px;
-    text-align: left;
-}
-
-.ranking-img {
-    width: 52px !important;
-    height: 52px !important;
-    max-width: 52px !important;
-    max-height: 52px !important;
-    border-radius: 8px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.ranking-info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    flex: 1;
-    overflow: hidden;
-}
-
-.ranking-name {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.ranking-artist {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.ranking-elo {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--neon-green);
-    margin-left: auto;
-    flex-shrink: 0;
-}
-
-/* =======================================================
-   8. PAGE DE SORTIE (QUIT.HTML)
-   ======================================================= */
-body.quit-body {
-    overflow-y: auto !important;
-    min-height: 100vh !important;
-    padding: 20px 10px !important;
-    display: flex !important;
-    justify-content: center !important;
-    position: static !important;
 }
 
 .quit-page-container {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding-bottom: 50px;
 }
 
-.quit-subtitle {
-    color: var(--text-muted);
-    font-size: 0.88rem;
-    margin: 6px 0 16px 0;
+.quit-actions-group {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 28px !important; /* Marge nette pour éliminer tout chevauchement avec le Top 5 */
+    width: 100%;
 }
 
 .top5-list {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-bottom: 20px;
+    gap: 12px;
 }
 
 .top5-card {
     background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
-    padding: 8px 12px;
+    border: 1px solid rgba(150, 150, 150, 0.15);
+    border-radius: 14px;
+    padding: 12px 18px;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
+    width: 100%;
 }
 
-.top5-rank {
-    font-size: 1rem;
-    font-weight: 800;
-    color: var(--neon-green);
-    min-width: 25px;
-}
+.top5-img { width: 56px !important; height: 56px !important; border-radius: 8px; object-fit: cover; }
 
-.top5-img {
-    width: 48px !important;
-    height: 48px !important;
-    max-width: 48px !important;
-    max-height: 48px !important;
-    border-radius: 8px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.top5-info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    flex: 1;
-}
-
-.top5-name {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: #fff;
-}
-
-.top5-artist {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
-
-.top5-elo {
-    font-size: 0.88rem;
-    font-weight: 700;
-    color: var(--neon-green);
-    margin-left: auto;
-}
-
-.resume-btn {
-    background: var(--neon-green);
-    color: #0d0d0d;
-    font-weight: 800;
-    padding: 10px 20px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-size: 0.85rem;
-    box-shadow: 0 0 10px var(--neon-green-glow);
-}
-
-/* =======================================================
-   9. FEEDBACK VISUEL DE VOTE & TOAST
-   ======================================================= */
-.track-card.voted-winner {
-    border-color: var(--neon-green) !important;
-    box-shadow: 0 0 25px var(--neon-green-glow) !important;
-}
-
-.track-card.voted-loser {
-    opacity: 0.35 !important;
-    filter: grayscale(60%);
-    pointer-events: none !important;
-}
-
-.vs-zone.voting-in-progress { pointer-events: none !important; }
-
-.toast {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    background: rgba(255, 153, 0, 0.95);
-    color: #0d0d0d;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.4);
-    z-index: 10000;
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    text-align: center;
-    max-width: 90vw;
-}
-
-.toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-.toast.hidden {
-    display: none;
+.resume-btn, .full-rank-btn {
+    background: var(--neon-green) !important;
+    color: #0d0d0d !important;
+    font-weight: 800 !important;
+    padding: 12px 24px !important;
+    border-radius: 20px !important;
+    text-decoration: none !important;
+    font-size: 0.9rem !important;
+    box-shadow: 0 0 12px var(--neon-green-glow) !important;
 }
