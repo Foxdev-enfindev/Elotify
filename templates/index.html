@@ -35,10 +35,14 @@
                     <div class="theme-selector-wrapper">
                         <span class="theme-label">Thème d'accent :</span>
                         <div class="theme-dots">
-                            <div class="theme-dot dot-green" onclick="setTheme('green')"></div>
-                            <div class="theme-dot dot-cyan" onclick="setTheme('cyan')"></div>
-                            <div class="theme-dot dot-pink" onclick="setTheme('pink')"></div>
-                            <div class="theme-dot dot-orange" onclick="setTheme('orange')"></div>
+                            <div class="theme-dot dot-green" title="Vert" onclick="setTheme('green')"></div>
+                            <div class="theme-dot dot-cyan" title="Cyan" onclick="setTheme('cyan')"></div>
+                            <div class="theme-dot dot-pink" title="Rose" onclick="setTheme('pink')"></div>
+                            <div class="theme-dot dot-orange" title="Orange" onclick="setTheme('orange')"></div>
+                            <div class="theme-dot dot-purple" title="Violet" onclick="setTheme('purple')"></div>
+                            <div class="theme-dot dot-yellow" title="Jaune" onclick="setTheme('yellow')"></div>
+                            <div class="theme-dot dot-light" title="Mode Clair" onclick="setTheme('light')">☀️</div>
+                            <div class="theme-dot dot-random" title="Thème Aléatoire" onclick="setTheme('random')">🎲</div>
                         </div>
                     </div>
                     <hr>
@@ -141,8 +145,19 @@
     <script>
         let currentPlaying = 'a';
         const isDesktop = window.matchMedia('(pointer: fine)').matches;
+        const availableThemes = ['green', 'cyan', 'pink', 'orange', 'purple', 'yellow'];
 
         window.addEventListener('DOMContentLoaded', () => {
+            // Application du thème (avec gestion de l'option aléatoire)
+            let savedTheme = "{{ current_theme if current_theme else 'green' }}";
+            if (savedTheme === 'random') {
+                let randomTheme = availableThemes[Math.floor(Math.random() * availableThemes.length)];
+                document.documentElement.setAttribute('data-theme', randomTheme);
+            } else {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            }
+
+            // Lancement initial de la piste A
             fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
@@ -283,7 +298,12 @@
         }
 
         function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
+            if (theme === 'random') {
+                let randomTheme = availableThemes[Math.floor(Math.random() * availableThemes.length)];
+                document.documentElement.setAttribute('data-theme', randomTheme);
+            } else {
+                document.documentElement.setAttribute('data-theme', theme);
+            }
             fetch('/set_theme/' + theme, { method: 'POST' })
                 .catch(err => console.error('Erreur sauvegarde thème BDD :', err));
         }

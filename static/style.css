@@ -1,5 +1,5 @@
 /* =======================================================
-   1. VARIABLES & PALETTES THÈMES
+   1. VARIABLES & PALETTES THÈMES (MODE SOMBRE & CLAIR)
    ======================================================= */
 :root, [data-theme="green"] {
     --bg-color: #0d0d0d;
@@ -14,6 +14,19 @@
 [data-theme="cyan"] { --neon-green: #00f0ff; --neon-green-glow: rgba(0, 240, 255, 0.4); }
 [data-theme="pink"] { --neon-green: #ff007f; --neon-green-glow: rgba(255, 0, 127, 0.4); }
 [data-theme="orange"] { --neon-green: #ff9900; --neon-green-glow: rgba(255, 153, 0, 0.4); }
+[data-theme="purple"] { --neon-green: #b026ff; --neon-green-glow: rgba(176, 38, 255, 0.4); }
+[data-theme="yellow"] { --neon-green: #ffe600; --neon-green-glow: rgba(255, 230, 0, 0.4); }
+
+/* MODE CLAIR */
+[data-theme="light"] {
+    --bg-color: #f4f5f8;
+    --card-bg: #ffffff;
+    --neon-green: #10b981;
+    --neon-green-glow: rgba(16, 185, 129, 0.3);
+    --text-color: #0f172a;
+    --text-muted: #64748b;
+    --danger-color: #ef4444;
+}
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -75,16 +88,17 @@ body.duel-body {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: rgba(24, 24, 24, 0.95);
+    background: var(--card-bg);
     border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 5px 12px;
     border-radius: 20px;
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .user-avatar, .user-avatar-placeholder { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
-.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-.user-name { font-size: 0.82rem; font-weight: 600; }
+.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #fff; }
+.user-name { font-size: 0.82rem; font-weight: 600; color: var(--text-color); }
 .arrow-down { font-size: 0.65rem; color: var(--text-muted); }
 
 .profile-dropdown {
@@ -93,23 +107,44 @@ body.duel-body {
     top: 110%;
     right: 0;
     background: var(--card-bg);
-    border: 1px solid #333;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     border-radius: 12px;
-    width: 180px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+    width: 210px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
     overflow: hidden;
 }
 
 .profile-dropdown.show { display: block; }
 .profile-dropdown a { display: block; padding: 10px 14px; color: var(--text-color); text-decoration: none; font-size: 0.85rem; }
-.profile-dropdown a:hover { background: #282828; color: var(--neon-green); }
-.profile-dropdown hr { border: none; border-top: 1px solid #333; margin: 0; }
+.profile-dropdown a:hover { background: rgba(255, 255, 255, 0.08); color: var(--neon-green); }
+.profile-dropdown hr { border: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 0; }
 
-.theme-selector-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 4px; }
+.theme-selector-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
 .theme-label { font-size: 0.72rem; color: var(--text-muted); }
-.theme-dots { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
-.theme-dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; }
-.dot-green { background: #00ff66; } .dot-cyan { background: #00f0ff; } .dot-pink { background: #ff007f; } .dot-orange { background: #ff9900; }
+.theme-dots { display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-wrap: wrap; }
+.theme-dot { 
+    width: 18px; 
+    height: 18px; 
+    border-radius: 50%; 
+    border: 2px solid rgba(255,255,255,0.2); 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-size: 0.65rem;
+}
+
+.dot-green { background: #00ff66; } 
+.dot-cyan { background: #00f0ff; } 
+.dot-pink { background: #ff007f; } 
+.dot-orange { background: #ff9900; }
+.dot-purple { background: #b026ff; }
+.dot-yellow { background: #ffe600; }
+.dot-light { background: #ffffff; border-color: #64748b !important; }
+.dot-random { 
+    background: linear-gradient(135deg, #00ff66, #00f0ff, #ff007f, #ff9900); 
+    border: none !important;
+}
 
 h1 {
     font-size: clamp(1.3rem, 2.6vh, 2rem);
@@ -168,7 +203,7 @@ h1 {
     background: var(--card-bg);
     border: 2px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
@@ -181,8 +216,7 @@ h1 {
 }
 
 .track-card:not(.active):hover {
-    border-color: rgba(255, 255, 255, 0.3) !important;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
 }
 
 .pochette-wrapper { position: relative; border-radius: 12px; overflow: hidden; }
@@ -191,7 +225,7 @@ h1 {
 
 .track-badge {
     display: inline-block;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(150, 150, 150, 0.15);
     color: var(--text-muted);
     font-size: 0.65rem;
     font-weight: 700;
@@ -205,7 +239,7 @@ h1 {
 .track-title {
     font-size: clamp(0.88rem, 1.7vh, 1.1rem) !important;
     font-weight: 800 !important;
-    color: #ffffff !important;
+    color: var(--text-color) !important;
     line-height: 1.25;
     margin: 2px 0 3px 0 !important;
     display: -webkit-box;
@@ -516,7 +550,7 @@ body.playlists-body {
     align-items: center;
     text-decoration: none;
     color: var(--text-color);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -535,7 +569,7 @@ body.playlists-body {
 }
 
 .playlist-img-placeholder {
-    background: #282828;
+    background: rgba(150, 150, 150, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -553,7 +587,7 @@ body.playlists-body {
 .playlist-name {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -640,7 +674,7 @@ body.classement-body {
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .ranking-rank {
@@ -672,7 +706,7 @@ body.classement-body {
 .ranking-name {
     font-size: 0.92rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -767,7 +801,7 @@ body.quit-body {
 .top5-name {
     font-size: 0.88rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-color);
 }
 
 .top5-artist {
