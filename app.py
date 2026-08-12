@@ -393,11 +393,25 @@ def quit_app():
             sp.pause_playback()
         except Exception: 
             pass
+
+    playlist_id = session.get('selected_playlist_id')
+    playlist_name = "ta playlist"
+
+    # Tentative de récupération du nom exact de la playlist
+    if sp and playlist_id:
+        try:
+            pl_info = sp.playlist(playlist_id, fields='name')
+            playlist_name = pl_info.get('name', 'ta playlist')
+        except Exception:
+            pass
+
     scores = load_local_scores()
     tracks = list(scores.values())
     tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
+    
     session.pop('tracks_cache', None)
-    return render_template('quit.html', top5=tracks[:5])
+    
+    return render_template('quit.html', top5=tracks[:5], playlist_name=playlist_name)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
