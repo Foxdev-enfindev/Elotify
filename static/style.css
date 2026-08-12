@@ -494,57 +494,109 @@ h1 {
 }
 
 /* =======================================================
-   5. LAYOUT PAYSAGE (DESKTOP, ECRAN PC)
+   5. LAYOUT PAYSAGE (DESKTOP, FOLD DÉPLIÉ EN PAYSAGE, TABLETTE)
    ======================================================= */
 @media screen and (orientation: landscape) {
+    body.duel-body {
+        padding: 50px 20px 16px 20px !important;
+        overflow-y: auto !important; /* Permet le scroll doux si l'écran est très bas */
+    }
+
+    .container {
+        width: 100% !important;
+        max-width: 950px !important;
+        gap: 16px !important;
+    }
+
+    .header-zone {
+        padding-top: 0 !important;
+        gap: 6px !important;
+    }
+
+    .result-banner-wrapper {
+        min-height: 28px !important;
+        margin-top: 2px !important;
+    }
+
     .duel-zone {
         display: flex !important;
         flex-direction: row !important;
         align-items: flex-start !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 950px !important;
-        gap: 24px !important;
+        gap: 20px !important;
     }
 
     .track-slot {
         flex: 1 !important;
-        max-width: 360px !important;
+        max-width: 380px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
     }
 
     .track-card {
-        padding: 16px !important;
+        padding: 14px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
+        min-height: 260px !important;
     }
 
+    /* Pochette s'adaptant à la hauteur de l'écran en paysage */
     .pochette-wrapper, .pochette-wrapper .pochette {
-        width: clamp(120px, 25vh, 170px) !important;
-        height: clamp(120px, 25vh, 170px) !important;
-        margin-bottom: 10px !important;
+        width: clamp(100px, 20vh, 150px) !important;
+        height: clamp(100px, 20vh, 150px) !important;
+        margin-bottom: 8px !important;
         flex-shrink: 0 !important;
+        border-radius: 12px !important;
     }
 
-    .track-info { text-align: center !important; width: 100% !important; }
+    .track-info {
+        text-align: center !important;
+        width: 100% !important;
+    }
 
+    .track-title {
+        font-size: 1.1rem !important;
+        margin: 2px 0 3px 0 !important;
+    }
+
+    .track-artist {
+        font-size: 0.88rem !important;
+        margin-bottom: 3px !important;
+    }
+
+    /* Contrôles de timecode alignés sous chaque carte */
+    .seek-controls {
+        margin-top: 8px !important;
+        width: 100% !important;
+        gap: 6px !important;
+    }
+
+    .seek-btn {
+        padding: 6px 0 !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Zone centrale VS */
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
         gap: 10px !important;
-        width: 140px !important;
+        width: 135px !important;
         flex-shrink: 0 !important;
-        margin-top: 35px !important;
+        margin-top: 35px !important; /* Aligne le VS avec les pochettes */
     }
 
     .vs-circle {
-        width: 58px !important;
-        height: 58px !important;
-        font-size: 1.15rem !important;
+        width: 56px !important;
+        height: 56px !important;
+        font-size: 1.1rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -553,6 +605,20 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         box-shadow: 0 0 10px var(--neon-green-glow) !important;
+    }
+
+    .tie-btn, .central-rank-btn, a.central-rank-btn {
+        padding: 8px 0 !important;
+        font-size: 0.82rem !important;
+    }
+
+    .quit-wrapper {
+        margin-top: 10px !important;
+    }
+
+    .quit-btn {
+        padding: 8px 24px !important;
+        font-size: 0.88rem !important;
     }
 }
 
