@@ -494,37 +494,41 @@ h1 {
 }
 
 /* =======================================================
-   5. LAYOUT PAYSAGE (DESKTOP, FOLD DÉPLIÉ EN PAYSAGE, TABLETTE)
+   5. LAYOUT PAYSAGE (PC, TABLETTE, FOLD ET Z FLIP)
    ======================================================= */
 @media screen and (orientation: landscape) {
     body.duel-body {
-        padding: 50px 20px 16px 20px !important;
-        overflow-y: auto !important;
+        padding: 40px 12px 10px 12px !important;
+        overflow-y: auto !important; /* Permet le défilement si l'écran est vraiment très court */
     }
 
     .container {
         width: 100% !important;
         max-width: 980px !important;
-        gap: 16px !important;
+        gap: 8px !important; /* Espacement global réduit pour économiser la hauteur */
     }
 
     .header-zone {
         padding-top: 0 !important;
-        gap: 6px !important;
+        gap: 2px !important;
+    }
+
+    .header-title {
+        font-size: 1.2rem !important;
     }
 
     .result-banner-wrapper {
-        min-height: 28px !important;
-        margin-top: 2px !important;
+        min-height: 22px !important;
+        margin-top: 0 !important;
     }
 
     .duel-zone {
         display: flex !important;
         flex-direction: row !important;
-        align-items: center !important; /* Alignement centré avec le bloc VS */
+        align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        gap: 24px !important;
+        gap: 12px !important;
     }
 
     .track-slot {
@@ -536,21 +540,22 @@ h1 {
     }
 
     .track-card {
-        padding: 16px !important;
+        padding: 8px 12px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        min-height: 280px !important;
+        min-height: unset !important; /* Retire la hauteur minimale fixe */
     }
 
+    /* Pochettes adaptatives en vh pour s'ajuster aux écrans peu hauts */
     .pochette-wrapper, .pochette-wrapper .pochette {
-        width: clamp(110px, 20vh, 155px) !important;
-        height: clamp(110px, 20vh, 155px) !important;
-        margin-bottom: 10px !important;
+        width: clamp(70px, 22vh, 130px) !important;
+        height: clamp(70px, 22vh, 130px) !important;
+        margin-bottom: 4px !important;
         flex-shrink: 0 !important;
-        border-radius: 12px !important;
+        border-radius: 8px !important;
     }
 
     .track-info {
@@ -559,44 +564,46 @@ h1 {
     }
 
     .track-title {
-        font-size: 1.15rem !important;
-        margin: 2px 0 4px 0 !important;
+        font-size: 0.95rem !important;
+        margin: 1px 0 2px 0 !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .track-artist {
-        font-size: 0.9rem !important;
-        margin-bottom: 4px !important;
+        font-size: 0.8rem !important;
+        margin-bottom: 2px !important;
     }
 
     .seek-controls {
-        margin-top: 10px !important;
+        margin-top: 4px !important;
         width: 100% !important;
-        gap: 6px !important;
+        gap: 4px !important;
     }
 
     .seek-btn {
-        padding: 7px 0 !important;
-        font-size: 0.8rem !important;
+        padding: 4px 0 !important;
+        font-size: 0.75rem !important;
     }
 
-    /* ZONE CENTRALE VS AJUSTÉE ET AGRANDIE */
+    /* ZONE CENTRALE VS COMPACTE */
     .vs-zone {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 12px !important;
-        width: 150px !important;
+        gap: 6px !important;
+        width: 130px !important;
         flex-shrink: 0 !important;
-        margin-top: 0 !important; /* Centrage vertical naturel avec les cartes */
+        margin-top: 0 !important;
         align-self: center !important;
     }
 
-    /* Cercle VS plus grand */
     .vs-circle {
-        width: 68px !important;
-        height: 68px !important;
-        font-size: 1.3rem !important;
+        width: 48px !important;
+        height: 48px !important;
+        font-size: 1rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -604,21 +611,43 @@ h1 {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 0 14px var(--neon-green-glow) !important;
+        box-shadow: 0 0 10px var(--neon-green-glow) !important;
     }
 
     .tie-btn, .central-rank-btn, a.central-rank-btn {
-        padding: 9px 0 !important;
-        font-size: 0.85rem !important;
+        padding: 6px 0 !important;
+        font-size: 0.78rem !important;
     }
 
     .quit-wrapper {
-        margin-top: 12px !important;
+        margin-top: 4px !important;
     }
 
     .quit-btn {
-        padding: 9px 26px !important;
-        font-size: 0.88rem !important;
+        padding: 6px 18px !important;
+        font-size: 0.8rem !important;
+    }
+}
+
+/* =======================================================
+   6. OPTIMISATION SPÉCIALE ÉCRANS TRÈS BAS EN PAYSAGE (Z FLIP, ETC.)
+   ======================================================= */
+@media screen and (orientation: landscape) and (max-height: 480px) {
+    body.duel-body {
+        padding-top: 32px !important;
+    }
+
+    .pochette-wrapper, .pochette-wrapper .pochette {
+        width: clamp(55px, 18vh, 85px) !important;
+        height: clamp(55px, 18vh, 85px) !important;
+    }
+
+    .header-title {
+        display: none !important; /* Masque le titre "ELOTIFY DUEL" sur écran extrêmement bas pour sauver 40px */
+    }
+
+    .seek-controls {
+        display: flex !important;
     }
 }
 
