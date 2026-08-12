@@ -1,36 +1,96 @@
 <!DOCTYPE html>
-<html lang="fr" data-bg-mode="dark" data-theme="green">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Statistiques Playlist - Elotify</title>
-    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <title>Elotify K-Pop - Stats Groupes</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    
+    <!-- Restauration du thème au chargement -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
-<body class="classement-body">
+<body>
 
-    {% include 'includes/user_menu.html' %}
-
-    <div class="classement-container">
-        <div class="classement-header">
-            <h1>📊 STATISTIQUES ARTISTES 📊</h1>
-            <p class="quit-subtitle" style="margin-bottom: 12px;">Répartition des {{ total_tracks }} titres de ta playlist active :</p>
-            <a href="{{ url_for('index') }}" class="back-btn">⚔️ Retour aux duels</a>
+    {% if user %}
+    <div class="user-profile-container" id="profileMenuContainer">
+        <div class="profile-trigger" onclick="toggleDropdown(event)">
+            {% if user.image %}
+                <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
+            {% else %}
+                <div class="user-avatar-placeholder">👤</div>
+            {% endif %}
+            <span class="user-name">{{ user.display_name }}</span>
+            <span class="arrow-down">▼</span>
         </div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
+            <hr>
+            <!-- SÉLECTEUR DE THÈME -->
+            <div class="theme-selector-wrapper">
+                <span class="theme-label">Thème :</span>
+                <div class="theme-dots">
+                    <button type="button" class="theme-dot dot-green" onclick="setTheme('green')" title="Vert Néon"></button>
+                    <button type="button" class="theme-dot dot-cyan" onclick="setTheme('cyan')" title="Cyan Cyber"></button>
+                    <button type="button" class="theme-dot dot-pink" onclick="setTheme('pink')" title="Rose Neon"></button>
+                    <button type="button" class="theme-dot dot-orange" onclick="setTheme('orange')" title="Orange Amber"></button>
+                </div>
+            </div>
+            <hr>
+            <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="container ranking-container">
+        
+        <div style="margin-bottom: 20px; text-align: left;">
+            <a href="{{ url_for('index') }}" class="nav-btn">⚔️ Retour aux Duels</a>
+        </div>
+
+        <h1>🎤 TITRES PAR GROUPE 🎤</h1>
+        <p style="color: var(--text-muted); text-align: center; font-size: 0.9rem; margin-top: -10px; margin-bottom: 20px;">
+            Total : {{ total_tracks }} titres dans la playlist
+        </p>
 
         <div class="ranking-list">
             {% for artist, count in sorted_artists %}
-            <div class="ranking-card">
-                <span class="ranking-rank">#{{ loop.index }}</span>
-                <div class="ranking-info">
-                    <span class="ranking-name">{{ artist }}</span>
-                    <span class="ranking-artist">{{ ((count / total_tracks) * 100) | round(1) }}% de la playlist</span>
+            <div class="ranking-item">
+                <div class="rank-number">#{{ loop.index }}</div>
+                
+                <div class="rank-details">
+                    <span class="rank-name">{{ artist }}</span>
                 </div>
-                <span class="ranking-elo">{{ count }} titre{% if count > 1 %}s{% endif %}</span>
+                
+                <div class="rank-elo">{{ count }} titre{% if count > 1 %}s{% endif %}</div>
             </div>
             {% endfor %}
         </div>
     </div>
+
+    <script>
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('elotify_theme', themeName);
+        }
+
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        }
+    </script>
 </body>
 </html>

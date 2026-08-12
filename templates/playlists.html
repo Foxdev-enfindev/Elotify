@@ -1,38 +1,96 @@
 <!DOCTYPE html>
-<html lang="fr" data-bg-mode="dark" data-theme="green">
+<html lang="fr" data-theme="{{ current_theme if current_theme else session.get('theme', 'green') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mes Playlists - Elotify</title>
+    <title>Elotify K-Pop - Choix de la Playlist</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='theme.js') }}"></script>
+    
+    <!-- Restauration du thème au chargement -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('elotify_theme') || 'green';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
 </head>
-<body class="playlists-body">
+<body>
 
-    {% include 'includes/user_menu.html' %}
-
-    <div class="playlists-container">
-        <div class="playlists-header">
-            <h1>🎵 CHOISIS UNE PLAYLIST 🎵</h1>
-            <a href="{{ url_for('index') }}" class="back-btn">⚔️ Retour aux duels</a>
+    <!-- --- BLOC PROFIL & MENU DÉROULANT --- -->
+    {% if user %}
+    <div class="user-profile-container" id="profileMenuContainer">
+        <div class="profile-trigger" onclick="toggleDropdown(event)">
+            {% if user.image %}
+                <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
+            {% else %}
+                <div class="user-avatar-placeholder">👤</div>
+            {% endif %}
+            <span class="user-name">{{ user.display_name }}</span>
+            <span class="arrow-down">▼</span>
         </div>
+        <div class="profile-dropdown" id="profileDropdown">
+            <a href="{{ url_for('liste_playlists') }}">📁 Mes Playlists</a>
+            <hr>
+            <!-- SÉLECTEUR DE THÈME -->
+            <div class="theme-selector-wrapper">
+                <span class="theme-label">Thème :</span>
+                <div class="theme-dots">
+                    <button type="button" class="theme-dot dot-green" onclick="setTheme('green')" title="Vert Néon"></button>
+                    <button type="button" class="theme-dot dot-cyan" onclick="setTheme('cyan')" title="Cyan Cyber"></button>
+                    <button type="button" class="theme-dot dot-pink" onclick="setTheme('pink')" title="Rose Neon"></button>
+                    <button type="button" class="theme-dot dot-orange" onclick="setTheme('orange')" title="Orange Amber"></button>
+                </div>
+            </div>
+            <hr>
+            <a href="{{ url_for('logout') }}" class="logout-link">🚪 Déconnexion</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <h1>🎵 CHOISIS TA PLAYLIST 🎵</h1>
+        <p class="subtitle" style="color: var(--text-muted); text-align: center; margin-bottom: 20px;">Sélectionne une playlist pour démarrer les duels Elo</p>
 
         <div class="playlists-grid">
-            {% for playlist in playlists %}
-            <a href="{{ url_for('select_playlist', playlist_id=playlist.id) }}" class="playlist-card">
-                {% if playlist.image_url %}
-                    <img src="{{ playlist.image_url }}" alt="{{ playlist.name }}" class="playlist-img">
+            {% for pl in playlists %}
+            <div class="playlist-card" onclick="selectPlaylist('{{ pl.id }}')">
+                {% if pl.images and pl.images[0].url %}
+                    <img src="{{ pl.images[0].url }}" alt="{{ pl.name }}" class="playlist-cover" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
                 {% else %}
-                    <div class="playlist-img-placeholder">🎵</div>
+                    <div class="playlist-cover playlist-placeholder" style="width: 100%; height: 160px; background: #282828; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 10px; font-size: 2rem;">🎵</div>
                 {% endif %}
                 <div class="playlist-info">
-                    <span class="playlist-name">{{ playlist.name }}</span>
-                    <span class="playlist-tracks">{{ playlist.tracks_count }} titres</span>
+                    <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 4px;">{{ pl.name }}</h3>
+                    <p style="font-size: 0.8rem; color: var(--text-muted);">{{ pl.total_tracks }} titres</p>
                 </div>
-            </a>
+            </div>
             {% endfor %}
         </div>
     </div>
+
+    <script>
+        function setTheme(themeName) {
+            document.documentElement.setAttribute('data-theme', themeName);
+            localStorage.setItem('elotify_theme', themeName);
+        }
+
+        function selectPlaylist(playlistId) {
+            window.location.replace("/select_playlist/" + playlistId);
+        }
+
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown) dropdown.classList.toggle('show');
+        }
+
+        window.onclick = function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        }
+    </script>
 </body>
 </html>

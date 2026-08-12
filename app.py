@@ -588,60 +588,15 @@ def toggle_pause():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/seek_offset/<offset_seconds>', methods=['POST'])
-def seek_offset(offset_seconds):
-    sp = get_spotify_client()
-    if not sp:
-        return jsonify({"error": "Non authentifié"}), 401
-    try:
-        offset_sec = int(offset_seconds)
-        playback = sp.current_playback()
-        if playback and playback.get('is_playing') and playback.get('progress_ms') is not None:
-            current_ms = playback['progress_ms']
-            target_ms = max(0, current_ms + (offset_sec * 1000))
-            sp.seek_track(position_ms=target_ms)
-            return jsonify({'status': 'success', 'new_position_ms': target_ms})
-        else:
-            return jsonify({'warning': 'Lance une piste sur Spotify pour ajuster le timecode.'})
-    except SpotifyException as e:
-        if e.http_status == 404:
-            return jsonify({'warning': 'Ouvre Spotify sur ton appareil pour ajuster la lecture.'}), 200
-        return jsonify({'error': str(e)}), 500
-    except Exception as e:
-        return jsonify({'warning': 'Impossible d\'ajuster le timecode (Spotify inactif).'})
-
 # --- ROUTE CLASSEMENT & API TOP 5 ---
 @app.route('/classement')
 def classement():
-    if 'user' not in session:
-        return redirect(url_for('login'))
-    
-    conn = get_db_connection()
-    cur = conn.cursor()
-    
-    # Récupérer le classement trié par Elo décroissant pour la playlist/utilisateur actif
-    cur.execute("""
-        SELECT track_id, track_name, artist_name, image_url, elo_rating 
-        FROM tracks 
-        WHERE user_id = %s 
-        ORDER BY elo_rating DESC
-    """, (session['user']['id'],))
-    
-    rows = cur.fetchall()
-    cur.close()
-    conn.close()
-    
-    ranking = []
-    for row in rows:
-        ranking.append({
-            'id': row[0],
-            'name': row[1],
-            'artist': row[2],
-            'image_url': row[3],
-            'elo': round(row[4])
-        })
-        
-    return render_template('classement.html', ranking=ranking, user=session.get('user'))
+    scores = load_local_scores()
+    tracks = list(scores.values())
+    tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
+    sp = get_spotify_client()
+    user = get_user_profile_cached(sp) if sp else None
+    return render_template('classement.html', tracks=tracks, user=user)
 
 @app.route('/api/top5')
 def api_top5():
@@ -682,20 +637,6 @@ def stats():
         sorted_artists=sorted_artists, 
         total_tracks=len(tracks), 
         user=profile
-    )
-@app.route('/set_bg_mode/<mode>', methods=['POST'])
-def set_bg_mode(mode):
-    if 'user' in session:
-        user_id = session['user']['id']
-        # Mettre à jour la colonne bg_mode pour l'utilisateur dans la BDD Neon
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("UPDATE users SET bg_mode = %s WHERE spotify_id = %s", (mode, user_id))
-        conn.commit()
-        cur.close()
-        conn.close()
-    session['bg_mode'] = mode
-    return jsonify({'status': 'ok'}
     )
 
 # --- ROUTE PAGE DE SORTIE AVEC CLASSEMENT ---
