@@ -3,20 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fin de session - Elotify</title>
+    <title>Session Terminée - Elotify</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </head>
 <body class="quit-body">
-
-    {% include 'includes/user_menu.html' %}
-
     <div class="quit-page-container">
-        <div class="playlists-header">
-            <h1>👋 MERCI D'AVOIR JOUÉ !</h1>
-            <p class="quit-subtitle">Voici le Top 5 de ta session actuelle :</p>
-        </div>
+        <h1>👋 MERCI D'AVOIR JOUÉ !</h1>
+        <p class="quit-subtitle">Voici le Top 5 de ta session actuelle :</p>
 
         <div class="top5-list">
             {% for track in top5 %}
