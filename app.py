@@ -345,12 +345,15 @@ def liste_playlists():
                 total = pl['items'].get('total', 0)
             elif 'tracks' in pl and isinstance(pl['tracks'], dict):
                 total = pl['tracks'].get('total', 0)
+            
+            images = pl.get('images', [])
+            image_url = images[0]['url'] if images else None
                     
             playlists.append({
                 "id": pl.get('id'),
                 "name": pl.get('name', 'Playlist sans nom'),
-                "images": pl.get('images', []),
-                "total_tracks": total
+                "image_url": image_url,
+                "tracks_count": total
             })
             
         return render_template('playlists.html', playlists=playlists, user=get_user_profile_cached(sp))
@@ -389,7 +392,6 @@ def index():
     profile = get_user_profile_cached(sp)
     user_id = profile.get('id') if profile else None
 
-    # Chargement du thème utilisateur depuis la BDD
     current_theme = session.get('theme', 'green')
     if DATABASE_URL and user_id:
         try:
@@ -610,7 +612,7 @@ def seek_offset(offset_seconds):
     except Exception as e:
         return jsonify({'warning': 'Impossible d\'ajuster le timecode (Spotify inactif).'})
 
-# --- ROUTE CLASSEMENT & API TOP 5 ---
+# --- ROUTE CLASSEMENT (Passage de 'ranking' pour corriger la boucle HTML) ---
 @app.route('/classement')
 def classement():
     scores = load_local_scores()
@@ -618,7 +620,7 @@ def classement():
     tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
     sp = get_spotify_client()
     user = get_user_profile_cached(sp) if sp else None
-    return render_template('classement.html', tracks=tracks, user=user)
+    return render_template('classement.html', ranking=tracks, user=user)
 
 @app.route('/api/top5')
 def api_top5():

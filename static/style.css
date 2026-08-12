@@ -1,5 +1,5 @@
 /* =======================================================
-   1. VARIABLES DE FOND (MODE CLAIR vs SOMBRE)
+   1. VARIABLES DE FOND & ACCENTS
    ======================================================= */
 :root, [data-bg-mode="dark"] {
     --bg-color: #0d0d0d;
@@ -17,9 +17,7 @@
     --danger-color: #ef4444;
 }
 
-/* =======================================================
-   2. PALETTES D'ACCENTUATION (COULEURS)
-   ======================================================= */
+/* PALETTES D'ACCENTUATION */
 [data-theme="green"]  { --neon-green: #00ff66; --neon-green-glow: rgba(0, 255, 102, 0.4); }
 [data-theme="cyan"]   { --neon-green: #00f0ff; --neon-green-glow: rgba(0, 240, 255, 0.4); }
 [data-theme="pink"]   { --neon-green: #ff007f; --neon-green-glow: rgba(255, 0, 127, 0.4); }
@@ -42,11 +40,11 @@ body.duel-body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px 12px;
+    padding: 60px 12px 20px 12px !important; /* Dégagement pour le menu fixed */
 }
 
 /* =======================================================
-   3. CONTENEUR PRINCIPAL DUEL
+   2. CONTENEUR PRINCIPAL & MENU PROFIL
    ======================================================= */
 .container {
     width: 100%;
@@ -66,6 +64,7 @@ body.duel-body {
     flex-direction: column;
     align-items: center;
     position: relative;
+    padding-top: 10px;
 }
 
 .user-profile-container {
@@ -117,10 +116,7 @@ body.duel-body {
     gap: 6px;
 }
 
-.mode-toggle-btns {
-    display: flex;
-    gap: 6px;
-}
+.mode-toggle-btns { display: flex; gap: 6px; }
 
 .mode-btn {
     flex: 1;
@@ -209,7 +205,7 @@ h1 {
 }
 
 /* =======================================================
-   4. CARTES ET SLOTS MORCEAUX DUEL
+   3. CARTES ET SLOTS MORCEAUX DUEL
    ======================================================= */
 .track-slot {
     display: flex;
@@ -379,7 +375,7 @@ h1 {
 }
 
 /* =======================================================
-   5. LAYOUT PORTRAIT (SMARTPHONE, TABLETTE EN PORTRAIT)
+   4. LAYOUT PORTRAIT (SMARTPHONE, TABLETTE EN PORTRAIT)
    ======================================================= */
 @media screen and (orientation: portrait) {
     .duel-zone {
@@ -405,7 +401,6 @@ h1 {
         gap: 18px !important;
     }
 
-    /* Pochette adaptative (s'agrandit jusqu'à 130px sur tablette) */
     .pochette-wrapper, .pochette-wrapper .pochette { 
         width: clamp(90px, 18vw, 130px) !important; 
         height: clamp(90px, 18vw, 130px) !important; 
@@ -444,7 +439,7 @@ h1 {
 }
 
 /* =======================================================
-   6. LAYOUT PAYSAGE (DESKTOP, ECRAN PC, TABLETTE EN PAYSAGE)
+   5. LAYOUT PAYSAGE (DESKTOP, ECRAN PC)
    ======================================================= */
 @media screen and (orientation: landscape) {
     .duel-zone {
@@ -507,31 +502,31 @@ h1 {
 }
 
 /* =======================================================
-   7. STYLES PAGE PLAYLISTS
+   6. STYLES PAGES SECONDAIRES (MARGE POUR LE MENU FIXED)
    ======================================================= */
-body.playlists-body {
+body.playlists-body, body.classement-body, body.quit-body {
     min-height: 100vh !important;
-    padding: 40px 20px !important;
+    padding: 60px 15px 30px 15px !important; /* Dégagement haut pour le menu */
     display: flex !important;
     justify-content: center !important;
 }
 
-.playlists-container {
+.playlists-container, .classement-container, .quit-page-container {
     width: 100%;
-    max-width: 1100px;
+    max-width: 700px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.playlists-header {
+.playlists-header, .classement-header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     width: 100%;
 }
 
-.playlists-header h1 {
+.playlists-header h1, .classement-header h1 {
     font-size: clamp(1.4rem, 3vh, 2.2rem);
     font-weight: 800;
     color: var(--neon-green);
@@ -604,39 +599,6 @@ body.playlists-body {
 .playlist-tracks {
     font-size: 0.78rem;
     color: var(--text-muted);
-}
-
-/* =======================================================
-   8. STYLES PAGE CLASSEMENT & STATS
-   ======================================================= */
-body.classement-body {
-    min-height: 100vh !important;
-    padding: 30px 15px !important;
-    display: flex !important;
-    justify-content: center !important;
-}
-
-.classement-container {
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.classement-header {
-    text-align: center;
-    margin-bottom: 25px;
-    width: 100%;
-}
-
-.classement-header h1 {
-    font-size: clamp(1.4rem, 3vh, 2.2rem);
-    font-weight: 800;
-    color: var(--neon-green);
-    text-shadow: 0 0 12px var(--neon-green-glow);
-    margin-bottom: 12px;
 }
 
 .back-btn {
@@ -721,27 +683,7 @@ body.classement-body {
     flex-shrink: 0;
 }
 
-/* =======================================================
-   9. PAGE DE SORTIE (QUIT.HTML)
-   ======================================================= */
-body.quit-body {
-    min-height: 100vh !important;
-    padding: 30px 15px !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-}
-
-.quit-page-container {
-    width: 100%;
-    max-width: 550px;
-    margin: 0 auto;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
+/* PAGE QUIT */
 .quit-subtitle {
     color: var(--text-muted);
     font-size: 0.9rem;
@@ -826,7 +768,7 @@ body.quit-body {
 }
 
 /* =======================================================
-   10. FEEDBACK VISUEL DE VOTE & TOAST
+   7. FEEDBACK VISUEL DE VOTE & TOAST
    ======================================================= */
 .track-card.voted-winner {
     border-color: var(--neon-green) !important;
