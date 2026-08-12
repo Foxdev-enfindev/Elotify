@@ -1,32 +1,31 @@
 /* =======================================================
-   1. VARIABLES & PALETTES THÈMES (MODE SOMBRE & CLAIR)
+   1. VARIABLES DE FOND (MODE CLAIR vs SOMBRE)
    ======================================================= */
-:root, [data-theme="green"] {
+:root, [data-bg-mode="dark"] {
     --bg-color: #0d0d0d;
     --card-bg: #181818;
-    --neon-green: #00ff66;
-    --neon-green-glow: rgba(0, 255, 102, 0.4);
     --text-color: #ffffff;
     --text-muted: #b3b3b3;
     --danger-color: #ff3366;
 }
 
-[data-theme="cyan"] { --neon-green: #00f0ff; --neon-green-glow: rgba(0, 240, 255, 0.4); }
-[data-theme="pink"] { --neon-green: #ff007f; --neon-green-glow: rgba(255, 0, 127, 0.4); }
-[data-theme="orange"] { --neon-green: #ff9900; --neon-green-glow: rgba(255, 153, 0, 0.4); }
-[data-theme="purple"] { --neon-green: #b026ff; --neon-green-glow: rgba(176, 38, 255, 0.4); }
-[data-theme="yellow"] { --neon-green: #ffe600; --neon-green-glow: rgba(255, 230, 0, 0.4); }
-
-/* MODE CLAIR */
-[data-theme="light"] {
-    --bg-color: #f4f5f8;
+[data-bg-mode="light"] {
+    --bg-color: #f1f3f6;
     --card-bg: #ffffff;
-    --neon-green: #10b981;
-    --neon-green-glow: rgba(16, 185, 129, 0.3);
     --text-color: #0f172a;
     --text-muted: #64748b;
     --danger-color: #ef4444;
 }
+
+/* =======================================================
+   2. PALETTES D'ACCENTUATION (COULEURS)
+   ======================================================= */
+[data-theme="green"]  { --neon-green: #00ff66; --neon-green-glow: rgba(0, 255, 102, 0.4); }
+[data-theme="cyan"]   { --neon-green: #00f0ff; --neon-green-glow: rgba(0, 240, 255, 0.4); }
+[data-theme="pink"]   { --neon-green: #ff007f; --neon-green-glow: rgba(255, 0, 127, 0.4); }
+[data-theme="orange"] { --neon-green: #ff9900; --neon-green-glow: rgba(255, 153, 0, 0.4); }
+[data-theme="purple"] { --neon-green: #b026ff; --neon-green-glow: rgba(176, 38, 255, 0.4); }
+[data-theme="yellow"] { --neon-green: #ffe600; --neon-green-glow: rgba(255, 230, 0, 0.4); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -36,6 +35,7 @@ html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     width: 100vw;
     height: 100vh;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 body.duel-body {
@@ -49,7 +49,7 @@ body.duel-body {
 }
 
 /* =======================================================
-   2. CONTENEUR PRINCIPAL DUEL
+   3. CONTENEUR PRINCIPAL DUEL
    ======================================================= */
 .container {
     position: fixed !important;
@@ -89,7 +89,7 @@ body.duel-body {
     align-items: center;
     gap: 6px;
     background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(150, 150, 150, 0.2);
     padding: 5px 12px;
     border-radius: 20px;
     cursor: pointer;
@@ -107,26 +107,63 @@ body.duel-body {
     top: 110%;
     right: 0;
     background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(150, 150, 150, 0.2);
     border-radius: 12px;
     width: 210px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
     overflow: hidden;
 }
 
 .profile-dropdown.show { display: block; }
 .profile-dropdown a { display: block; padding: 10px 14px; color: var(--text-color); text-decoration: none; font-size: 0.85rem; }
-.profile-dropdown a:hover { background: rgba(255, 255, 255, 0.08); color: var(--neon-green); }
-.profile-dropdown hr { border: none; border-top: 1px solid rgba(255, 255, 255, 0.1); margin: 0; }
+.profile-dropdown a:hover { background: rgba(150, 150, 150, 0.12); color: var(--neon-green); }
+.profile-dropdown hr { border: none; border-top: 1px solid rgba(150, 150, 150, 0.15); margin: 0; }
 
+/* OPTION BASCULE CLAIR / SOMBRE */
+.mode-toggle-wrapper {
+    padding: 8px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.mode-toggle-btns {
+    display: flex;
+    gap: 6px;
+}
+
+.mode-btn {
+    flex: 1;
+    background: rgba(150, 150, 150, 0.12);
+    border: 1px solid rgba(150, 150, 150, 0.2);
+    color: var(--text-color);
+    padding: 6px 0;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.mode-btn:hover {
+    background: rgba(150, 150, 150, 0.25);
+}
+
+[data-bg-mode="dark"] #btn-mode-dark,
+[data-bg-mode="light"] #btn-mode-light {
+    border-color: var(--neon-green);
+    color: var(--neon-green);
+}
+
+/* SÉLECTEUR DE COULEURS */
 .theme-selector-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
 .theme-label { font-size: 0.72rem; color: var(--text-muted); }
-.theme-dots { display: flex; align-items: center; justify-content: space-between; gap: 4px; flex-wrap: wrap; }
+.theme-dots { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
 .theme-dot { 
     width: 18px; 
     height: 18px; 
     border-radius: 50%; 
-    border: 2px solid rgba(255,255,255,0.2); 
+    border: 2px solid rgba(150,150,150,0.3); 
     cursor: pointer; 
     display: flex; 
     align-items: center; 
@@ -140,7 +177,6 @@ body.duel-body {
 .dot-orange { background: #ff9900; }
 .dot-purple { background: #b026ff; }
 .dot-yellow { background: #ffe600; }
-.dot-light { background: #ffffff; border-color: #64748b !important; }
 .dot-random { 
     background: linear-gradient(135deg, #00ff66, #00f0ff, #ff007f, #ff9900); 
     border: none !important;
@@ -190,7 +226,7 @@ h1 {
 }
 
 /* =======================================================
-   3. CARTES ET SLOTS MORCEAUX DUEL
+   4. CARTES ET SLOTS MORCEAUX DUEL
    ======================================================= */
 .track-slot {
     display: flex;
@@ -201,9 +237,9 @@ h1 {
 
 .track-card {
     background: var(--card-bg);
-    border: 2px solid rgba(255, 255, 255, 0.08);
+    border: 2px solid rgba(150, 150, 150, 0.15);
     border-radius: 18px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
@@ -216,7 +252,7 @@ h1 {
 }
 
 .track-card:not(.active):hover {
-    border-color: rgba(0, 0, 0, 0.2) !important;
+    border-color: rgba(150, 150, 150, 0.3) !important;
 }
 
 .pochette-wrapper { position: relative; border-radius: 12px; overflow: hidden; }
@@ -369,7 +405,7 @@ h1 {
 }
 
 /* =======================================================
-   4. LAYOUT PORTRAIT (DUEL)
+   5. LAYOUT PORTRAIT (DUEL)
    ======================================================= */
 @media screen and (orientation: portrait) {
     .duel-zone {
@@ -434,7 +470,7 @@ h1 {
 }
 
 /* =======================================================
-   5. LAYOUT PAYSAGE (DUEL)
+   6. LAYOUT PAYSAGE (DUEL)
    ======================================================= */
 @media screen and (orientation: landscape) {
     .duel-zone {
@@ -497,7 +533,7 @@ h1 {
 }
 
 /* =======================================================
-   6. STYLES CORRIGÉS PAGE PLAYLISTS
+   7. STYLES CORRIGÉS PAGE PLAYLISTS
    ======================================================= */
 body.playlists-body {
     overflow-y: auto !important;
@@ -542,7 +578,7 @@ body.playlists-body {
 
 .playlist-card {
     background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(150, 150, 150, 0.15);
     border-radius: 16px;
     padding: 12px;
     display: flex;
@@ -550,7 +586,7 @@ body.playlists-body {
     align-items: center;
     text-decoration: none;
     color: var(--text-color);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
     transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -569,7 +605,7 @@ body.playlists-body {
 }
 
 .playlist-img-placeholder {
-    background: rgba(150, 150, 150, 0.1);
+    background: rgba(150, 150, 150, 0.15);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -600,7 +636,7 @@ body.playlists-body {
 }
 
 /* =======================================================
-   7. STYLES CORRIGÉS PAGE CLASSEMENT & STATS
+   8. STYLES CORRIGÉS PAGE CLASSEMENT & STATS
    ======================================================= */
 body.classement-body {
     overflow-y: auto !important;
@@ -668,13 +704,13 @@ body.classement-body {
 
 .ranking-card {
     background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(150, 150, 150, 0.15);
     border-radius: 12px;
     padding: 10px 16px;
     display: flex;
     align-items: center;
     gap: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .ranking-rank {
@@ -729,7 +765,7 @@ body.classement-body {
 }
 
 /* =======================================================
-   8. PAGE DE SORTIE (QUIT.HTML)
+   9. PAGE DE SORTIE (QUIT.HTML)
    ======================================================= */
 body.quit-body {
     overflow-y: auto !important;
@@ -766,7 +802,7 @@ body.quit-body {
 
 .top5-card {
     background: var(--card-bg);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(150, 150, 150, 0.15);
     border-radius: 12px;
     padding: 8px 12px;
     display: flex;
@@ -847,7 +883,7 @@ body.quit-body {
 }
 
 /* =======================================================
-   9. FEEDBACK VISUEL DE VOTE & TOAST
+   10. FEEDBACK VISUEL DE VOTE & TOAST
    ======================================================= */
 .track-card.voted-winner {
     border-color: var(--neon-green) !important;

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="{{ current_theme if current_theme else 'green' }}">
+<html lang="fr" data-bg-mode="{{ user_bg_mode if user_bg_mode else 'dark' }}" data-theme="{{ current_theme if current_theme else 'green' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,19 +32,32 @@
                     <a href="{{ url_for('liste_playlists') }}">🎵 Mes Playlists</a>
                     <a href="{{ url_for('stats') }}">📊 Mes Statistiques</a>
                     <hr>
-                    <div class="theme-selector-wrapper">
-                        <span class="theme-label">Thème d'accent :</span>
-                        <div class="theme-dots">
-                            <div class="theme-dot dot-green" title="Vert" onclick="setTheme('green')"></div>
-                            <div class="theme-dot dot-cyan" title="Cyan" onclick="setTheme('cyan')"></div>
-                            <div class="theme-dot dot-pink" title="Rose" onclick="setTheme('pink')"></div>
-                            <div class="theme-dot dot-orange" title="Orange" onclick="setTheme('orange')"></div>
-                            <div class="theme-dot dot-purple" title="Violet" onclick="setTheme('purple')"></div>
-                            <div class="theme-dot dot-yellow" title="Jaune" onclick="setTheme('yellow')"></div>
-                            <div class="theme-dot dot-light" title="Mode Clair" onclick="setTheme('light')">☀️</div>
-                            <div class="theme-dot dot-random" title="Thème Aléatoire" onclick="setTheme('random')">🎲</div>
+                    
+                    <!-- BASCULEUR FOND CLAIR / SOMBRE -->
+                    <div class="mode-toggle-wrapper">
+                        <span class="theme-label">Mode d'affichage :</span>
+                        <div class="mode-toggle-btns">
+                            <button type="button" class="mode-btn" id="btn-mode-dark" onclick="setBgMode('dark')">🌙 Sombre</button>
+                            <button type="button" class="mode-btn" id="btn-mode-light" onclick="setBgMode('light')">☀️ Clair</button>
                         </div>
                     </div>
+
+                    <hr>
+
+                    <!-- SÉLECTEUR DE COULEURS D'ACCENT -->
+                    <div class="theme-selector-wrapper">
+                        <span class="theme-label">Couleur d'accent :</span>
+                        <div class="theme-dots">
+                            <div class="theme-dot dot-green" title="Vert" onclick="setAccentColor('green')"></div>
+                            <div class="theme-dot dot-cyan" title="Cyan" onclick="setAccentColor('cyan')"></div>
+                            <div class="theme-dot dot-pink" title="Rose" onclick="setAccentColor('pink')"></div>
+                            <div class="theme-dot dot-orange" title="Orange" onclick="setAccentColor('orange')"></div>
+                            <div class="theme-dot dot-purple" title="Violet" onclick="setAccentColor('purple')"></div>
+                            <div class="theme-dot dot-yellow" title="Jaune" onclick="setAccentColor('yellow')"></div>
+                            <div class="theme-dot dot-random" title="Couleur Aléatoire" onclick="setAccentColor('random')">🎲</div>
+                        </div>
+                    </div>
+
                     <hr>
                     <a href="{{ url_for('logout') }}" style="color: var(--danger-color);">Déconnexion</a>
                 </div>
@@ -81,7 +94,7 @@
                         <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
                     </div>
                 </div>
-                <!-- BARRE DE CONTRÔLES ÉGALISÉE (5 BOUTONS D'ÉGALE TAILLE) -->
+                <!-- BARRE DE CONTRÔLES ÉGALISÉE -->
                 <div class="seek-controls" id="seek-a">
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
@@ -123,7 +136,7 @@
                         <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
                     </div>
                 </div>
-                <!-- BARRE DE CONTRÔLES ÉGALISÉE (5 BOUTONS D'ÉGALE TAILLE) -->
+                <!-- BARRE DE CONTRÔLES ÉGALISÉE -->
                 <div class="seek-controls" id="seek-b">
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
@@ -145,19 +158,22 @@
     <script>
         let currentPlaying = 'a';
         const isDesktop = window.matchMedia('(pointer: fine)').matches;
-        const availableThemes = ['green', 'cyan', 'pink', 'orange', 'purple', 'yellow'];
+        const availableAccentColors = ['green', 'cyan', 'pink', 'orange', 'purple', 'yellow'];
 
         window.addEventListener('DOMContentLoaded', () => {
-            // Application du thème (avec gestion de l'option aléatoire)
-            let savedTheme = "{{ current_theme if current_theme else 'green' }}";
-            if (savedTheme === 'random') {
-                let randomTheme = availableThemes[Math.floor(Math.random() * availableThemes.length)];
-                document.documentElement.setAttribute('data-theme', randomTheme);
+            // 1. Gestion du fond (Dark / Light) enregistrée ou stockée en localStorage
+            let savedBgMode = localStorage.getItem('elotify_bg_mode') || "{{ user_bg_mode if user_bg_mode else 'dark' }}";
+            setBgMode(savedBgMode, false);
+
+            // 2. Gestion de la couleur d'accentuation (avec tirage aléatoire à chaque duel si 'random')
+            let savedAccent = "{{ current_theme if current_theme else 'green' }}";
+            if (savedAccent === 'random') {
+                let randomColor = availableAccentColors[Math.floor(Math.random() * availableAccentColors.length)];
+                document.documentElement.setAttribute('data-theme', randomColor);
             } else {
-                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.documentElement.setAttribute('data-theme', savedAccent);
             }
 
-            // Lancement initial de la piste A
             fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {
@@ -167,6 +183,25 @@
                 })
                 .catch(err => console.error('Erreur lecture initiale :', err));
         });
+
+        function setBgMode(mode, save = true) {
+            document.documentElement.setAttribute('data-bg-mode', mode);
+            if (save) {
+                localStorage.setItem('elotify_bg_mode', mode);
+                fetch('/set_bg_mode/' + mode, { method: 'POST' }).catch(err => {});
+            }
+        }
+
+        function setAccentColor(color) {
+            if (color === 'random') {
+                let randomColor = availableAccentColors[Math.floor(Math.random() * availableAccentColors.length)];
+                document.documentElement.setAttribute('data-theme', randomColor);
+            } else {
+                document.documentElement.setAttribute('data-theme', color);
+            }
+            fetch('/set_theme/' + color, { method: 'POST' })
+                .catch(err => console.error('Erreur sauvegarde thème BDD :', err));
+        }
 
         function showSpotifyWarning(msg) {
             const toast = document.getElementById('spotify-toast');
@@ -295,17 +330,6 @@
                     dropdown.classList.remove('show');
                 }
             }
-        }
-
-        function setTheme(theme) {
-            if (theme === 'random') {
-                let randomTheme = availableThemes[Math.floor(Math.random() * availableThemes.length)];
-                document.documentElement.setAttribute('data-theme', randomTheme);
-            } else {
-                document.documentElement.setAttribute('data-theme', theme);
-            }
-            fetch('/set_theme/' + theme, { method: 'POST' })
-                .catch(err => console.error('Erreur sauvegarde thème BDD :', err));
         }
     </script>
 </body>
