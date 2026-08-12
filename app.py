@@ -7,25 +7,45 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_session import Session
+from flask_sqlalchemy import SQLAlchemy
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.exceptions import SpotifyException
 from collections import Counter
 
 app = Flask(__name__)
-app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify')
 
-# --- CONFIGURATION SESSION CÔTÉ SERVEUR ---
-app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_PERMANENT"] = True
-app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
-Session(app)
+# --- CLÉ SECRÈTE FIXE ---
+app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify_12345')
 
-# Variable globale pour l'inactivité
-LAST_ACTIVITY_TIME = time.time()
-
-# --- BASE DE DONNÉES NEON POSTGRESQL ---
+# --- BASE DE DONNÉES & SESSIONS PÉRENNES ---
 DATABASE_URL = os.environ.get('DATABASE_URL')
+
+db_url = DATABASE_URL or ''
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
+
+if db_url:
+    app.config["SESSION_TYPE"] = "sqlalchemy"
+    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SESSION_SQLALCHEMY_TABLE"] = "sessions"
+    app.config["SESSION_PERMANENT"] = True
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+    
+    db = SQLAlchemy(app)
+    app.config["SESSION_SQLALCHEMY"] = db
+    Session(app)
+    
+    with app.app_context():
+        db.create_all()
+else:
+    app.config["SESSION_TYPE"] = "filesystem"
+    app.config["SESSION_PERMANENT"] = True
+    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+    Session(app)
+
+LAST_ACTIVITY_TIME = time.time()
 
 def get_db_connection():
     if not DATABASE_URL:
@@ -33,14 +53,13 @@ def get_db_connection():
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 def init_db():
-    """Initialise les tables dans Neon si elles n'existent pas encore."""
+    """Initialise les tables principales si elles n'existent pas encore."""
     if not DATABASE_URL:
         return
     try:
         conn = get_db_connection()
         cur = conn.cursor()
         
-        # Table des scores Elo
         cur.execute("""
             CREATE TABLE IF NOT EXISTS tracks_scores (
                 playlist_id VARCHAR(255),
@@ -53,7 +72,6 @@ def init_db():
             );
         """)
         
-        # Table des préférences utilisateurs (playlist active + thème)
         cur.execute("""
             CREATE TABLE IF NOT EXISTS user_preferences (
                 user_id VARCHAR(255) PRIMARY KEY,
@@ -62,7 +80,6 @@ def init_db():
             );
         """)
 
-        # Migration : Forcer l'ajout de la colonne theme si la table existait déjà
         cur.execute("""
             ALTER TABLE user_preferences 
             ADD COLUMN IF NOT EXISTS theme VARCHAR(50) DEFAULT 'green';
@@ -74,7 +91,6 @@ def init_db():
     except Exception as e:
         print(f"⚠️ Erreur initialisation BDD Neon : {e}")
 
-# Initialisation BDD au démarrage
 init_db()
 
 # --- CONFIGURATION SPOTIFY OAUTH ---
@@ -101,7 +117,6 @@ def get_spotify_client():
     return spotipy.Spotify(auth=token_info['access_token'])
 
 def get_user_profile_cached(sp):
-    """Récupère le profil et le met en cache individuellement dans la session de l'utilisateur."""
     now = time.time()
     cached_profile = session.get('user_profile')
     cached_time = session.get('user_profile_timestamp', 0)
@@ -128,7 +143,7 @@ def get_user_profile_cached(sp):
         print(f"⚠️ Erreur récupération profil : {e}")
         return session.get('user_profile')
 
-# --- GESTION DE LA PLAYLIST ACTIVE & PRÉFÉRENCES BDD ---
+# --- GESTION PREFERENCIES & ELO ---
 def get_user_active_playlist_db(user_id):
     if not DATABASE_URL or not user_id:
         return None
@@ -162,11 +177,9 @@ def set_user_active_playlist_db(user_id, playlist_id):
     except Exception as e:
         print(f"⚠️ Erreur sauvegarde playlist active BDD : {e}")
 
-# --- GESTION DU SCORE ELO & BDD ---
 def calculate_elo(elo_a, elo_b, outcome_a, k=32):
     expected_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
     expected_b = 1 - expected_a
-    
     outcome_b = 1.0 - outcome_a
     
     new_elo_a = round(elo_a + k * (outcome_a - expected_a))
@@ -265,7 +278,6 @@ def login():
 @app.route('/callback')
 def callback():
     sp_oauth = get_spotify_oauth()
-    
     code = request.args.get('code')
     token_info = sp_oauth.get_access_token(code)
     
@@ -289,11 +301,9 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# --- ROUTE CHANGEMENT DE THÈME (SYNCHRO MULTI-APPAREILS) ---
 @app.route('/set_theme/<theme_name>', methods=['POST'])
 def set_theme_route(theme_name):
     session['theme'] = theme_name
-    
     user_profile = session.get('user_profile')
     user_id = user_profile.get('id') if user_profile else None
     
@@ -612,7 +622,7 @@ def seek_offset(offset_seconds):
     except Exception as e:
         return jsonify({'warning': 'Impossible d\'ajuster le timecode (Spotify inactif).'})
 
-# --- ROUTE CLASSEMENT (Passage de 'ranking' pour corriger la boucle HTML) ---
+# --- ROUTE CLASSEMENT ---
 @app.route('/classement')
 def classement():
     scores = load_local_scores()
