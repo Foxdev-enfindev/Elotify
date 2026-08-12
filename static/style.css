@@ -42,7 +42,7 @@ body.duel-body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 16px;
+    padding: 24px 16px;
 }
 
 /* =======================================================
@@ -56,7 +56,7 @@ body.duel-body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 16px;
+    gap: 24px;
 }
 
 .header-zone {
@@ -69,27 +69,27 @@ body.duel-body {
 
 .user-profile-container {
     position: fixed !important;
-    top: 12px !important;
-    right: 16px !important;
+    top: 16px !important;
+    right: 20px !important;
     z-index: 9999 !important;
 }
 
 .profile-trigger {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     background: var(--card-bg);
     border: 1px solid rgba(150, 150, 150, 0.2);
-    padding: 6px 14px;
+    padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.user-avatar, .user-avatar-placeholder { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
-.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #fff; }
-.user-name { font-size: 0.88rem; font-weight: 600; color: var(--text-color); }
-.arrow-down { font-size: 0.65rem; color: var(--text-muted); }
+.user-avatar, .user-avatar-placeholder { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
+.user-avatar-placeholder { background: #333; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; color: #fff; }
+.user-name { font-size: 0.9rem; font-weight: 600; color: var(--text-color); }
+.arrow-down { font-size: 0.7rem; color: var(--text-muted); }
 
 .profile-dropdown {
     display: none;
@@ -109,13 +109,7 @@ body.duel-body {
 .profile-dropdown a:hover { background: rgba(150, 150, 150, 0.12); color: var(--neon-green); }
 .profile-dropdown hr { border: none; border-top: 1px solid rgba(150, 150, 150, 0.15); margin: 0; }
 
-.mode-toggle-wrapper {
-    padding: 8px 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
+.mode-toggle-wrapper { padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; }
 .mode-toggle-btns { display: flex; gap: 6px; }
 
 .mode-btn {
@@ -163,37 +157,34 @@ body.duel-body {
 .dot-random { background: linear-gradient(135deg, #00ff66, #00f0ff, #ff007f, #ff9900); border: none !important; }
 
 h1 {
-    font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 12px var(--neon-green-glow);
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     margin: 0;
     text-align: center;
 }
 
 .result-banner-wrapper {
-    min-height: 36px;
+    min-height: 38px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 4px;
+    margin-top: 8px;
 }
 
 .result-banner {
     background: rgba(0, 255, 102, 0.12) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 6px 20px !important;
+    padding: 6px 22px !important;
     border-radius: 20px !important;
     text-align: center !important;
     font-weight: 700 !important;
-    font-size: 0.92rem !important;
+    font-size: 0.95rem !important;
     box-shadow: 0 0 12px var(--neon-green-glow) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
 }
 
 .result-banner.hidden {
@@ -204,14 +195,14 @@ h1 {
 }
 
 /* =======================================================
-   4. CARTES ET SLOTS MORCEAUX DUEL
-   ========================================================= */
+   4. CARTES DUEL GRAND FORMAT (+50% HAUTEUR ET PADDING)
+   ======================================================= */
 .duel-zone {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    gap: 16px;
+    gap: 20px;
 }
 
 .track-slot {
@@ -224,12 +215,13 @@ h1 {
 .track-card {
     background: var(--card-bg);
     border: 2px solid rgba(150, 150, 150, 0.15);
-    border-radius: 18px;
+    border-radius: 20px;
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
     box-sizing: border-box;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
     cursor: pointer;
     width: 100%;
+    min-height: 180px !important; /* Hauteur minimale augmentée */
 }
 
 .track-card.active {
@@ -239,7 +231,7 @@ h1 {
 
 .track-card:not(.active):hover { border-color: rgba(150, 150, 150, 0.3) !important; }
 
-.pochette-wrapper { position: relative; border-radius: 12px; overflow: hidden; }
+.pochette-wrapper { position: relative; border-radius: 14px; overflow: hidden; }
 .pochette { width: 100%; height: 100%; object-fit: cover; }
 .vote-form { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
@@ -247,45 +239,45 @@ h1 {
     display: inline-block;
     background: rgba(150, 150, 150, 0.15);
     color: var(--text-muted);
-    font-size: 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
-    padding: 3px 12px;
+    padding: 4px 14px;
     border-radius: 12px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .track-title {
-    font-size: 1.15rem !important;
+    font-size: 1.25rem !important;
     font-weight: 800 !important;
     color: var(--text-color) !important;
-    line-height: 1.25;
-    margin: 2px 0 4px 0 !important;
+    line-height: 1.3;
+    margin: 4px 0 6px 0 !important;
 }
 
 .track-artist {
-    font-size: 0.9rem !important;
+    font-size: 0.98rem !important;
     color: var(--text-muted) !important;
     font-weight: 500 !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 6px !important;
 }
 
 .elo-display {
-    font-size: 0.82rem !important;
+    font-size: 0.85rem !important;
     color: var(--text-muted) !important;
 }
 
 .elo-display strong {
     color: var(--neon-green) !important;
-    font-size: 0.95rem !important;
+    font-size: 1rem !important;
 }
 
-/* BOUTONS TIMECODE */
+/* BOUTONS TIMECODE SURÉLEVÉS ET AÉRÉS */
 .seek-controls {
     display: flex;
-    gap: 6px;
-    margin-top: 8px;
+    gap: 8px;
+    margin-top: 12px;
     width: 100%;
     visibility: hidden;
     opacity: 0;
@@ -305,9 +297,9 @@ h1 {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 8px 0 !important;
+    padding: 10px 0 !important;
     border-radius: 12px !important;
-    font-size: 0.8rem !important;
+    font-size: 0.85rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 8px var(--neon-green-glow) !important;
@@ -322,10 +314,10 @@ h1 {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 9px 0 !important;
+    padding: 10px 0 !important;
     border-radius: 16px !important;
     font-weight: 800 !important;
-    font-size: 0.85rem !important;
+    font-size: 0.88rem !important;
     cursor: pointer !important;
     text-decoration: none !important;
     display: flex !important;
@@ -340,15 +332,16 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-top: 10px;
 }
 
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 10px 24px !important;
+    padding: 12px 28px !important;
     border-radius: 20px !important;
-    font-size: 0.9rem !important;
+    font-size: 0.95rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 12px rgba(255, 51, 102, 0.4) !important;
@@ -359,7 +352,7 @@ h1 {
 }
 
 /* =======================================================
-   5. LAYOUT PORTRAIT / DÉPLIÉ (EMPILEMENT VERTICAL SANS BRIDAGE)
+   5. LAYOUT PORTRAIT / DÉPLIÉ (LARGEUR ET HAUTEUR MAXIMISÉES)
    ======================================================= */
 @media screen and (max-aspect-ratio: 13/10), screen and (orientation: portrait) {
     .duel-zone {
@@ -368,7 +361,7 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        gap: 14px !important;
+        gap: 18px !important;
     }
 
     .track-slot {
@@ -377,17 +370,17 @@ h1 {
 
     .track-card {
         width: 100% !important;
-        padding: 14px 18px !important;
+        padding: 20px 24px !important; /* +50% d'espace interne */
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 16px !important;
+        gap: 20px !important;
     }
 
-    /* Pochette s'adaptant à l'écran du Fold */
+    /* Pochette agrandie à 160px (+60% de surface) */
     .pochette-wrapper, .pochette-wrapper .pochette { 
-        width: 110px !important; 
-        height: 110px !important; 
+        width: 160px !important; 
+        height: 160px !important; 
         flex-shrink: 0 !important; 
     }
 
@@ -395,19 +388,19 @@ h1 {
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 64px 1fr !important;
+        grid-template-columns: 68px 1fr !important;
         grid-template-areas: "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 320px !important;
-        gap: 6px 14px !important;
+        max-width: 360px !important;
+        gap: 8px 16px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 60px !important;
-        height: 60px !important;
-        font-size: 1.2rem !important;
+        width: 64px !important;
+        height: 64px !important;
+        font-size: 1.25rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -437,11 +430,11 @@ h1 {
 
     .track-slot {
         flex: 1 !important;
-        max-width: 360px !important;
+        max-width: 380px !important;
     }
 
     .track-card {
-        padding: 16px !important;
+        padding: 20px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -449,9 +442,9 @@ h1 {
     }
 
     .pochette-wrapper, .pochette-wrapper .pochette {
-        width: clamp(120px, 25vh, 170px) !important;
-        height: clamp(120px, 25vh, 170px) !important;
-        margin-bottom: 10px !important;
+        width: 180px !important;
+        height: 180px !important;
+        margin-bottom: 12px !important;
         flex-shrink: 0 !important;
     }
 
@@ -462,16 +455,16 @@ h1 {
         flex-direction: column !important;
         align-items: center !important;
         justify-content: center !important;
-        gap: 10px !important;
-        width: 140px !important;
+        gap: 12px !important;
+        width: 150px !important;
         flex-shrink: 0 !important;
-        margin-top: 35px !important;
+        margin-top: 45px !important;
     }
 
     .vs-circle {
-        width: 58px !important;
-        height: 58px !important;
-        font-size: 1.15rem !important;
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.2rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -484,7 +477,7 @@ h1 {
 }
 
 /* =======================================================
-   7. STYLES PAGES SECONDAIRES & LOGIN
+   7. STYLES CORRIGÉS PAGE QUIT ET PAGES SECONDAIRES
    ======================================================= */
 body.playlists-body, body.classement-body, body.quit-body {
     min-height: 100vh !important;
@@ -502,88 +495,47 @@ body.playlists-body, body.classement-body, body.quit-body {
     align-items: center;
 }
 
-.playlists-header, .classement-header { text-align: center; margin-bottom: 25px; width: 100%; }
-.playlists-header h1, .classement-header h1 {
-    font-size: clamp(1.5rem, 3.5vw, 2.2rem);
-    font-weight: 800;
-    color: var(--neon-green);
-    text-shadow: 0 0 12px var(--neon-green-glow);
-    margin-bottom: 12px;
+.quit-page-container {
+    padding-bottom: 50px;
 }
 
-.playlists-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-    gap: 20px !important;
-    width: 100% !important;
-}
-
-.playlist-card {
-    background: var(--card-bg);
-    border: 1px solid rgba(150, 150, 150, 0.15);
-    border-radius: 16px;
-    padding: 12px;
+.quit-actions-group {
     display: flex;
-    flex-direction: column;
+    gap: 16px;
+    justify-content: center;
     align-items: center;
-    text-decoration: none;
-    color: var(--text-color);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-}
-
-.playlist-img {
-    width: 100% !important;
-    aspect-ratio: 1 / 1 !important;
-    border-radius: 10px;
-    object-fit: cover;
-    margin-bottom: 10px;
-}
-
-.ranking-list, .top5-list { width: 100%; display: flex; flex-direction: column; gap: 10px; }
-.ranking-card, .top5-card {
-    background: var(--card-bg);
-    border: 1px solid rgba(150, 150, 150, 0.15);
-    border-radius: 12px;
-    padding: 12px 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 28px !important; /* Marge nette pour éliminer tout chevauchement avec le Top 5 */
     width: 100%;
 }
 
-.ranking-img, .top5-img { width: 54px !important; height: 54px !important; border-radius: 8px; object-fit: cover; }
-.ranking-info, .top5-info { display: flex; flex-direction: column; text-align: left; flex: 1; }
-.ranking-name, .top5-name { font-size: 0.95rem; font-weight: 700; color: var(--text-color); }
-.ranking-artist, .top5-artist { font-size: 0.82rem; color: var(--text-muted); }
-.ranking-elo, .top5-elo { font-size: 0.98rem; font-weight: 700; color: var(--neon-green); margin-left: auto; }
+.top5-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
-.back-btn, .resume-btn, .full-rank-btn {
+.top5-card {
+    background: var(--card-bg);
+    border: 1px solid rgba(150, 150, 150, 0.15);
+    border-radius: 14px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+}
+
+.top5-img { width: 56px !important; height: 56px !important; border-radius: 8px; object-fit: cover; }
+
+.resume-btn, .full-rank-btn {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     font-weight: 800 !important;
-    padding: 10px 22px !important;
+    padding: 12px 24px !important;
     border-radius: 20px !important;
     text-decoration: none !important;
-    font-size: 0.88rem !important;
-    box-shadow: 0 0 10px var(--neon-green-glow) !important;
+    font-size: 0.9rem !important;
+    box-shadow: 0 0 12px var(--neon-green-glow) !important;
 }
-
-.toast {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    background: rgba(255, 153, 0, 0.95);
-    color: #0d0d0d;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    z-index: 10000;
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-}
-
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.hidden { display: none; }

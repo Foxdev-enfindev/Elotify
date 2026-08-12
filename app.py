@@ -613,12 +613,35 @@ def seek_offset(offset_seconds):
 # --- ROUTE CLASSEMENT & API TOP 5 ---
 @app.route('/classement')
 def classement():
-    scores = load_local_scores()
-    tracks = list(scores.values())
-    tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
-    sp = get_spotify_client()
-    user = get_user_profile_cached(sp) if sp else None
-    return render_template('classement.html', tracks=tracks, user=user)
+    if 'user' not in session:
+        return redirect(url_for('login'))
+    
+    conn = get_db_connection()
+    cur = conn.cursor()
+    
+    # Récupérer le classement trié par Elo décroissant pour la playlist/utilisateur actif
+    cur.execute("""
+        SELECT track_id, track_name, artist_name, image_url, elo_rating 
+        FROM tracks 
+        WHERE user_id = %s 
+        ORDER BY elo_rating DESC
+    """, (session['user']['id'],))
+    
+    rows = cur.fetchall()
+    cur.close()
+    conn.close()
+    
+    ranking = []
+    for row in rows:
+        ranking.append({
+            'id': row[0],
+            'name': row[1],
+            'artist': row[2],
+            'image_url': row[3],
+            'elo': round(row[4])
+        })
+        
+    return render_template('classement.html', ranking=ranking, user=session.get('user'))
 
 @app.route('/api/top5')
 def api_top5():
