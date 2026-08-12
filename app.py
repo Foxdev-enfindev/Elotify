@@ -7,7 +7,6 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_session import Session
-from flask_sqlalchemy import SQLAlchemy
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.exceptions import SpotifyException
@@ -15,37 +14,16 @@ from collections import Counter
 
 app = Flask(__name__)
 
-# --- CLÉ SECRÈTE FIXE ---
+# Clé secrète fixe
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify_12345')
 
-# --- BASE DE DONNÉES & SESSIONS PÉRENNES ---
+# Configuration Session ultra-rapide (Mémoire/Disque local avec expiration 30 jours)
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_PERMANENT"] = True
+app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+Session(app)
+
 DATABASE_URL = os.environ.get('DATABASE_URL')
-
-db_url = DATABASE_URL or ''
-if db_url.startswith("postgres://"):
-    db_url = db_url.replace("postgres://", "postgresql://", 1)
-
-if db_url:
-    app.config["SESSION_TYPE"] = "sqlalchemy"
-    app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["SESSION_SQLALCHEMY_TABLE"] = "sessions"
-    app.config["SESSION_PERMANENT"] = True
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
-    
-    db = SQLAlchemy(app)
-    app.config["SESSION_SQLALCHEMY"] = db
-    Session(app)
-    
-    with app.app_context():
-        db.create_all()
-else:
-    app.config["SESSION_TYPE"] = "filesystem"
-    app.config["SESSION_PERMANENT"] = True
-    app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
-    Session(app)
-
-LAST_ACTIVITY_TIME = time.time()
 
 def get_db_connection():
     if not DATABASE_URL:
@@ -53,13 +31,11 @@ def get_db_connection():
     return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 def init_db():
-    """Initialise les tables principales si elles n'existent pas encore."""
     if not DATABASE_URL:
         return
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        
         cur.execute("""
             CREATE TABLE IF NOT EXISTS tracks_scores (
                 playlist_id VARCHAR(255),
@@ -71,7 +47,6 @@ def init_db():
                 PRIMARY KEY (playlist_id, track_id)
             );
         """)
-        
         cur.execute("""
             CREATE TABLE IF NOT EXISTS user_preferences (
                 user_id VARCHAR(255) PRIMARY KEY,
@@ -79,21 +54,18 @@ def init_db():
                 theme VARCHAR(50) DEFAULT 'green'
             );
         """)
-
         cur.execute("""
             ALTER TABLE user_preferences 
             ADD COLUMN IF NOT EXISTS theme VARCHAR(50) DEFAULT 'green';
         """)
-        
         conn.commit()
         cur.close()
         conn.close()
     except Exception as e:
-        print(f"⚠️ Erreur initialisation BDD Neon : {e}")
+        print(f"⚠️ Erreur BDD : {e}")
 
 init_db()
 
-# --- CONFIGURATION SPOTIFY OAUTH ---
 SPOTIPY_CLIENT_ID = os.environ.get('SPOTIPY_CLIENT_ID')
 SPOTIPY_CLIENT_SECRET = os.environ.get('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = os.environ.get('SPOTIPY_REDIRECT_URI', 'https://elotify.onrender.com/callback')
@@ -121,179 +93,98 @@ def get_user_profile_cached(sp):
     cached_profile = session.get('user_profile')
     cached_time = session.get('user_profile_timestamp', 0)
     
-    if cached_profile and (now - cached_time < 600):
+    if cached_profile and (now - cached_time < 3600): # Cache 1h
         return cached_profile
     
     try:
         user_info = sp.current_user()
         images = user_info.get('images', [])
-        image_url = images[0]['url'] if images else None
-        
         profile = {
             'id': user_info.get('id'),
             'display_name': user_info.get('display_name', 'Utilisateur'),
-            'image': image_url
+            'image': images[0]['url'] if images else None
         }
-        
         session['user_profile'] = profile
         session['user_profile_timestamp'] = now
         session.modified = True
         return profile
-    except Exception as e:
-        print(f"⚠️ Erreur récupération profil : {e}")
+    except Exception:
         return session.get('user_profile')
 
-# --- GESTION PREFERENCIES & ELO ---
-def get_user_active_playlist_db(user_id):
-    if not DATABASE_URL or not user_id:
-        return None
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("SELECT active_playlist_id FROM user_preferences WHERE user_id = %s;", (user_id,))
-        row = cur.fetchone()
-        cur.close()
-        conn.close()
-        return row[0] if row else None
-    except Exception as e:
-        print(f"⚠️ Erreur lecture playlist active BDD : {e}")
-        return None
-
-def set_user_active_playlist_db(user_id, playlist_id):
-    if not DATABASE_URL or not user_id or not playlist_id:
-        return
-    try:
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("""
-            INSERT INTO user_preferences (user_id, active_playlist_id)
-            VALUES (%s, %s)
-            ON CONFLICT (user_id)
-            DO UPDATE SET active_playlist_id = EXCLUDED.active_playlist_id;
-        """, (user_id, playlist_id))
-        conn.commit()
-        cur.close()
-        conn.close()
-    except Exception as e:
-        print(f"⚠️ Erreur sauvegarde playlist active BDD : {e}")
-
-def calculate_elo(elo_a, elo_b, outcome_a, k=32):
-    expected_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
-    expected_b = 1 - expected_a
-    outcome_b = 1.0 - outcome_a
-    
-    new_elo_a = round(elo_a + k * (outcome_a - expected_a))
-    new_elo_b = round(elo_b + k * (outcome_b - expected_b))
-    
-    return new_elo_a, new_elo_b
-
 def load_local_scores():
-    playlist_id = session.get('selected_playlist_id')
-    if not playlist_id and DATABASE_URL:
-        sp = get_spotify_client()
-        if sp:
-            profile = get_user_profile_cached(sp)
-            if profile and profile.get('id'):
-                playlist_id = get_user_active_playlist_db(profile['id'])
+    # Priorité absolue au cache session pour éliminer la latence
+    if 'scores_cache' in session and session['scores_cache']:
+        return session['scores_cache']
 
+    playlist_id = session.get('selected_playlist_id')
     if not playlist_id or not DATABASE_URL:
-        return session.get('local_scores_fallback', {})
+        return {}
 
     try:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute(
-            "SELECT track_id, name, artist, image_url, elo FROM tracks_scores WHERE playlist_id = %s;",
-            (playlist_id,)
-        )
+        cur.execute("SELECT track_id, name, artist, image_url, elo FROM tracks_scores WHERE playlist_id = %s;", (playlist_id,))
         rows = cur.fetchall()
         cur.close()
         conn.close()
 
-        scores = {}
-        for row in rows:
-            scores[row['track_id']] = {
-                'name': row['name'],
-                'artist': row['artist'],
-                'image_url': row['image_url'],
-                'elo': row['elo']
-            }
+        scores = {row['track_id']: dict(row) for row in rows}
+        session['scores_cache'] = scores
+        session.modified = True
         return scores
     except Exception as e:
-        print(f"⚠️ Erreur chargement BDD Neon : {e}")
-        return session.get('local_scores_fallback', {})
+        print(f"⚠️ Erreur chargement BDD : {e}")
+        return {}
 
 def _save_to_db_async(playlist_id, scores_to_update):
     if not DATABASE_URL or not playlist_id:
         return
-
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        
         for track_id, data in scores_to_update.items():
             cur.execute("""
                 INSERT INTO tracks_scores (playlist_id, track_id, name, artist, image_url, elo)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 ON CONFLICT (playlist_id, track_id) 
                 DO UPDATE SET elo = EXCLUDED.elo, name = EXCLUDED.name, artist = EXCLUDED.artist, image_url = EXCLUDED.image_url;
-            """, (
-                playlist_id,
-                track_id,
-                data.get('name', ''),
-                data.get('artist', ''),
-                data.get('image_url', ''),
-                data.get('elo', 1000)
-            ))
-
+            """, (playlist_id, track_id, data.get('name', ''), data.get('artist', ''), data.get('image_url', ''), data.get('elo', 1000)))
         conn.commit()
         cur.close()
         conn.close()
     except Exception as e:
-        print(f"⚠️ Erreur sauvegarde asynchrone BDD Neon : {e}")
+        print(f"⚠️ Erreur écriture arrière-plan : {e}")
 
 def save_local_scores(scores_to_update):
+    # 1. Mise à jour instantanée du cache local en session
+    scores = session.get('scores_cache', {})
+    scores.update(scores_to_update)
+    session['scores_cache'] = scores
+    session.modified = True
+
+    # 2. Sauvegarde PostgreSQL déportée dans un thread séparé (non-bloquant)
     playlist_id = session.get('selected_playlist_id')
-    if not playlist_id:
-        return
+    if DATABASE_URL and playlist_id:
+        threading.Thread(target=_save_to_db_async, args=(playlist_id, scores_to_update), daemon=True).start()
 
-    if not DATABASE_URL:
-        fallback = session.get('local_scores_fallback', {})
-        fallback.update(scores_to_update)
-        session['local_scores_fallback'] = fallback
-        session.modified = True
-        return
+def calculate_elo(elo_a, elo_b, outcome_a, k=32):
+    expected_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
+    expected_b = 1 - expected_a
+    new_elo_a = round(elo_a + k * (outcome_a - expected_a))
+    new_elo_b = round(elo_b + k * ((1.0 - outcome_a) - expected_b))
+    return new_elo_a, new_elo_b
 
-    thread = threading.Thread(target=_save_to_db_async, args=(playlist_id, scores_to_update))
-    thread.daemon = True
-    thread.start()
-
-# --- ROUTES AUTHENTIFICATION ---
 @app.route('/login')
 def login():
-    sp_oauth = get_spotify_oauth(show_dialog=True)
-    auth_url = sp_oauth.get_authorize_url()
-    return render_template('login.html', auth_url=auth_url)
+    return render_template('login.html', auth_url=get_spotify_oauth(show_dialog=True).get_authorize_url())
 
 @app.route('/callback')
 def callback():
     sp_oauth = get_spotify_oauth()
-    code = request.args.get('code')
-    token_info = sp_oauth.get_access_token(code)
-    
+    token_info = sp_oauth.get_access_token(request.args.get('code'))
     if token_info:
-        sp = spotipy.Spotify(auth=token_info['access_token'])
-        profile = get_user_profile_cached(sp)
-        
-        active_playlist = get_user_active_playlist_db(profile.get('id')) if profile else None
-        
-        if active_playlist:
-            session['selected_playlist_id'] = active_playlist
-            session.permanent = True
-            return redirect(url_for('index'))
-            
-        return redirect(url_for('liste_playlists'))
-        
+        session.permanent = True
+        return redirect(url_for('index'))
     return redirect(url_for('login'))
 
 @app.route('/logout')
@@ -301,210 +192,74 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-@app.route('/set_theme/<theme_name>', methods=['POST'])
-def set_theme_route(theme_name):
-    session['theme'] = theme_name
-    user_profile = session.get('user_profile')
-    user_id = user_profile.get('id') if user_profile else None
-    
-    if not user_id:
-        sp = get_spotify_client()
-        if sp:
-            profile = get_user_profile_cached(sp)
-            user_id = profile.get('id') if profile else None
-
-    if user_id and DATABASE_URL:
-        try:
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("""
-                INSERT INTO user_preferences (user_id, theme)
-                VALUES (%s, %s)
-                ON CONFLICT (user_id)
-                DO UPDATE SET theme = EXCLUDED.theme;
-            """, (user_id, theme_name))
-            conn.commit()
-            cur.close()
-            conn.close()
-        except Exception as e:
-            print(f"⚠️ Erreur sauvegarde thème BDD : {e}")
-
-    return jsonify({"status": "success", "theme": theme_name})
-
-# --- ROUTE SELECTION PLAYLIST ---
 @app.route('/playlists')
 def liste_playlists():
-    global LAST_ACTIVITY_TIME
-    LAST_ACTIVITY_TIME = time.time()
-    
     sp = get_spotify_client()
-    if not sp:
-        return redirect(url_for('login'))
-        
+    if not sp: return redirect(url_for('login'))
     try:
         results = sp.current_user_playlists(limit=50)
-        raw_playlists = results.get('items', [])
         playlists = []
-        
-        for pl in raw_playlists:
-            if not pl:
-                continue
-            
-            total = 0
-            if 'items' in pl and isinstance(pl['items'], dict):
-                total = pl['items'].get('total', 0)
-            elif 'tracks' in pl and isinstance(pl['tracks'], dict):
-                total = pl['tracks'].get('total', 0)
-            
+        for pl in results.get('items', []):
+            if not pl: continue
+            total = pl.get('tracks', {}).get('total', 0) if isinstance(pl.get('tracks'), dict) else 0
             images = pl.get('images', [])
-            image_url = images[0]['url'] if images else None
-                    
-            playlists.append({
-                "id": pl.get('id'),
-                "name": pl.get('name', 'Playlist sans nom'),
-                "image_url": image_url,
-                "tracks_count": total
-            })
-            
+            playlists.append({"id": pl.get('id'), "name": pl.get('name', 'Sans nom'), "image_url": images[0]['url'] if images else None, "tracks_count": total})
         return render_template('playlists.html', playlists=playlists, user=get_user_profile_cached(sp))
-    except Exception as e:
-        print(f"⚠️ Erreur liste_playlists : {e}")
+    except Exception:
         return redirect(url_for('login'))
 
 @app.route('/select_playlist/<playlist_id>')
 def select_playlist(playlist_id):
-    sp = get_spotify_client()
-    if not sp:
-        return redirect(url_for('login'))
-
-    profile = get_user_profile_cached(sp)
-    user_id = profile.get('id') if profile else None
-
-    session.permanent = True
     session['selected_playlist_id'] = playlist_id
     session.pop('tracks_cache', None)
-    
-    if user_id:
-        set_user_active_playlist_db(user_id, playlist_id)
-        
+    session.pop('scores_cache', None)
     return '<script>window.location.replace("/");</script>'
 
-# --- ROUTE PRINCIPALE (DUEL) ---
 @app.route('/')
 def index():
-    global LAST_ACTIVITY_TIME
-    LAST_ACTIVITY_TIME = time.time()
-    
     sp = get_spotify_client()
-    if not sp:
-        return redirect(url_for('login'))
-
+    if not sp: return redirect(url_for('login'))
     profile = get_user_profile_cached(sp)
-    user_id = profile.get('id') if profile else None
-
-    current_theme = session.get('theme', 'green')
-    if DATABASE_URL and user_id:
-        try:
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("SELECT theme FROM user_preferences WHERE user_id = %s;", (user_id,))
-            row = cur.fetchone()
-            if row and row[0]:
-                current_theme = row[0]
-                session['theme'] = current_theme
-            cur.close()
-            conn.close()
-        except Exception as e:
-            print(f"⚠️ Erreur lecture thème BDD : {e}")
 
     playlist_id = session.get('selected_playlist_id')
-    if not playlist_id and user_id:
-        playlist_id = get_user_active_playlist_db(user_id)
-        if playlist_id:
-            session['selected_playlist_id'] = playlist_id
-
-    if not playlist_id:
-        return redirect(url_for('liste_playlists'))
+    if not playlist_id: return redirect(url_for('liste_playlists'))
 
     scores = load_local_scores()
 
     if 'tracks_cache' not in session or not session['tracks_cache']:
         try:
-            raw_items = []
-            offset = 0
-            limit = 100
-
+            raw_items, offset = [], 0
             while True:
-                results = sp.playlist_tracks(playlist_id, limit=limit, offset=offset)
-                items = results.get('items', []) if isinstance(results, dict) else []
-                
-                if not items:
-                    break
-                    
+                res = sp.playlist_tracks(playlist_id, limit=100, offset=offset)
+                items = res.get('items', []) if isinstance(res, dict) else []
+                if not items: break
                 raw_items.extend(items)
-                
-                if len(items) < limit:
-                    break
-                    
-                offset += limit
+                if len(items) < 100: break
+                offset += 100
 
             tracks = []
             for el in raw_items:
-                if not el:
-                    continue
-                
-                track = el.get('item') or el.get('track')
-                
+                track = el.get('item') or el.get('track') if el else None
                 if isinstance(track, dict) and track.get('id'):
-                    album = track.get('album', {})
-                    images = album.get('images', []) if isinstance(album, dict) else []
-                    image_url = images[0]['url'] if images else ''
-                    
-                    artists = track.get('artists', [])
-                    artist_name = ", ".join([a.get('name', '') for a in artists if isinstance(a, dict)])
-                    
-                    tracks.append({
-                        'id': track['id'],
-                        'name': track.get('name', 'Titre inconnu'),
-                        'artist': artist_name or 'Artiste inconnu',
-                        'uri': track.get('uri', ''),
-                        'image_url': image_url
-                    })
-                    
+                    images = track.get('album', {}).get('images', [])
+                    artists = ", ".join([a.get('name', '') for a in track.get('artists', []) if isinstance(a, dict)])
+                    tracks.append({'id': track['id'], 'name': track.get('name', 'Titre inconnu'), 'artist': artists or 'Inconnu', 'uri': track.get('uri', ''), 'image_url': images[0]['url'] if images else ''})
             session['tracks_cache'] = tracks
-        except Exception as e:
-            print(f"⚠️ Erreur rechargement titres : {e}")
+        except Exception:
             return redirect(url_for('liste_playlists'))
 
     tracks = session.get('tracks_cache', [])
-    if len(tracks) < 2:
-        return f"La playlist sélectionnée ne contient pas assez de morceaux valides ({len(tracks)}) pour réaliser un match.", 400
+    if len(tracks) < 2: return "Playlist trop courte (minimum 2 titres).", 400
 
     track_a, track_b = random.sample(tracks, 2)
-
-    elo_a = scores.get(track_a['id'], {}).get('elo', 1000)
-    elo_b = scores.get(track_b['id'], {}).get('elo', 1000)
-
-    track_a['elo'] = elo_a
-    track_b['elo'] = elo_b
+    track_a['elo'] = scores.get(track_a['id'], {}).get('elo', 1000)
+    track_b['elo'] = scores.get(track_b['id'], {}).get('elo', 1000)
 
     dernier_resultat = session.pop('dernier_resultat', None)
+    return render_template('index.html', track_a=track_a, track_b=track_b, dernier_resultat=dernier_resultat, user=profile, current_theme=session.get('theme', 'green'))
 
-    return render_template(
-        'index.html', 
-        track_a=track_a, 
-        track_b=track_b, 
-        dernier_resultat=dernier_resultat,
-        user=profile,
-        current_theme=current_theme
-    )
-
-# --- ROUTE VOTE ---
 @app.route('/vote', methods=['POST'])
 def vote():
-    global LAST_ACTIVITY_TIME
-    LAST_ACTIVITY_TIME = time.time()
-    
     id_a = request.form.get('id_a')
     id_b = request.form.get('id_b')
     outcome = float(request.form.get('outcome', 0.5))
@@ -513,186 +268,101 @@ def vote():
     track_a = next((t for t in tracks if t['id'] == id_a), None)
     track_b = next((t for t in tracks if t['id'] == id_b), None)
 
-    if not track_a or not track_b:
-        return redirect(url_for('index'))
+    if track_a and track_b:
+        scores = load_local_scores()
+        elo_a = scores.get(id_a, {}).get('elo', 1000)
+        elo_b = scores.get(id_b, {}).get('elo', 1000)
 
-    scores = load_local_scores()
+        new_elo_a, new_elo_b = calculate_elo(elo_a, elo_b, outcome)
+        delta_a, delta_b = new_elo_a - elo_a, new_elo_b - elo_b
 
-    elo_a = scores.get(id_a, {}).get('elo', 1000)
-    elo_b = scores.get(id_b, {}).get('elo', 1000)
-
-    new_elo_a, new_elo_b = calculate_elo(elo_a, elo_b, outcome)
-
-    delta_a = new_elo_a - elo_a
-    delta_b = new_elo_b - elo_b
-
-    updated_scores = {
-        id_a: {
-            'name': track_a['name'],
-            'artist': track_a['artist'],
-            'image_url': track_a['image_url'],
-            'elo': new_elo_a
-        },
-        id_b: {
-            'name': track_b['name'],
-            'artist': track_b['artist'],
-            'image_url': track_b['image_url'],
-            'elo': new_elo_b
+        updated = {
+            id_a: {'name': track_a['name'], 'artist': track_a['artist'], 'image_url': track_a['image_url'], 'elo': new_elo_a},
+            id_b: {'name': track_b['name'], 'artist': track_b['artist'], 'image_url': track_b['image_url'], 'elo': new_elo_b}
         }
-    }
+        save_local_scores(updated)
 
-    save_local_scores(updated_scores)
-
-    for t in session.get('tracks_cache', []):
-        if t['id'] == id_a:
-            t['elo'] = new_elo_a
-        elif t['id'] == id_b:
-            t['elo'] = new_elo_b
-    session.modified = True
-
-    sign_a = f"+{delta_a}" if delta_a > 0 else f"{delta_a}"
-    sign_b = f"+{delta_b}" if delta_b > 0 else f"{delta_b}"
-
-    if outcome == 1.0:
-        session['dernier_resultat'] = f"🏆 Victoire de {track_a['name']} ({sign_a} Elo) face à {track_b['name']} ({sign_b} Elo)"
-    elif outcome == 0.0:
-        session['dernier_resultat'] = f"🏆 Victoire de {track_b['name']} ({sign_b} Elo) face à {track_a['name']} ({sign_a} Elo)"
-    else:
-        session['dernier_resultat'] = f"🤝 Match nul entre {track_a['name']} ({sign_a} Elo) et {track_b['name']} ({sign_b} Elo)"
+        sign_a = f"+{delta_a}" if delta_a > 0 else f"{delta_a}"
+        sign_b = f"+{delta_b}" if delta_b > 0 else f"{delta_b}"
+        if outcome == 1.0: session['dernier_resultat'] = f"🏆 Victoire de {track_a['name']} ({sign_a} Elo) face à {track_b['name']} ({sign_b} Elo)"
+        elif outcome == 0.0: session['dernier_resultat'] = f"🏆 Victoire de {track_b['name']} ({sign_b} Elo) face à {track_a['name']} ({sign_a} Elo)"
+        else: session['dernier_resultat'] = f"🤝 Match nul entre {track_a['name']} ({sign_a} Elo) et {track_b['name']} ({sign_b} Elo)"
 
     return redirect(url_for('index'))
 
-# --- CONTROLES LECTURE SPOTIFY ---
 @app.route('/listen/<path:track_uri>', methods=['POST'])
 def listen(track_uri):
     sp = get_spotify_client()
-    if not sp:
-        return jsonify({"error": "Non authentifié"}), 401
+    if not sp: return jsonify({"error": "Non authentifié"}), 401
     try:
         sp.start_playback(uris=[track_uri])
-        return jsonify({"status": "playing", "uri": track_uri})
-    except SpotifyException as e:
-        if e.http_status == 404:
-            print("⚠️ Aucun lecteur Spotify actif trouvé.")
-            return jsonify({"warning": "Ouvre Spotify sur ton appareil pour écouter l'extrait."}), 200
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"status": "playing"})
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"warning": "Ouvre Spotify sur ton appareil."}), 200
 
 @app.route('/toggle-pause', methods=['POST'])
 def toggle_pause():
     sp = get_spotify_client()
-    if not sp:
-        return jsonify({"error": "Non authentifié"}), 401
+    if not sp: return jsonify({"error": "Non authentifié"}), 401
     try:
         playback = sp.current_playback()
         if playback and playback.get('is_playing'):
             sp.pause_playback()
             return jsonify({"status": "paused"})
-        else:
-            sp.start_playback()
-            return jsonify({"status": "playing"})
-    except SpotifyException as e:
-        if e.http_status == 404:
-            print("⚠️ Aucun lecteur Spotify actif trouvé.")
-            return jsonify({"warning": "Ouvre Spotify sur ton appareil pour contrôler la lecture."}), 200
-        return jsonify({"error": str(e)}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        sp.start_playback()
+        return jsonify({"status": "playing"})
+    except Exception:
+        return jsonify({"warning": "Erreur lecteur Spotify."}), 200
 
 @app.route('/seek_offset/<offset_seconds>', methods=['POST'])
 def seek_offset(offset_seconds):
     sp = get_spotify_client()
-    if not sp:
-        return jsonify({"error": "Non authentifié"}), 401
+    if not sp: return jsonify({"error": "Non authentifié"}), 401
     try:
-        offset_sec = int(offset_seconds)
         playback = sp.current_playback()
         if playback and playback.get('is_playing') and playback.get('progress_ms') is not None:
-            current_ms = playback['progress_ms']
-            target_ms = max(0, current_ms + (offset_sec * 1000))
+            target_ms = max(0, playback['progress_ms'] + (int(offset_seconds) * 1000))
             sp.seek_track(position_ms=target_ms)
-            return jsonify({'status': 'success', 'new_position_ms': target_ms})
-        else:
-            return jsonify({'warning': 'Lance une piste sur Spotify pour ajuster le timecode.'})
-    except SpotifyException as e:
-        if e.http_status == 404:
-            return jsonify({'warning': 'Ouvre Spotify sur ton appareil pour ajuster la lecture.'}), 200
-        return jsonify({'error': str(e)}), 500
-    except Exception as e:
-        return jsonify({'warning': 'Impossible d\'ajuster le timecode (Spotify inactif).'})
+            return jsonify({'status': 'success'})
+        return jsonify({'warning': 'Lance Spotify.'})
+    except Exception:
+        return jsonify({'warning': 'Erreur lecteur Spotify.'})
 
-# --- ROUTE CLASSEMENT ---
+@app.route('/set_theme/<theme_name>', methods=['POST'])
+def set_theme_route(theme_name):
+    session['theme'] = theme_name
+    return jsonify({"status": "success"})
+
 @app.route('/classement')
 def classement():
     scores = load_local_scores()
     tracks = list(scores.values())
     tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
     sp = get_spotify_client()
-    user = get_user_profile_cached(sp) if sp else None
-    return render_template('classement.html', ranking=tracks, user=user)
-
-@app.route('/api/top5')
-def api_top5():
-    scores = load_local_scores()
-    tracks = list(scores.values())
-    tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
-    top5 = tracks[:5]
-    return jsonify(top5)
+    return render_template('classement.html', ranking=tracks, user=get_user_profile_cached(sp) if sp else None)
 
 @app.route('/stats')
 def stats():
     sp = get_spotify_client()
-    if not sp:
-        return redirect(url_for('login'))
-
-    profile = get_user_profile_cached(sp)
-    user_id = profile.get('id') if profile else None
-
-    playlist_id = session.get('selected_playlist_id') or get_user_active_playlist_db(user_id)
-    if not playlist_id:
-        return redirect(url_for('liste_playlists'))
-
+    if not sp: return redirect(url_for('login'))
     tracks = session.get('tracks_cache', [])
-    if not tracks:
-        return redirect(url_for('index'))
-
     artist_counter = Counter()
     for t in tracks:
-        artist_str = t.get('artist', '')
-        artists = [a.strip() for a in artist_str.split(',') if a.strip()]
-        for artist in artists:
-            artist_counter[artist] += 1
+        for a in t.get('artist', '').split(','):
+            if a.strip(): artist_counter[a.strip()] += 1
+    return render_template('stats.html', sorted_artists=artist_counter.most_common(), total_tracks=len(tracks), user=get_user_profile_cached(sp))
 
-    sorted_artists = artist_counter.most_common()
-
-    return render_template(
-        'stats.html', 
-        sorted_artists=sorted_artists, 
-        total_tracks=len(tracks), 
-        user=profile
-    )
-
-# --- ROUTE PAGE DE SORTIE AVEC CLASSEMENT ---
 @app.route('/quit')
 def quit_app():
     sp = get_spotify_client()
     if sp:
-        try:
-            playback = sp.current_playback()
-            if playback and playback.get('is_playing'):
-                sp.pause_playback()
-        except Exception as e:
-            print(f"⚠️ Erreur lors de la mise en pause à la sortie : {e}")
-
+        try: sp.pause_playback()
+        except Exception: pass
     scores = load_local_scores()
     tracks = list(scores.values())
     tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
-    top5 = tracks[:5]
-
     session.pop('tracks_cache', None)
-    
-    return render_template('quit.html', top5=top5)
+    return render_template('quit.html', top5=tracks[:5])
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
