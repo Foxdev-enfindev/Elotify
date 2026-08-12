@@ -39,10 +39,10 @@ html, body {
 }
 
 body.duel-body {
-    overflow: hidden !important;
-    position: fixed;
+    overflow-y: auto !important;
+    position: relative;
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -52,19 +52,16 @@ body.duel-body {
    3. CONTENEUR PRINCIPAL DUEL
    ======================================================= */
 .container {
-    position: fixed !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    padding: 12px 16px;
+    width: 100% !important;
+    max-width: 650px !important;
+    padding: 20px 16px;
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: clamp(10px, 2.5vh, 24px) !important;
+    gap: 16px !important;
     box-sizing: border-box;
-    overflow: hidden !important;
+    margin: 0 auto;
 }
 
 .header-zone {
@@ -183,7 +180,7 @@ body.duel-body {
 }
 
 h1 {
-    font-size: clamp(1.3rem, 2.6vh, 2rem);
+    font-size: clamp(1.5rem, 3.5vw, 2.2rem);
     font-weight: 800;
     color: var(--neon-green);
     text-shadow: 0 0 12px var(--neon-green-glow);
@@ -193,29 +190,28 @@ h1 {
 }
 
 .result-banner-wrapper {
-    height: 34px;
     min-height: 34px;
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-top: 4px;
+    margin-top: 6px;
 }
 
 .result-banner {
     background: rgba(0, 255, 102, 0.12) !important;
     border: 1px solid var(--neon-green) !important;
     color: var(--neon-green) !important;
-    padding: 5px 18px !important;
+    padding: 6px 20px !important;
     border-radius: 20px !important;
     text-align: center !important;
     font-weight: 700 !important;
-    font-size: clamp(0.78rem, 1.5vh, 0.92rem) !important;
+    font-size: 0.9rem !important;
     box-shadow: 0 0 12px var(--neon-green-glow) !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    max-width: 92% !important;
+    max-width: 95% !important;
 }
 
 .result-banner.hidden {
@@ -263,21 +259,21 @@ h1 {
     display: inline-block;
     background: rgba(150, 150, 150, 0.15);
     color: var(--text-muted);
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 700;
-    padding: 2px 10px;
+    padding: 3px 12px;
     border-radius: 12px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    margin-bottom: 3px;
+    margin-bottom: 4px;
 }
 
 .track-title {
-    font-size: clamp(0.88rem, 1.7vh, 1.1rem) !important;
+    font-size: 1.15rem !important;
     font-weight: 800 !important;
     color: var(--text-color) !important;
     line-height: 1.25;
-    margin: 2px 0 3px 0 !important;
+    margin: 2px 0 4px 0 !important;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -285,29 +281,29 @@ h1 {
 }
 
 .track-artist {
-    font-size: clamp(0.75rem, 1.3vh, 0.85rem) !important;
+    font-size: 0.9rem !important;
     color: var(--text-muted) !important;
     font-weight: 500 !important;
-    margin-bottom: 3px !important;
+    margin-bottom: 4px !important;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .elo-display {
-    font-size: 0.72rem !important;
+    font-size: 0.8rem !important;
     color: var(--text-muted) !important;
 }
 
 .elo-display strong {
     color: var(--neon-green) !important;
-    font-size: 0.82rem !important;
+    font-size: 0.92rem !important;
 }
 
-/* BOUTONS TIMECODE EXTÉRIEURS SOUS LA CARTE (ÉGALISÉS PARFAITEMENT) */
+/* BOUTONS TIMECODE EXTÉRIEURS SOUS LA CARTE */
 .seek-controls {
     display: flex;
-    gap: 4px;
+    gap: 6px;
     margin-top: 8px;
     width: 100%;
     visibility: hidden;
@@ -337,9 +333,9 @@ h1 {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 6px 0 !important;
+    padding: 8px 0 !important;
     border-radius: 12px !important;
-    font-size: 0.72rem !important;
+    font-size: 0.8rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 8px var(--neon-green-glow) !important;
@@ -350,7 +346,7 @@ h1 {
 }
 
 .pause-btn-inline {
-    font-size: 0.85rem !important;
+    font-size: 0.95rem !important;
 }
 
 .seek-btn:hover {
@@ -367,10 +363,10 @@ h1 {
     background: var(--neon-green) !important;
     color: #0d0d0d !important;
     border: none !important;
-    padding: 7px 0 !important;
+    padding: 8px 0 !important;
     border-radius: 16px !important;
     font-weight: 800 !important;
-    font-size: 0.78rem !important;
+    font-size: 0.85rem !important;
     cursor: pointer !important;
     text-decoration: none !important;
     display: flex !important;
@@ -386,15 +382,16 @@ h1 {
     justify-content: center;
     align-items: center;
     flex-shrink: 0 !important;
+    margin-top: 4px;
 }
 
 .quit-btn {
     background: var(--danger-color) !important;
     color: #ffffff !important;
     border: none !important;
-    padding: 8px 18px !important;
+    padding: 9px 22px !important;
     border-radius: 18px !important;
-    font-size: 0.82rem !important;
+    font-size: 0.88rem !important;
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 12px rgba(255, 51, 102, 0.4) !important;
@@ -414,8 +411,8 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 450px !important;
-        gap: 12px !important;
+        max-width: 550px !important;
+        gap: 14px !important;
         flex: 0 1 auto !important;
     }
 
@@ -425,16 +422,16 @@ h1 {
 
     .track-card {
         width: 100% !important;
-        padding: 10px 14px !important;
+        padding: 14px 18px !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 14px !important;
+        gap: 16px !important;
     }
 
     .pochette-wrapper, .pochette-wrapper .pochette { 
-        width: clamp(72px, 10.5vh, 95px) !important; 
-        height: clamp(72px, 10.5vh, 95px) !important; 
+        width: 110px !important; 
+        height: 110px !important; 
         flex-shrink: 0 !important; 
     }
 
@@ -442,19 +439,19 @@ h1 {
 
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 60px 1fr !important;
+        grid-template-columns: 64px 1fr !important;
         grid-template-areas: "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 250px !important;
-        gap: 6px 12px !important;
+        max-width: 280px !important;
+        gap: 6px 14px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 58px !important;
-        height: 58px !important;
-        font-size: 1.15rem !important;
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.2rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -479,18 +476,18 @@ h1 {
         align-items: flex-start !important;
         justify-content: center !important;
         width: 100% !important;
-        max-width: 900px !important;
+        max-width: 950px !important;
         gap: 20px !important;
         flex: 0 1 auto !important;
     }
 
     .track-slot {
         flex: 1 !important;
-        max-width: 320px !important;
+        max-width: 340px !important;
     }
 
     .track-card {
-        padding: 12px 14px !important;
+        padding: 14px 16px !important;
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
@@ -498,9 +495,9 @@ h1 {
     }
 
     .pochette-wrapper, .pochette-wrapper .pochette {
-        width: clamp(85px, 22vh, 135px) !important;
-        height: clamp(85px, 22vh, 135px) !important;
-        margin-bottom: 8px !important;
+        width: 130px !important;
+        height: 130px !important;
+        margin-bottom: 10px !important;
         flex-shrink: 0 !important;
     }
 
@@ -512,15 +509,15 @@ h1 {
         align-items: center !important;
         justify-content: center !important;
         gap: 8px !important;
-        width: 125px !important;
+        width: 130px !important;
         flex-shrink: 0 !important;
-        margin-top: 20px !important;
+        margin-top: 25px !important;
     }
 
     .vs-circle {
-        width: 50px !important;
-        height: 50px !important;
-        font-size: 1rem !important;
+        width: 54px !important;
+        height: 54px !important;
+        font-size: 1.1rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
