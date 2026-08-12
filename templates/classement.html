@@ -10,48 +10,7 @@
 </head>
 <body class="classement-body">
 
-    {% if user %}
-    <div class="user-profile-container">
-        <div class="profile-trigger" onclick="toggleProfileDropdown()">
-            {% if user.image %}
-                <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
-            {% else %}
-                <div class="user-avatar-placeholder">👤</div>
-            {% endif %}
-            <span class="user-name">{{ user.display_name }}</span>
-            <span class="arrow-down">▼</span>
-        </div>
-        
-        <div class="profile-dropdown" id="profileDropdown">
-            <a href="{{ url_for('index') }}">⚔️ Duels</a>
-            <a href="{{ url_for('liste_playlists') }}">🎵 Mes Playlists</a>
-            <a href="{{ url_for('stats') }}">📊 Mes Statistiques</a>
-            <hr>
-            <div class="mode-toggle-wrapper">
-                <span class="theme-label">Mode d'affichage :</span>
-                <div class="mode-toggle-btns">
-                    <button type="button" class="mode-btn" id="btn-mode-dark" onclick="setBgMode('dark')">🌙 Sombre</button>
-                    <button type="button" class="mode-btn" id="btn-mode-light" onclick="setBgMode('light')">☀️ Clair</button>
-                </div>
-            </div>
-            <hr>
-            <div class="theme-selector-wrapper">
-                <span class="theme-label">Couleur d'accent :</span>
-                <div class="theme-dots">
-                    <div class="theme-dot dot-green" title="Vert" onclick="setAccentColor('green')"></div>
-                    <div class="theme-dot dot-cyan" title="Cyan" onclick="setAccentColor('cyan')"></div>
-                    <div class="theme-dot dot-pink" title="Rose" onclick="setAccentColor('pink')"></div>
-                    <div class="theme-dot dot-orange" title="Orange" onclick="setAccentColor('orange')"></div>
-                    <div class="theme-dot dot-purple" title="Violet" onclick="setAccentColor('purple')"></div>
-                    <div class="theme-dot dot-yellow" title="Jaune" onclick="setAccentColor('yellow')"></div>
-                    <div class="theme-dot dot-random" title="Couleur Aléatoire" onclick="setAccentColor('random')">🎲</div>
-                </div>
-            </div>
-            <hr>
-            <a href="{{ url_for('logout') }}" style="color: var(--danger-color);">Déconnexion</a>
-        </div>
-    </div>
-    {% endif %}
+    {% include 'includes/user_menu.html' %}
 
     <div class="classement-container">
         <div class="classement-header">

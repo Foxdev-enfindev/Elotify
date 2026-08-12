@@ -1,16 +1,13 @@
 const availableAccentColors = ['green', 'cyan', 'pink', 'orange', 'purple', 'yellow'];
 
-// Appliqué immédiatement dès que le DOM est prêt
 document.addEventListener('DOMContentLoaded', () => {
     initThemeAndMode();
 });
 
 function initThemeAndMode() {
-    // 1. Mode de fond (Sera lu depuis localStorage pour une réactivité instantanée)
     let savedBgMode = localStorage.getItem('elotify_bg_mode') || 'dark';
     document.documentElement.setAttribute('data-bg-mode', savedBgMode);
 
-    // 2. Couleur d'accent
     let savedAccent = localStorage.getItem('elotify_theme') || 'green';
     
     if (savedAccent === 'random') {
@@ -24,7 +21,7 @@ function initThemeAndMode() {
 function setBgMode(mode) {
     document.documentElement.setAttribute('data-bg-mode', mode);
     localStorage.setItem('elotify_bg_mode', mode);
-    fetch('/set_bg_mode/' + mode, { method: 'POST' }).catch(err => {});
+    fetch('/set_bg_mode/' + mode, { method: 'POST' }).catch(err => console.error('Erreur BDD mode :', err));
 }
 
 function setAccentColor(color) {
@@ -37,7 +34,7 @@ function setAccentColor(color) {
         document.documentElement.setAttribute('data-theme', color);
     }
 
-    fetch('/set_theme/' + color, { method: 'POST' }).catch(err => console.error('Erreur sauvegarde thème BDD :', err));
+    fetch('/set_theme/' + color, { method: 'POST' }).catch(err => console.error('Erreur BDD couleur :', err));
 }
 
 function toggleProfileDropdown() {
@@ -52,4 +49,4 @@ window.onclick = function(event) {
             dropdown.classList.remove('show');
         }
     }
-}
+};
