@@ -16,7 +16,6 @@
         <a href="{{ url_for('stats') }}">📊 Mes Statistiques</a>
         <a href="{{ url_for('classement') }}">🏆 Classement</a>
         <hr>
-        
         <div class="mode-toggle-wrapper">
             <span class="theme-label">Mode d'affichage :</span>
             <div class="mode-toggle-btns">
@@ -24,11 +23,9 @@
                 <button type="button" class="mode-btn" id="btn-mode-light" onclick="setBgMode('light')">☀️ Clair</button>
             </div>
         </div>
-
         <hr>
-
         <div class="theme-selector-wrapper">
-            <span class="theme-label">Couleur :</span>
+            <span class="theme-label">Couleur d'accent :</span>
             <div class="theme-dots">
                 <div class="theme-dot dot-green" title="Vert" onclick="setAccentColor('green')"></div>
                 <div class="theme-dot dot-cyan" title="Cyan" onclick="setAccentColor('cyan')"></div>
@@ -36,10 +33,9 @@
                 <div class="theme-dot dot-orange" title="Orange" onclick="setAccentColor('orange')"></div>
                 <div class="theme-dot dot-purple" title="Violet" onclick="setAccentColor('purple')"></div>
                 <div class="theme-dot dot-yellow" title="Jaune" onclick="setAccentColor('yellow')"></div>
-                <div class="theme-dot dot-random" title="Aléatoire" onclick="setAccentColor('random')">🎲</div>
+                <div class="theme-dot dot-random" title="Couleur Aléatoire" onclick="setAccentColor('random')">🎲</div>
             </div>
         </div>
-
         <hr>
         <a href="{{ url_for('logout') }}" style="color: var(--danger-color);">Déconnexion</a>
     </div>

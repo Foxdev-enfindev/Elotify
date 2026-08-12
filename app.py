@@ -660,20 +660,6 @@ def stats():
         total_tracks=len(tracks), 
         user=profile
     )
-@app.route('/set_bg_mode/<mode>', methods=['POST'])
-def set_bg_mode(mode):
-    if 'user' in session:
-        user_id = session['user']['id']
-        # Mettre à jour la colonne bg_mode pour l'utilisateur dans la BDD Neon
-        conn = get_db_connection()
-        cur = conn.cursor()
-        cur.execute("UPDATE users SET bg_mode = %s WHERE spotify_id = %s", (mode, user_id))
-        conn.commit()
-        cur.close()
-        conn.close()
-    session['bg_mode'] = mode
-    return jsonify({'status': 'ok'}
-    )
 
 # --- ROUTE PAGE DE SORTIE AVEC CLASSEMENT ---
 @app.route('/quit')

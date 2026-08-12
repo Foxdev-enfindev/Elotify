@@ -27,6 +27,7 @@
         </div>
 
         <div class="duel-zone">
+            <!-- PISTE A -->
             <div class="track-slot">
                 <div class="track-card active" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
                     <div class="pochette-wrapper">
@@ -53,6 +54,7 @@
                 </div>
             </div>
 
+            <!-- VS ZONE -->
             <div class="vs-zone" id="vsZone">
                 <div class="vs-circle">VS</div>
                 <form action="{{ url_for('vote') }}" method="POST" onsubmit="handleVote(event, 'tie')">
@@ -64,6 +66,7 @@
                 <a href="{{ url_for('classement') }}" class="central-rank-btn">📊 Classement</a>
             </div>
 
+            <!-- PISTE B -->
             <div class="track-slot">
                 <div class="track-card" id="card-b" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
                     <div class="pochette-wrapper">
@@ -103,9 +106,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
                 .then(res => res.json())
-                .then(data => {
-                    if (data.warning) showSpotifyWarning("⚠️ " + data.warning);
-                })
+                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
                 .catch(err => console.error('Erreur lecture initiale :', err));
         });
 
