@@ -1,36 +1,38 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-bg-mode="dark" data-theme="green">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Session terminée - Elotify Duel</title>
+    <title>Session Terminée - Elotify</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='theme.js') }}"></script>
 </head>
 <body class="quit-body">
-    <div class="quit-container">
-        <h1 class="quit-title">Session terminée</h1>
-        
-        <p class="quit-subtitle">
-            Voici le top 5 de ta playlist <strong>« {{ playlist_name }} »</strong> :
-        </p>
+    <div class="quit-page-container">
+        <h1>👋 MERCI D'AVOIR JOUÉ !</h1>
+        <p class="quit-subtitle">Voici le Top 5 de ta session actuelle :</p>
 
         <div class="top5-list">
             {% for track in top5 %}
-                <div class="top5-item">
-                    <span class="top5-rank">#{{ loop.index }}</span>
-                    {% if track.image_url %}
-                        <img src="{{ track.image_url }}" alt="Pochette" class="top5-img">
-                    {% endif %}
-                    <div class="top5-info">
-                        <span class="top5-track-title">{{ track.name }}</span>
-                        <span class="top5-track-artist">{{ track.artist }}</span>
-                    </div>
-                    <span class="top5-elo">{{ track.elo }} Elo</span>
+            <div class="top5-card">
+                <span class="top5-rank">#{{ loop.index }}</span>
+                {% if track.image_url %}
+                    <img src="{{ track.image_url }}" alt="{{ track.name }}" class="top5-img">
+                {% endif %}
+                <div class="top5-info">
+                    <span class="top5-name">{{ track.name }}</span>
+                    <span class="top5-artist">{{ track.artist }}</span>
                 </div>
+                <span class="top5-elo">{{ track.elo }} pts</span>
+            </div>
             {% endfor %}
         </div>
 
-        <p class="close-notice">Tu peux maintenant fermer la page.</p>
+        <div class="quit-actions-group">
+            <a href="{{ url_for('index') }}" class="resume-btn">⚔️ Reprendre les duels</a>
+            <a href="{{ url_for('classement') }}" class="full-rank-btn">📊 Classement complet</a>
+        </div>
     </div>
 </body>
 </html>
