@@ -375,9 +375,21 @@ h1 {
 }
 
 /* =======================================================
-   4. LAYOUT PORTRAIT (SMARTPHONE, TABLETTE EN PORTRAIT)
+   4. LAYOUT PORTRAIT (COMPACTÉ POUR TENIR EN HAUTEUR)
    ======================================================= */
 @media screen and (orientation: portrait) {
+    body.duel-body {
+        padding: 45px 10px 10px 10px !important; /* Dégagement haut ajusté */
+    }
+
+    .container {
+        gap: 8px !important; /* Réduction de l'écart vertical global */
+    }
+
+    .header-zone {
+        padding-top: 0 !important;
+    }
+
     .duel-zone {
         display: flex !important;
         flex-direction: column !important;
@@ -385,7 +397,7 @@ h1 {
         justify-content: center !important;
         width: 100% !important;
         max-width: 680px !important;
-        gap: 16px !important;
+        gap: 8px !important; /* Réduit l'espace entre carte A / VS / carte B */
     }
 
     .track-slot {
@@ -394,36 +406,46 @@ h1 {
 
     .track-card {
         width: 100% !important;
-        padding: 14px 18px !important;
+        padding: 10px 14px !important; /* Padding interne resserré */
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
-        gap: 18px !important;
+        gap: 14px !important;
     }
 
+    /* Pochette légèrement réduite pour gagner en hauteur */
     .pochette-wrapper, .pochette-wrapper .pochette { 
-        width: clamp(90px, 18vw, 130px) !important; 
-        height: clamp(90px, 18vw, 130px) !important; 
+        width: clamp(75px, 14vw, 110px) !important; 
+        height: clamp(75px, 14vw, 110px) !important; 
         flex-shrink: 0 !important; 
     }
 
     .track-info { text-align: left !important; flex: 1 !important; }
 
+    .seek-controls {
+        margin-top: 4px !important;
+        gap: 4px !important;
+    }
+
+    .seek-btn {
+        padding: 6px 0 !important;
+    }
+
     .vs-zone {
         display: grid !important;
-        grid-template-columns: 68px 1fr !important;
+        grid-template-columns: 58px 1fr !important;
         grid-template-areas: "circle tie" "circle rank" !important;
         align-items: center !important;
         width: 100% !important;
-        max-width: 300px !important;
-        gap: 8px 16px !important;
+        max-width: 280px !important;
+        gap: 4px 10px !important;
     }
 
     .vs-circle {
         grid-area: circle !important;
-        width: 64px !important;
-        height: 64px !important;
-        font-size: 1.25rem !important;
+        width: 56px !important;
+        height: 56px !important;
+        font-size: 1.1rem !important;
         background: var(--neon-green) !important;
         color: #0d0d0d !important;
         font-weight: 900 !important;
@@ -431,11 +453,20 @@ h1 {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 0 12px var(--neon-green-glow) !important;
+        box-shadow: 0 0 10px var(--neon-green-glow) !important;
     }
 
     .vs-zone > form { grid-area: tie !important; }
     .vs-zone > a.central-rank-btn { grid-area: rank !important; }
+
+    .quit-wrapper {
+        margin-top: 2px !important;
+    }
+
+    .quit-btn {
+        padding: 8px 20px !important;
+        font-size: 0.85rem !important;
+    }
 }
 
 /* =======================================================
