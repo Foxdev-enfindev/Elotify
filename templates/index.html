@@ -8,7 +8,7 @@
 </head>
 <body class="duel-body {{ 'theme-' + current_theme if current_theme else '' }}">
 
-    <!-- MENU UTILISATEUR PROPRE EN HAUT À DROITE -->
+    <!-- MENU PROFIL UTILISATEUR & THÈMES -->
     {% if user %}
     <div class="user-menu-wrapper">
         <button class="user-profile-btn">
@@ -18,25 +18,25 @@
             <span>{{ user.display_name }} ▼</span>
         </button>
         <div class="user-dropdown-content">
-            <a href="{{ url_for('liste_playlists') }}" style="color: #fff; text-decoration: none; font-size: 0.85rem;">🎵 Mes Playlists</a>
-            <a href="{{ url_for('stats') }}" style="color: #fff; text-decoration: none; font-size: 0.85rem;">📊 Mes Statistiques</a>
-            <a href="{{ url_for('classement') }}" style="color: #fff; text-decoration: none; font-size: 0.85rem;">🏆 Classement</a>
-            <hr style="border-color: #333; margin: 4px 0;">
-            <span style="font-size: 0.75rem; color: #888;">Thème :</span>
-            <div style="display: flex; gap: 6px; margin-top: 2px;">
-                <button onclick="setTheme('green')" style="background: #1db954; border:none; width:18px; height:18px; border-radius:50%; cursor:pointer;"></button>
-                <button onclick="setTheme('purple')" style="background: #a855f7; border:none; width:18px; height:18px; border-radius:50%; cursor:pointer;"></button>
-                <button onclick="setTheme('blue')" style="background: #3b82f6; border:none; width:18px; height:18px; border-radius:50%; cursor:pointer;"></button>
-                <button onclick="setTheme('red')" style="background: #ef4444; border:none; width:18px; height:18px; border-radius:50%; cursor:pointer;"></button>
+            <a href="{{ url_for('liste_playlists') }}" class="dropdown-link">🎵 Mes Playlists</a>
+            <a href="{{ url_for('stats') }}" class="dropdown-link">📊 Mes Statistiques</a>
+            <a href="{{ url_for('classement') }}" class="dropdown-link">🏆 Classement</a>
+            <hr class="dropdown-divider">
+            <span class="dropdown-label">Thème :</span>
+            <div class="theme-selector">
+                <button onclick="setTheme('green')" class="theme-dot dot-green" title="Vert"></button>
+                <button onclick="setTheme('purple')" class="theme-dot dot-purple" title="Violet"></button>
+                <button onclick="setTheme('blue')" class="theme-dot dot-blue" title="Bleu"></button>
+                <button onclick="setTheme('red')" class="theme-dot dot-red" title="Rouge"></button>
             </div>
-            <hr style="border-color: #333; margin: 4px 0;">
-            <a href="{{ url_for('logout') }}" style="color: #ff4757; text-decoration: none; font-size: 0.85rem;">Déconnexion</a>
+            <hr class="dropdown-divider">
+            <a href="{{ url_for('logout') }}" class="dropdown-link link-logout">Déconnexion</a>
         </div>
     </div>
     {% endif %}
 
     <div class="container">
-        <!-- EN-TÊTE SANS &nbsp; BRUT -->
+        <!-- EN-TÊTE & BANNIÈRE D'INFORMATION -->
         <div class="header-zone">
             <h1 class="header-title">⚔️ ELOTIFY DUEL ⚔️</h1>
             <div class="result-banner-wrapper">
@@ -46,10 +46,10 @@
             </div>
         </div>
 
-        <!-- ZONE DES CARTES DU DUEL -->
+        <!-- ZONE DE DUEL -->
         <div class="duel-zone">
             
-            <!-- TITRE A -->
+            <!-- TRACK A -->
             <div class="track-slot">
                 <div class="track-card">
                     {% if track_a.image_url %}
@@ -58,27 +58,29 @@
                         </div>
                     {% endif %}
                     <div class="track-info">
-                        <div class="track-title">{{ track_a.name }}</div>
-                        <div class="track-artist">{{ track_a.artist }}</div>
-                        <div class="track-elo">Elo : {{ track_a.elo }}</div>
+                        <div class="track-title" title="{{ track_a.name }}">{{ track_a.name }}</div>
+                        <div class="track-artist" title="{{ track_a.artist }}">{{ track_a.artist }}</div>
+                        <div class="track-elo">Elo actuel : <strong>{{ track_a.elo }}</strong></div>
                         
                         <div class="seek-controls">
-                            <button class="seek-btn" onclick="seekOffset(-10)">-10s</button>
-                            <button class="seek-btn" onclick="togglePause()">⏸</button>
-                            <button class="seek-btn" onclick="seekOffset(10)">+10s</button>
+                            <button type="button" class="seek-btn" onclick="seekOffset(-30)">-30s</button>
+                            <button type="button" class="seek-btn" onclick="seekOffset(-10)">-10s</button>
+                            <button type="button" class="seek-btn" onclick="togglePause()">⏸</button>
+                            <button type="button" class="seek-btn" onclick="seekOffset(10)">+10s</button>
+                            <button type="button" class="seek-btn" onclick="seekOffset(30)">+30s</button>
                         </div>
                     </div>
                 </div>
                 
-                <form action="{{ url_for('vote') }}" method="POST" style="margin-top: 8px;">
+                <form action="{{ url_for('vote') }}" method="POST" class="vote-form">
                     <input type="hidden" name="id_a" value="{{ track_a.id }}">
                     <input type="hidden" name="id_b" value="{{ track_b.id }}">
                     <input type="hidden" name="outcome" value="1.0">
-                    <button type="submit" class="tie-btn" style="background: var(--neon-green); color: #0d0d0d;">Voter pour ce titre</button>
+                    <button type="submit" class="vote-btn">Voter pour ce titre</button>
                 </form>
             </div>
 
-            <!-- ZONE CENTRALE VS & MATCH NUL -->
+            <!-- ZONE CENTRALE VS -->
             <div class="vs-zone">
                 <div class="vs-circle">VS</div>
                 
@@ -92,7 +94,7 @@
                 <a href="{{ url_for('classement') }}" class="central-rank-btn">📊 Classement</a>
             </div>
 
-            <!-- TITRE B -->
+            <!-- TRACK B -->
             <div class="track-slot">
                 <div class="track-card">
                     {% if track_b.image_url %}
@@ -101,35 +103,36 @@
                         </div>
                     {% endif %}
                     <div class="track-info">
-                        <div class="track-title">{{ track_b.name }}</div>
-                        <div class="track-artist">{{ track_b.artist }}</div>
-                        <div class="track-elo">Elo : {{ track_b.elo }}</div>
+                        <div class="track-title" title="{{ track_b.name }}">{{ track_b.name }}</div>
+                        <div class="track-artist" title="{{ track_b.artist }}">{{ track_b.artist }}</div>
+                        <div class="track-elo">Elo actuel : <strong>{{ track_b.elo }}</strong></div>
                         
                         <div class="seek-controls">
-                            <button class="seek-btn" onclick="seekOffset(-10)">-10s</button>
-                            <button class="seek-btn" onclick="togglePause()">⏸</button>
-                            <button class="seek-btn" onclick="seekOffset(10)">+10s</button>
+                            <button type="button" class="seek-btn" onclick="seekOffset(-30)">-30s</button>
+                            <button type="button" class="seek-btn" onclick="seekOffset(-10)">-10s</button>
+                            <button type="button" class="seek-btn" onclick="togglePause()">⏸</button>
+                            <button type="button" class="seek-btn" onclick="seekOffset(10)">+10s</button>
+                            <button type="button" class="seek-btn" onclick="seekOffset(30)">+30s</button>
                         </div>
                     </div>
                 </div>
 
-                <form action="{{ url_for('vote') }}" method="POST" style="margin-top: 8px;">
+                <form action="{{ url_for('vote') }}" method="POST" class="vote-form">
                     <input type="hidden" name="id_a" value="{{ track_a.id }}">
                     <input type="hidden" name="id_b" value="{{ track_b.id }}">
                     <input type="hidden" name="outcome" value="0.0">
-                    <button type="submit" class="tie-btn" style="background: var(--neon-green); color: #0d0d0d;">Voter pour ce titre</button>
+                    <button type="submit" class="vote-btn">Voter pour ce titre</button>
                 </form>
             </div>
 
         </div>
 
-        <!-- BOUTON QUITTER EN BAS -->
+        <!-- BOUTON QUITTER -->
         <div class="quit-wrapper">
             <a href="{{ url_for('quit_app') }}" class="quit-btn">🚪 Quitter la session</a>
         </div>
     </div>
 
-    <!-- SCRIPTS LECTEUR ET THÈMES -->
     <script>
         function playTrack(uri) {
             fetch('/listen/' + encodeURIComponent(uri), { method: 'POST' });
