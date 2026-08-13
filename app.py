@@ -15,7 +15,7 @@ from collections import Counter
 
 app = Flask(__name__)
 
-# Clé secrète fixe (Impératif pour ne pas invalider les cookies au redémarrage Render)
+# Clé secrète fixe
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify_12345')
 
 # Configuration Session sur système de fichiers
@@ -76,49 +76,53 @@ SPOTIPY_CLIENT_SECRET = os.environ.get('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = os.environ.get('SPOTIPY_REDIRECT_URI', 'https://elotify.onrender.com/callback')
 SCOPE = 'playlist-read-private playlist-read-collaborative user-read-playback-state user-modify-playback-state'
 
-# --- CACHE HANDLER PERSISTANT EN BDD NEON ---
+# --- CACHE HANDLER HYBRIDE (RAM / SESSION D'ABORD -> BDD EN SECOURS) ---
 class DBTokenCacheHandler(spotipy.cache_handler.CacheHandler):
     def get_cached_token(self):
-        user_profile = session.get('user_profile')
-        if not user_profile or not user_profile.get('id'):
+        # 1. Priorité ABSOLUE à la session locale (0ms de latence)
+        if session.get('token_info'):
             return session.get('token_info')
         
-        user_id = user_profile['id']
-        if not DATABASE_URL:
-            return session.get('token_info')
-        try:
-            conn = get_db_connection()
-            cur = conn.cursor()
-            cur.execute("SELECT token_info FROM user_preferences WHERE user_id = %s;", (user_id,))
-            row = cur.fetchone()
-            cur.close()
-            conn.close()
-            if row and row[0]:
-                return json.loads(row[0])
-        except Exception as e:
-            print(f"⚠️ Erreur lecture token BDD : {e}")
-        return session.get('token_info')
+        # 2. Si la session est vide (ex: après un redémarrage Render), on cherche en BDD
+        user_profile = session.get('user_profile')
+        if user_profile and user_profile.get('id') and DATABASE_URL:
+            try:
+                conn = get_db_connection()
+                cur = conn.cursor()
+                cur.execute("SELECT token_info FROM user_preferences WHERE user_id = %s;", (user_profile['id'],))
+                row = cur.fetchone()
+                cur.close()
+                conn.close()
+                if row and row[0]:
+                    token_info = json.loads(row[0])
+                    session['token_info'] = token_info # Re-remplit le cache rapide !
+                    return token_info
+            except Exception as e:
+                print(f"⚠️ Erreur lecture token BDD : {e}")
+        return None
 
     def save_token_to_cache(self, token_info):
         session['token_info'] = token_info
         user_profile = session.get('user_profile')
         if user_profile and user_profile.get('id') and DATABASE_URL:
-            user_id = user_profile['id']
-            try:
-                token_json = json.dumps(token_info)
-                conn = get_db_connection()
-                cur = conn.cursor()
-                cur.execute("""
-                    INSERT INTO user_preferences (user_id, token_info)
-                    VALUES (%s, %s)
-                    ON CONFLICT (user_id) 
-                    DO UPDATE SET token_info = EXCLUDED.token_info;
-                """, (user_id, token_json))
-                conn.commit()
-                cur.close()
-                conn.close()
-            except Exception as e:
-                print(f"⚠️ Erreur sauvegarde token BDD : {e}")
+            # Sauvegarde en arrière-plan pour ne pas bloquer le clic
+            def _async_save(u_id, t_info):
+                try:
+                    conn = get_db_connection()
+                    cur = conn.cursor()
+                    cur.execute("""
+                        INSERT INTO user_preferences (user_id, token_info)
+                        VALUES (%s, %s)
+                        ON CONFLICT (user_id) 
+                        DO UPDATE SET token_info = EXCLUDED.token_info;
+                    """, (u_id, json.dumps(t_info)))
+                    conn.commit()
+                    cur.close()
+                    conn.close()
+                except Exception as e:
+                    print(f"⚠️ Erreur sauvegarde token BDD : {e}")
+            
+            threading.Thread(target=_async_save, args=(user_profile['id'], token_info), daemon=True).start()
 
 def get_spotify_oauth(show_dialog=False):
     return SpotifyOAuth(
@@ -395,7 +399,6 @@ def index():
     if len(tracks) < 2: 
         return "Playlist trop courte (minimum 2 titres).", 400
 
-    # Conservation du duel lors d'un simple rechargement (changement de thème/mode)
     current_duel = session.get('current_duel')
     track_a, track_b = None, None
 
@@ -448,9 +451,7 @@ def vote():
         else: 
             session['dernier_resultat'] = f"🤝 Match nul entre {track_a['name']} ({sign_a} Elo) et {track_b['name']} ({sign_b} Elo)"
 
-    # Réinitialise le duel en cours pour forcer le tirage de 2 nouveaux morceaux au prochain tour
     session.pop('current_duel', None)
-
     return redirect(url_for('index'))
 
 @app.route('/listen/<path:track_uri>', methods=['POST'])
@@ -519,7 +520,6 @@ def set_silent_mode_route(status):
         if profile and profile.get('id'):
             threading.Thread(target=save_user_silent_mode_db, args=(profile['id'], is_silent), daemon=True).start()
         
-        # Pause la musique sur Spotify si le mode silence est activé
         if is_silent:
             try:
                 sp.pause_playback()
@@ -531,17 +531,12 @@ def set_silent_mode_route(status):
 @app.route('/classement')
 @app.route('/classement/<playlist_id>')
 def classement(playlist_id=None):
-    sp = get_spotify_client()
-    user_profile = get_user_profile_cached(sp) if sp else None
-
-    # Si pas d'ID spécifié dans l'URL, on prend celui en session
     if not playlist_id:
         playlist_id = session.get('selected_playlist_id')
 
     if not playlist_id:
         return redirect(url_for('liste_playlists'))
 
-    # 1. Chargement des scores depuis PostgreSQL
     tracks = []
     if DATABASE_URL:
         try:
@@ -559,24 +554,29 @@ def classement(playlist_id=None):
         except Exception as e:
             print(f"⚠️ Erreur chargement classement BDD : {e}")
 
-    # Fallback si rien en BDD et que c'est la playlist courante en session
     if not tracks and playlist_id == session.get('selected_playlist_id'):
         scores = load_local_scores()
         tracks = list(scores.values())
         tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
 
-    # 2. Récupération des détails de la playlist (Nom & Propriétaire)
     playlist_name = "Playlist"
     owner_name = None
 
-    if sp:
-        try:
-            pl_info = sp.playlist(playlist_id, fields='name,owner.display_name')
-            playlist_name = pl_info.get('name', 'Playlist')
-            if pl_info.get('owner'):
-                owner_name = pl_info['owner'].get('display_name')
-        except Exception:
-            pass
+    user_profile = session.get('user_profile')
+    if user_profile:
+        owner_name = user_profile.get('display_name')
+
+    # On ne fait de requête à l'API Spotify QUE si on visite une playlist externe
+    if playlist_id != session.get('selected_playlist_id'):
+        sp = get_spotify_client()
+        if sp:
+            try:
+                pl_info = sp.playlist(playlist_id, fields='name,owner.display_name')
+                playlist_name = pl_info.get('name', 'Playlist')
+                if pl_info.get('owner'):
+                    owner_name = pl_info['owner'].get('display_name')
+            except Exception:
+                pass
 
     return render_template(
         'classement.html', 

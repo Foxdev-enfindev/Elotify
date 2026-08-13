@@ -930,7 +930,27 @@ body.playlists-body, body.classement-body, body.quit-body {
     gap: 12px;
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap;
+    width: 100%;
+    max-width: 480px;
+    margin: 16px auto 0 auto;
+}
+
+.quit-actions-group .back-btn,
+.quit-actions-group .resume-btn {
+    flex: 1 1 0px !important;
+    min-width: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 44px !important;
+    padding: 0 12px !important;
+    font-size: 0.88rem !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    box-sizing: border-box !important;
+    white-space: nowrap !important;
+    border: none !important;
+    cursor: pointer !important;
 }
 
 .resume-btn, .full-rank-btn {
