@@ -2,6 +2,7 @@ import os
 import time
 import random
 import threading
+import json
 from datetime import timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -17,7 +18,7 @@ app = Flask(__name__)
 # Clé secrète fixe (Impératif pour ne pas invalider les cookies au redémarrage Render)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify_12345')
 
-# Configuration Session sur système de fichiers pour éviter l'explosion de taille du cookie (>4Ko)
+# Configuration Session sur système de fichiers
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
@@ -52,13 +53,15 @@ def init_db():
                 user_id VARCHAR(255) PRIMARY KEY,
                 active_playlist_id VARCHAR(255),
                 theme VARCHAR(50) DEFAULT 'green',
-                silent_mode BOOLEAN DEFAULT FALSE
+                silent_mode BOOLEAN DEFAULT FALSE,
+                token_info TEXT
             );
         """)
         cur.execute("""
             ALTER TABLE user_preferences 
             ADD COLUMN IF NOT EXISTS theme VARCHAR(50) DEFAULT 'green',
-            ADD COLUMN IF NOT EXISTS silent_mode BOOLEAN DEFAULT FALSE;
+            ADD COLUMN IF NOT EXISTS silent_mode BOOLEAN DEFAULT FALSE,
+            ADD COLUMN IF NOT EXISTS token_info TEXT;
         """)
         conn.commit()
         cur.close()
@@ -73,6 +76,50 @@ SPOTIPY_CLIENT_SECRET = os.environ.get('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = os.environ.get('SPOTIPY_REDIRECT_URI', 'https://elotify.onrender.com/callback')
 SCOPE = 'playlist-read-private playlist-read-collaborative user-read-playback-state user-modify-playback-state'
 
+# --- CACHE HANDLER PERSISTANT EN BDD NEON ---
+class DBTokenCacheHandler(spotipy.cache_handler.CacheHandler):
+    def get_cached_token(self):
+        user_profile = session.get('user_profile')
+        if not user_profile or not user_profile.get('id'):
+            return session.get('token_info')
+        
+        user_id = user_profile['id']
+        if not DATABASE_URL:
+            return session.get('token_info')
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("SELECT token_info FROM user_preferences WHERE user_id = %s;", (user_id,))
+            row = cur.fetchone()
+            cur.close()
+            conn.close()
+            if row and row[0]:
+                return json.loads(row[0])
+        except Exception as e:
+            print(f"⚠️ Erreur lecture token BDD : {e}")
+        return session.get('token_info')
+
+    def save_token_to_cache(self, token_info):
+        session['token_info'] = token_info
+        user_profile = session.get('user_profile')
+        if user_profile and user_profile.get('id') and DATABASE_URL:
+            user_id = user_profile['id']
+            try:
+                token_json = json.dumps(token_info)
+                conn = get_db_connection()
+                cur = conn.cursor()
+                cur.execute("""
+                    INSERT INTO user_preferences (user_id, token_info)
+                    VALUES (%s, %s)
+                    ON CONFLICT (user_id) 
+                    DO UPDATE SET token_info = EXCLUDED.token_info;
+                """, (user_id, token_json))
+                conn.commit()
+                cur.close()
+                conn.close()
+            except Exception as e:
+                print(f"⚠️ Erreur sauvegarde token BDD : {e}")
+
 def get_spotify_oauth(show_dialog=False):
     return SpotifyOAuth(
         client_id=SPOTIPY_CLIENT_ID,
@@ -80,7 +127,7 @@ def get_spotify_oauth(show_dialog=False):
         redirect_uri=SPOTIPY_REDIRECT_URI,
         scope=SCOPE,
         show_dialog=show_dialog,
-        cache_handler=spotipy.cache_handler.FlaskSessionCacheHandler(session)
+        cache_handler=DBTokenCacheHandler()
     )
 
 def get_spotify_client():
@@ -482,12 +529,63 @@ def set_silent_mode_route(status):
     return jsonify({"status": "success", "silent_mode": is_silent})
 
 @app.route('/classement')
-def classement():
-    scores = load_local_scores()
-    tracks = list(scores.values())
-    tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
+@app.route('/classement/<playlist_id>')
+def classement(playlist_id=None):
     sp = get_spotify_client()
-    return render_template('classement.html', ranking=tracks, user=get_user_profile_cached(sp) if sp else None)
+    user_profile = get_user_profile_cached(sp) if sp else None
+
+    # Si pas d'ID spécifié dans l'URL, on prend celui en session
+    if not playlist_id:
+        playlist_id = session.get('selected_playlist_id')
+
+    if not playlist_id:
+        return redirect(url_for('liste_playlists'))
+
+    # 1. Chargement des scores depuis PostgreSQL
+    tracks = []
+    if DATABASE_URL:
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+            cur.execute("""
+                SELECT track_id, name, artist, image_url, elo 
+                FROM tracks_scores 
+                WHERE playlist_id = %s 
+                ORDER BY elo DESC;
+            """, (playlist_id,))
+            tracks = cur.fetchall()
+            cur.close()
+            conn.close()
+        except Exception as e:
+            print(f"⚠️ Erreur chargement classement BDD : {e}")
+
+    # Fallback si rien en BDD et que c'est la playlist courante en session
+    if not tracks and playlist_id == session.get('selected_playlist_id'):
+        scores = load_local_scores()
+        tracks = list(scores.values())
+        tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
+
+    # 2. Récupération des détails de la playlist (Nom & Propriétaire)
+    playlist_name = "Playlist"
+    owner_name = None
+
+    if sp:
+        try:
+            pl_info = sp.playlist(playlist_id, fields='name,owner.display_name')
+            playlist_name = pl_info.get('name', 'Playlist')
+            if pl_info.get('owner'):
+                owner_name = pl_info['owner'].get('display_name')
+        except Exception:
+            pass
+
+    return render_template(
+        'classement.html', 
+        ranking=tracks, 
+        playlist_id=playlist_id, 
+        playlist_name=playlist_name, 
+        owner_name=owner_name, 
+        user=user_profile
+    )
 
 @app.route('/stats')
 def stats():

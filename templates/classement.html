@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Classement Général - Elotify</title>
+    <title>Classement - {{ playlist_name }}</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='theme.js') }}"></script>
@@ -15,24 +15,56 @@
     <div class="classement-container">
         <div class="classement-header">
             <h1>🏆 CLASSEMENT COMPLET 🏆</h1>
-            <a href="{{ url_for('index') }}" class="back-btn">⚔️ Retour aux duels</a>
+            
+            <!-- Nom de la playlist et propriétaire -->
+            <p class="quit-subtitle" style="margin-top: 4px; font-size: 1.05rem; font-weight: 600;">
+                🎵 {{ playlist_name }}
+                {% if owner_name %}
+                    <span style="opacity: 0.8; font-size: 0.9rem; font-weight: 400;">(par {{ owner_name }})</span>
+                {% endif %}
+            </p>
+
+            <!-- Actions : Retour + Partage -->
+            <div class="quit-actions-group" style="margin-top: 14px; gap: 10px;">
+                <a href="{{ url_for('index') }}" class="back-btn">⚔️ Retour aux duels</a>
+                <button type="button" class="resume-btn" onclick="copyPublicLink()" style="cursor: pointer; border: none;">
+                    🔗 Partager ce classement
+                </button>
+            </div>
         </div>
 
         <div class="ranking-list">
-            {% for track in ranking %}
-            <div class="ranking-card">
-                <span class="ranking-rank">#{{ loop.index }}</span>
-                {% if track.image_url %}
-                    <img src="{{ track.image_url }}" alt="{{ track.name }}" class="ranking-img">
-                {% endif %}
-                <div class="ranking-info">
-                    <span class="ranking-name">{{ track.name }}</span>
-                    <span class="ranking-artist">{{ track.artist }}</span>
+            {% if ranking %}
+                {% for track in ranking %}
+                <div class="ranking-card">
+                    <span class="ranking-rank">#{{ loop.index }}</span>
+                    {% if track.image_url %}
+                        <img src="{{ track.image_url }}" alt="{{ track.name }}" class="ranking-img">
+                    {% endif %}
+                    <div class="ranking-info">
+                        <span class="ranking-name">{{ track.name }}</span>
+                        <span class="ranking-artist">{{ track.artist }}</span>
+                    </div>
+                    <span class="ranking-elo">{{ track.elo }} pts</span>
                 </div>
-                <span class="ranking-elo">{{ track.elo }} pts</span>
-            </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <p style="text-align: center; color: var(--text-muted); margin-top: 20px;">
+                    Aucun titre classé pour le moment dans cette playlist.
+                </p>
+            {% endif %}
         </div>
     </div>
+
+    <script>
+        function copyPublicLink() {
+            const publicUrl = window.location.origin + "/classement/{{ playlist_id }}";
+            navigator.clipboard.writeText(publicUrl).then(() => {
+                alert("Lien du classement copié dans le presse-papier !");
+            }).catch(err => {
+                console.error("Erreur lors de la copie :", err);
+            });
+        }
+    </script>
 </body>
 </html>
