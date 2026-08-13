@@ -17,6 +17,18 @@
         
         <hr>
 
+        <!-- MODE SOMBRE / CLAIR -->
+        <div class="mode-toggle-wrapper">
+            <span class="theme-label">Mode d'affichage :</span>
+            <div class="mode-toggle-btns">
+                <button id="btn-mode-dark" class="mode-btn" onclick="setBgMode('dark')">🌙 Sombre</button>
+                <button id="btn-mode-light" class="mode-btn" onclick="setBgMode('light')">☀️ Clair</button>
+            </div>
+        </div>
+
+        <hr>
+
+        <!-- MODE DE JEU -->
         <div class="mode-toggle-wrapper">
             <span class="theme-label">Mode de jeu :</span>
             <button class="mode-btn {% if silent_mode %}active{% endif %}" onclick="toggleSilentMode(event)">
@@ -26,8 +38,9 @@
 
         <hr>
 
+        <!-- COULEURS + ALEATOIRE -->
         <div class="theme-selector-wrapper">
-            <span class="theme-label">Couleur: </span>
+            <span class="theme-label">Couleur :</span>
             <div class="theme-dots">
                 <div class="theme-dot dot-green" onclick="setThemeColor('green')" title="Vert"></div>
                 <div class="theme-dot dot-cyan" onclick="setThemeColor('cyan')" title="Cyan"></div>
@@ -35,6 +48,7 @@
                 <div class="theme-dot dot-orange" onclick="setThemeColor('orange')" title="Orange"></div>
                 <div class="theme-dot dot-purple" onclick="setThemeColor('purple')" title="Violet"></div>
                 <div class="theme-dot dot-yellow" onclick="setThemeColor('yellow')" title="Jaune"></div>
+                <div class="theme-dot dot-random" onclick="setThemeColor('random')" title="Aléatoire">🎲</div>
             </div>
         </div>
 
@@ -57,6 +71,27 @@
         }
     });
 
+    function setBgMode(mode) {
+        document.documentElement.setAttribute('data-bg-mode', mode);
+        localStorage.setItem('elotify_bg_mode', mode);
+        updateBgModeButtons(mode);
+    }
+
+    function updateBgModeButtons(mode) {
+        const darkBtn = document.getElementById('btn-mode-dark');
+        const lightBtn = document.getElementById('btn-mode-light');
+        if (darkBtn && lightBtn) {
+            darkBtn.classList.toggle('active-bg-mode', mode === 'dark');
+            lightBtn.classList.toggle('active-bg-mode', mode === 'light');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedBg = localStorage.getItem('elotify_bg_mode') || 'dark';
+        document.documentElement.setAttribute('data-bg-mode', savedBg);
+        updateBgModeButtons(savedBg);
+    });
+
     function toggleSilentMode(e) {
         e.stopPropagation();
         const nextStatus = {{ '0' if silent_mode else '1' }};
@@ -65,6 +100,10 @@
     }
 
     function setThemeColor(themeName) {
+        if (themeName === 'random') {
+            const colors = ['green', 'cyan', 'pink', 'orange', 'purple', 'yellow'];
+            themeName = colors[Math.floor(Math.random() * colors.length)];
+        }
         fetch('/set_theme/' + themeName, { method: 'POST' })
             .then(() => {
                 document.documentElement.setAttribute('data-theme', themeName);

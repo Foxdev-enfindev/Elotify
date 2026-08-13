@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr" data-bg-mode="dark" data-theme="green">
+<html lang="fr" data-bg-mode="dark" data-theme="{{ current_theme if current_theme else 'green' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,8 +17,7 @@
         <div class="header-zone">
             {% include 'includes/user_menu.html' %}
 
-            <!-- NOUVEAU TITRE -->
-            <h1>À vous de choisir</h1>
+            <h1 class="main-title">À vous de choisir</h1>
 
             <div class="result-banner-wrapper">
                 <div class="result-banner {% if not dernier_resultat %}hidden{% endif %}">
@@ -154,7 +153,6 @@
             if (currentPlaying !== trackKey) switchActiveCard(trackKey, trackUri);
         }
 
-        /* VOTE DIRECT EN 1 CLIC SI MODE SILENCE ACTIF */
         function onCardClick(trackKey, trackUri) {
             if (isSilentMode || currentPlaying === trackKey) {
                 triggerVoteAnimation(trackKey);

@@ -40,7 +40,7 @@ body.duel-body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 60px 12px 20px 12px !important;
+    padding: 60px 14px 24px 14px !important;
 }
 
 /* =======================================================
@@ -48,23 +48,24 @@ body.duel-body {
    ======================================================= */
 .container {
     width: 100%;
-    max-width: 900px;
+    max-width: 920px;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 18px;
+    gap: 24px !important; /* Espacement aéré entre Header, Duel et Quitter */
 }
 
 .header-zone {
     width: 100%;
-    max-width: 650px;
+    max-width: 680px;
     display: flex;
     flex-direction: column;
     align-items: center;
     position: relative;
     padding-top: 10px;
+    gap: 12px !important;
 }
 
 .user-profile-container {
@@ -109,7 +110,6 @@ body.duel-body {
 .profile-dropdown a:hover { background: rgba(150, 150, 150, 0.12); color: var(--neon-green); }
 .profile-dropdown hr { border: none; border-top: 1px solid rgba(150, 150, 150, 0.15); margin: 0; }
 
-/* MODE DE JEU (SILENCE / SPOTIFY) */
 .mode-toggle-wrapper {
     padding: 8px 14px;
     display: flex;
@@ -117,12 +117,17 @@ body.duel-body {
     gap: 6px;
 }
 
+.mode-toggle-btns {
+    display: flex;
+    gap: 6px;
+}
+
 .mode-btn {
-    width: 100%;
+    flex: 1;
     background: rgba(150, 150, 150, 0.12);
     border: 1px solid rgba(150, 150, 150, 0.2);
     color: var(--text-color);
-    padding: 8px 0;
+    padding: 7px 0;
     border-radius: 8px;
     font-size: 0.8rem;
     font-weight: 700;
@@ -130,13 +135,12 @@ body.duel-body {
     transition: all 0.15s ease;
 }
 
-.mode-btn.active {
-    border-color: var(--neon-green);
-    color: var(--neon-green);
-    background: rgba(0, 255, 102, 0.08);
+.mode-btn.active-bg-mode, .mode-btn.active {
+    border-color: var(--neon-green) !important;
+    color: var(--neon-green) !important;
+    background: rgba(0, 255, 102, 0.08) !important;
 }
 
-/* PASTILLES DE COULEURS */
 .theme-selector-wrapper {
     padding: 8px 14px;
     display: flex;
@@ -154,21 +158,25 @@ body.duel-body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 6px;
+    gap: 4px;
     margin-top: 4px;
 }
 
 .theme-dot {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid rgba(255, 255, 255, 0.2);
     transition: transform 0.15s ease, border-color 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
 }
 
 .theme-dot:hover {
-    transform: scale(1.15);
+    transform: scale(1.18);
     border-color: #ffffff;
 }
 
@@ -178,10 +186,62 @@ body.duel-body {
 .dot-orange { background-color: #ff9900; }
 .dot-purple { background-color: #b026ff; }
 .dot-yellow { background-color: #ffe600; }
+.dot-random { background: linear-gradient(135deg, #00ff66, #00f0ff, #ff007f, #ff9900); border: none !important; color: #000; }
+
+/* TITRE & BANNIÈRE RÉ-ACCENTUÉS EN NÉON */
+h1, h1.main-title {
+    font-size: clamp(1.6rem, 4vw, 2.4rem) !important;
+    font-weight: 800 !important;
+    color: var(--neon-green) !important;
+    text-shadow: 0 0 14px var(--neon-green-glow) !important;
+    letter-spacing: 1.5px !important;
+    margin: 0 !important;
+    text-align: center !important;
+}
+
+.result-banner-wrapper {
+    min-height: 38px !important;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.result-banner {
+    background: var(--neon-green-glow) !important;
+    border: 1.5px solid var(--neon-green) !important;
+    color: var(--text-color) !important;
+    padding: 7px 22px !important;
+    border-radius: 20px !important;
+    text-align: center !important;
+    font-weight: 700 !important;
+    font-size: 0.92rem !important;
+    box-shadow: 0 0 14px var(--neon-green-glow) !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 95% !important;
+}
+
+.result-banner.hidden {
+    visibility: hidden !important;
+    border-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
 
 /* =======================================================
    3. CARTES ET TRONQUAGE STRICT TITRES/ARTISTES
    ======================================================= */
+.duel-zone {
+    display: flex;
+    gap: 20px !important;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
 .track-slot {
     display: flex;
     flex-direction: column;
@@ -226,9 +286,8 @@ body.duel-body {
     margin-bottom: 4px;
 }
 
-/* VERROUILLAGE ANTI-DÉFORMATION DU TEXTE */
 .track-info {
-    min-width: 0 !important; /* Libère la contrainte Flexbox pour autoriser le tronquage */
+    min-width: 0 !important;
     flex: 1 !important;
     overflow: hidden !important;
 }
@@ -286,14 +345,6 @@ body.duel-body {
     pointer-events: auto !important;
 }
 
-.track-card.voted-winner + .seek-controls,
-.track-card.voted-loser + .seek-controls,
-.vs-zone.voting-in-progress ~ .track-slot .seek-controls {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-
 .seek-btn {
     flex: 1 1 0px !important;
     min-width: 0 !important;
@@ -306,17 +357,10 @@ body.duel-body {
     font-weight: 800 !important;
     cursor: pointer !important;
     box-shadow: 0 0 8px var(--neon-green-glow) !important;
-    transition: transform 0.1s ease, filter 0.15s ease !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
 }
-
-.pause-btn-inline { font-size: 0.95rem !important; }
-.seek-btn:hover { filter: brightness(1.15); }
-.seek-btn:active { transform: scale(0.95); }
-
-.vs-zone form { width: 100% !important; }
 
 .tie-btn, .central-rank-btn, a.central-rank-btn {
     background: var(--neon-green) !important;
@@ -360,25 +404,20 @@ body.duel-body {
 }
 
 /* =======================================================
-   4. LAYOUT PORTRAIT
+   4. LAYOUT PORTRAIT (AÉRÉ)
    ======================================================= */
 @media screen and (orientation: portrait) {
     body.duel-body {
-        padding: 50px 14px 16px 14px !important;
+        padding: 55px 16px 20px 16px !important;
     }
 
     .container {
-        gap: 16px !important;
+        gap: 20px !important;
     }
 
     .header-zone {
         padding-top: 0 !important;
-        gap: 8px !important;
-    }
-
-    .result-banner-wrapper {
-        min-height: 28px !important;
-        margin-top: 2px !important;
+        gap: 10px !important;
     }
 
     .duel-zone {
@@ -388,7 +427,7 @@ body.duel-body {
         justify-content: center !important;
         width: 100% !important;
         max-width: 680px !important;
-        gap: 14px !important;
+        gap: 16px !important;
     }
 
     .track-slot {
@@ -397,35 +436,18 @@ body.duel-body {
 
     .track-card {
         width: 100% !important;
-        padding: 8px 14px !important;
+        padding: 10px 14px !important;
         display: flex !important;
         flex-direction: row !important;
         align-items: center !important;
         gap: 14px !important;
-        min-height: auto !important;
     }
 
     .pochette-wrapper, .pochette-wrapper .pochette { 
-        width: clamp(68px, 12vw, 92px) !important; 
-        height: clamp(68px, 12vw, 92px) !important; 
+        width: clamp(70px, 14vw, 96px) !important; 
+        height: clamp(70px, 14vw, 96px) !important; 
         flex-shrink: 0 !important; 
         border-radius: 10px !important;
-    }
-
-    .track-info { 
-        text-align: left !important; 
-        flex: 1 !important; 
-        min-width: 0 !important;
-    }
-
-    .seek-controls {
-        margin-top: 6px !important;
-        gap: 6px !important;
-    }
-
-    .seek-btn {
-        padding: 5px 0 !important;
-        font-size: 0.78rem !important;
     }
 
     .vs-zone {
@@ -452,483 +474,17 @@ body.duel-body {
         justify-content: center !important;
         box-shadow: 0 0 10px var(--neon-green-glow) !important;
     }
-
-    .vs-zone > form { grid-area: tie !important; }
-    .vs-zone > a.central-rank-btn { grid-area: rank !important; }
-
-    .tie-btn, .central-rank-btn, a.central-rank-btn {
-        padding: 7px 0 !important;
-        font-size: 0.82rem !important;
-    }
-
-    .quit-wrapper {
-        margin-top: 6px !important;
-    }
-
-    .quit-btn {
-        padding: 8px 22px !important;
-        font-size: 0.85rem !important;
-    }
 }
 
 /* =======================================================
-   5. LAYOUT PAYSAGE (PC, FOLD ET Z FLIP)
+   5. LAYOUT PAYSAGE
    ======================================================= */
 @media screen and (orientation: landscape) {
     body.duel-body {
-        padding: 40px 12px 10px 12px !important;
-        overflow-y: auto !important;
-    }
-
-    .container {
-        width: 100% !important;
-        max-width: 980px !important;
-        gap: 8px !important;
-    }
-
-    .header-zone {
-        padding-top: 0 !important;
-        gap: 2px !important;
-    }
-
-    .header-title {
-        font-size: 1.2rem !important;
-    }
-
-    .result-banner-wrapper {
-        min-height: 22px !important;
-        margin-top: 0 !important;
+        padding: 40px 12px 12px 12px !important;
     }
 
     .duel-zone {
-        display: flex !important;
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important;
-        gap: 12px !important;
-    }
-
-    .track-slot {
-        flex: 1 !important;
-        max-width: 380px !important;
-        min-width: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-    }
-
-    .track-card {
-        padding: 8px 12px !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important;
-        min-height: unset !important;
-    }
-
-    .pochette-wrapper, .pochette-wrapper .pochette {
-        width: clamp(70px, 22vh, 130px) !important;
-        height: clamp(70px, 22vh, 130px) !important;
-        margin-bottom: 4px !important;
-        flex-shrink: 0 !important;
-        border-radius: 8px !important;
-    }
-
-    .track-info {
-        text-align: center !important;
-        width: 100% !important;
-        min-width: 0 !important;
-    }
-
-    .seek-controls {
-        margin-top: 4px !important;
-        width: 100% !important;
-        gap: 4px !important;
-    }
-
-    .seek-btn {
-        padding: 4px 0 !important;
-        font-size: 0.75rem !important;
-    }
-
-    .vs-zone {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        justify-content: center !important;
-        gap: 6px !important;
-        width: 130px !important;
-        flex-shrink: 0 !important;
-        margin-top: 0 !important;
-        align-self: center !important;
-    }
-
-    .vs-circle {
-        width: 48px !important;
-        height: 48px !important;
-        font-size: 1rem !important;
-        background: var(--neon-green) !important;
-        color: #0d0d0d !important;
-        font-weight: 900 !important;
-        border-radius: 50% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: 0 0 10px var(--neon-green-glow) !important;
-    }
-
-    .tie-btn, .central-rank-btn, a.central-rank-btn {
-        padding: 6px 0 !important;
-        font-size: 0.78rem !important;
-    }
-
-    .quit-wrapper {
-        margin-top: 4px !important;
-    }
-
-    .quit-btn {
-        padding: 6px 18px !important;
-        font-size: 0.8rem !important;
+        gap: 16px !important;
     }
 }
-
-@media screen and (orientation: landscape) and (max-height: 480px) {
-    body.duel-body {
-        padding-top: 32px !important;
-    }
-
-    .pochette-wrapper, .pochette-wrapper .pochette {
-        width: clamp(55px, 18vh, 85px) !important;
-        height: clamp(55px, 18vh, 85px) !important;
-    }
-
-    h1 {
-        display: none !important;
-    }
-
-    .seek-controls {
-        display: flex !important;
-    }
-}
-
-/* =======================================================
-   6. PAGES SECONDAIRES & QUIT
-   ======================================================= */
-body.playlists-body, body.classement-body, body.quit-body {
-    min-height: 100vh !important;
-    padding: 60px 15px 30px 15px !important;
-    display: flex !important;
-    justify-content: center !important;
-}
-
-.playlists-container, .classement-container, .quit-page-container {
-    width: 100%;
-    max-width: 700px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.playlists-header, .classement-header {
-    text-align: center;
-    margin-bottom: 25px;
-    width: 100%;
-}
-
-.playlists-header h1, .classement-header h1 {
-    font-size: clamp(1.4rem, 3vh, 2.2rem);
-    font-weight: 800;
-    color: var(--neon-green);
-    text-shadow: 0 0 12px var(--neon-green-glow);
-    margin-bottom: 12px;
-}
-
-.playlists-grid {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
-    gap: 20px !important;
-    width: 100% !important;
-    padding-bottom: 40px;
-}
-
-.playlist-card {
-    background: var(--card-bg);
-    border: 1px solid rgba(150, 150, 150, 0.15);
-    border-radius: 16px;
-    padding: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: var(--text-color);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.playlist-card:hover {
-    transform: translateY(-5px);
-    border-color: var(--neon-green);
-    box-shadow: 0 6px 20px var(--neon-green-glow);
-}
-
-.playlist-img, .playlist-img-placeholder {
-    width: 100% !important;
-    aspect-ratio: 1 / 1 !important;
-    border-radius: 10px;
-    object-fit: cover;
-    margin-bottom: 10px;
-}
-
-.playlist-img-placeholder {
-    background: rgba(150, 150, 150, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.5rem;
-}
-
-.playlist-info {
-    width: 100%;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.playlist-name {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: var(--text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-}
-
-.playlist-tracks {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-}
-
-.back-btn {
-    display: inline-block;
-    background: var(--neon-green) !important;
-    color: #0d0d0d !important;
-    font-weight: 800 !important;
-    padding: 8px 20px !important;
-    border-radius: 20px !important;
-    text-decoration: none !important;
-    font-size: 0.88rem !important;
-    box-shadow: 0 0 10px var(--neon-green-glow) !important;
-    transition: transform 0.15s ease !important;
-}
-
-.back-btn:hover { transform: translateY(-2px); }
-
-.ranking-list {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.ranking-card {
-    background: var(--card-bg);
-    border: 1px solid rgba(150, 150, 150, 0.15);
-    border-radius: 12px;
-    padding: 12px 18px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.ranking-rank {
-    font-size: 1.15rem;
-    font-weight: 800;
-    color: var(--neon-green);
-    min-width: 45px;
-    text-align: left;
-}
-
-.ranking-img {
-    width: 54px !important;
-    height: 54px !important;
-    border-radius: 8px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.ranking-info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    flex: 1;
-    overflow: hidden;
-}
-
-.ranking-name {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.ranking-artist {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.ranking-elo {
-    font-size: 0.98rem;
-    font-weight: 700;
-    color: var(--neon-green);
-    margin-left: auto;
-    flex-shrink: 0;
-}
-
-/* PAGE QUIT */
-.quit-subtitle {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    margin: 6px 0 18px 0;
-}
-
-.top5-list {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 24px;
-}
-
-.top5-card {
-    background: var(--card-bg);
-    border: 1px solid rgba(150, 150, 150, 0.15);
-    border-radius: 12px;
-    padding: 10px 14px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.top5-rank {
-    font-size: 1.05rem;
-    font-weight: 800;
-    color: var(--neon-green);
-    min-width: 28px;
-}
-
-.top5-img {
-    width: 50px !important;
-    height: 50px !important;
-    border-radius: 8px;
-    object-fit: cover;
-    flex-shrink: 0;
-}
-
-.top5-info {
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    flex: 1;
-    overflow: hidden;
-}
-
-.top5-name {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: var(--text-color);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.top5-artist {
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.top5-elo {
-    font-size: 0.92rem;
-    font-weight: 700;
-    color: var(--neon-green);
-    margin-left: auto;
-}
-
-.close-notice {
-    color: var(--text-muted);
-    font-size: 0.88rem;
-    font-style: italic;
-    margin-top: 6px;
-    text-align: center;
-}
-
-.quit-actions-group {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: wrap;
-}
-
-.resume-btn, .full-rank-btn {
-    background: var(--neon-green) !important;
-    color: #0d0d0d !important;
-    font-weight: 800 !important;
-    padding: 12px 22px !important;
-    border-radius: 20px !important;
-    text-decoration: none !important;
-    font-size: 0.88rem !important;
-    box-shadow: 0 0 10px var(--neon-green-glow) !important;
-}
-
-/* =======================================================
-   7. FEEDBACK VISUEL DE VOTE & TOAST
-   ======================================================= */
-.track-card.voted-winner {
-    border-color: var(--neon-green) !important;
-    box-shadow: 0 0 25px var(--neon-green-glow) !important;
-}
-
-.track-card.voted-loser {
-    opacity: 0.35 !important;
-    filter: grayscale(60%);
-    pointer-events: none !important;
-}
-
-.vs-zone.voting-in-progress { pointer-events: none !important; }
-
-.toast {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    background: rgba(255, 153, 0, 0.95);
-    color: #0d0d0d;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: 700;
-    font-size: 0.85rem;
-    box-shadow: 0 4px 15px rgba(255, 153, 0, 0.4);
-    z-index: 10000;
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    text-align: center;
-    max-width: 90vw;
-}
-
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.toast.hidden { display: none; }
