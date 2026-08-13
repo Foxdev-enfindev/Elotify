@@ -26,6 +26,20 @@
 
         <hr>
 
+        <div class="theme-selector-wrapper">
+            <span class="theme-label">Couleur d'accent :</span>
+            <div class="theme-dots">
+                <div class="theme-dot dot-green" onclick="setThemeColor('green')" title="Vert"></div>
+                <div class="theme-dot dot-cyan" onclick="setThemeColor('cyan')" title="Cyan"></div>
+                <div class="theme-dot dot-pink" onclick="setThemeColor('pink')" title="Rose"></div>
+                <div class="theme-dot dot-orange" onclick="setThemeColor('orange')" title="Orange"></div>
+                <div class="theme-dot dot-purple" onclick="setThemeColor('purple')" title="Violet"></div>
+                <div class="theme-dot dot-yellow" onclick="setThemeColor('yellow')" title="Jaune"></div>
+            </div>
+        </div>
+
+        <hr>
+
         <a href="{{ url_for('logout') }}" style="color: var(--danger-color);">Déconnexion</a>
     </div>
 </div>
@@ -48,6 +62,14 @@
         const nextStatus = {{ '0' if silent_mode else '1' }};
         fetch('/set_silent_mode/' + nextStatus, { method: 'POST' })
             .then(() => location.reload());
+    }
+
+    function setThemeColor(themeName) {
+        fetch('/set_theme/' + themeName, { method: 'POST' })
+            .then(() => {
+                document.documentElement.setAttribute('data-theme', themeName);
+                location.reload();
+            });
     }
 </script>
 {% endif %}
