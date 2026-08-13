@@ -6,6 +6,7 @@ from datetime import timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask_session import Session
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.exceptions import SpotifyException
@@ -13,11 +14,14 @@ from collections import Counter
 
 app = Flask(__name__)
 
-# Clé secrète fixe (Impératif pour valider le cookie de session après le réveil de Render)
+# Clé secrète fixe (Impératif pour ne pas invalider les cookies au redémarrage Render)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify_12345')
 
-# Session permanente en cookie navigateur (Persiste malgré la mise en veille de Render)
+# Configuration Session sur système de fichiers pour éviter l'explosion de taille du cookie (>4Ko)
+app.config["SESSION_TYPE"] = "filesystem"
+app.config["SESSION_PERMANENT"] = True
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
+Session(app)
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
