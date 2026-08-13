@@ -451,10 +451,19 @@ def set_silent_mode_route(status):
     is_silent = bool(status)
     session['silent_mode'] = is_silent
     sp = get_spotify_client()
+    
     if sp:
         profile = get_user_profile_cached(sp)
         if profile and profile.get('id'):
             threading.Thread(target=save_user_silent_mode_db, args=(profile['id'], is_silent), daemon=True).start()
+        
+        # Mettre en pause la lecture Spotify lors de l'activation du mode Silence
+        if is_silent:
+            try:
+                sp.pause_playback()
+            except Exception:
+                pass # Ignore si aucun lecteur actif n'est ouvert
+                
     return jsonify({"status": "success", "silent_mode": is_silent})
 
 @app.route('/classement')
