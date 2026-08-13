@@ -280,6 +280,7 @@ def select_playlist(playlist_id):
     session['selected_playlist_id'] = playlist_id
     session.pop('tracks_cache', None)
     session.pop('scores_cache', None)
+    session.pop('current_duel', None)
 
     sp = get_spotify_client()
     if sp:
@@ -347,7 +348,18 @@ def index():
     if len(tracks) < 2: 
         return "Playlist trop courte (minimum 2 titres).", 400
 
-    track_a, track_b = random.sample(tracks, 2)
+    # Conservation du duel lors d'un simple rechargement (changement de thème/mode)
+    current_duel = session.get('current_duel')
+    track_a, track_b = None, None
+
+    if current_duel:
+        track_a = next((t for t in tracks if t['id'] == current_duel[0]), None)
+        track_b = next((t for t in tracks if t['id'] == current_duel[1]), None)
+
+    if not track_a or not track_b or track_a['id'] == track_b['id']:
+        track_a, track_b = random.sample(tracks, 2)
+        session['current_duel'] = (track_a['id'], track_b['id'])
+
     track_a['elo'] = scores.get(track_a['id'], {}).get('elo', 1000)
     track_b['elo'] = scores.get(track_b['id'], {}).get('elo', 1000)
 
@@ -388,6 +400,9 @@ def vote():
             session['dernier_resultat'] = f"🏆 Victoire de {track_b['name']} ({sign_b} Elo) face à {track_a['name']} ({sign_a} Elo)"
         else: 
             session['dernier_resultat'] = f"🤝 Match nul entre {track_a['name']} ({sign_a} Elo) et {track_b['name']} ({sign_b} Elo)"
+
+    # Réinitialise le duel en cours pour forcer le tirage de 2 nouveaux morceaux au prochain tour
+    session.pop('current_duel', None)
 
     return redirect(url_for('index'))
 
@@ -457,12 +472,12 @@ def set_silent_mode_route(status):
         if profile and profile.get('id'):
             threading.Thread(target=save_user_silent_mode_db, args=(profile['id'], is_silent), daemon=True).start()
         
-        # Mettre en pause la lecture Spotify lors de l'activation du mode Silence
+        # Pause la musique sur Spotify si le mode silence est activé
         if is_silent:
             try:
                 sp.pause_playback()
             except Exception:
-                pass # Ignore si aucun lecteur actif n'est ouvert
+                pass
                 
     return jsonify({"status": "success", "silent_mode": is_silent})
 
@@ -511,6 +526,7 @@ def quit_app():
     tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
     
     session.pop('tracks_cache', None)
+    session.pop('current_duel', None)
     return render_template('quit.html', top5=tracks[:5], playlist_name=playlist_name)
 
 if __name__ == '__main__':
