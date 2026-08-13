@@ -27,9 +27,9 @@
         </div>
 
         <div class="duel-zone">
-            <!-- PISTE A -->
+            <!-- PISTE A (Toujours 'active' par défaut au démarrage) -->
             <div class="track-slot">
-                <div class="track-card {% if silent_mode or current_playing == 'a' %}active{% endif %}" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
+                <div class="track-card active" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
                     <div class="pochette-wrapper">
                         <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
                         <form action="{{ url_for('vote') }}" method="POST" id="form-a" class="vote-form" onsubmit="handleVote(event, 'a')">
@@ -69,7 +69,7 @@
                 <a href="{{ url_for('classement') }}" class="central-rank-btn">📊 Classement</a>
             </div>
 
-            <!-- PISTE B -->
+            <!-- PISTE B ('active' si Mode Silence) -->
             <div class="track-slot">
                 <div class="track-card {% if silent_mode %}active{% endif %}" id="card-b" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
                     <div class="pochette-wrapper">
