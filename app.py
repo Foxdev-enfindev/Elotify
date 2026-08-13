@@ -338,6 +338,12 @@ def select_playlist(playlist_id):
         profile = get_user_profile_cached(sp)
         if profile and profile.get('id'):
             threading.Thread(target=save_user_active_playlist_db, args=(profile['id'], playlist_id), daemon=True).start()
+            
+        try:
+            pl_info = sp.playlist(playlist_id, fields='name')
+            session['selected_playlist_name'] = pl_info.get('name', 'Playlist')
+        except Exception:
+            session['selected_playlist_name'] = 'Playlist'
 
     return '<script>window.location.replace("/");</script>'
 
@@ -559,15 +565,12 @@ def classement(playlist_id=None):
         tracks = list(scores.values())
         tracks.sort(key=lambda x: x.get('elo', 1000), reverse=True)
 
-    playlist_name = "Playlist"
-    owner_name = None
-
+    playlist_name = session.get('selected_playlist_name')
     user_profile = session.get('user_profile')
-    if user_profile:
-        owner_name = user_profile.get('display_name')
+    owner_name = user_profile.get('display_name') if user_profile else None
 
-    # On ne fait de requête à l'API Spotify QUE si on visite une playlist externe
-    if playlist_id != session.get('selected_playlist_id'):
+    # Si le nom n'est pas encore en cache ou si la playlist ne correspond pas à celle de la session active
+    if not playlist_name or playlist_id != session.get('selected_playlist_id'):
         sp = get_spotify_client()
         if sp:
             try:
@@ -575,8 +578,11 @@ def classement(playlist_id=None):
                 playlist_name = pl_info.get('name', 'Playlist')
                 if pl_info.get('owner'):
                     owner_name = pl_info['owner'].get('display_name')
+                
+                if playlist_id == session.get('selected_playlist_id'):
+                    session['selected_playlist_name'] = playlist_name
             except Exception:
-                pass
+                playlist_name = playlist_name or "Playlist"
 
     return render_template(
         'classement.html', 
@@ -610,9 +616,9 @@ def quit_app():
             pass
 
     playlist_id = session.get('selected_playlist_id')
-    playlist_name = "ta playlist"
+    playlist_name = session.get('selected_playlist_name', 'ta playlist')
 
-    if sp and playlist_id:
+    if sp and playlist_id and playlist_name == 'ta playlist':
         try:
             pl_info = sp.playlist(playlist_id, fields='name')
             playlist_name = pl_info.get('name', 'ta playlist')
