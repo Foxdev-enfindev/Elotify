@@ -109,6 +109,7 @@ body.duel-body {
 .profile-dropdown a:hover { background: rgba(150, 150, 150, 0.12); color: var(--neon-green); }
 .profile-dropdown hr { border: none; border-top: 1px solid rgba(150, 150, 150, 0.15); margin: 0; }
 
+/* MODE DE JEU (SILENCE / SPOTIFY) */
 .mode-toggle-wrapper {
     padding: 8px 14px;
     display: flex;
@@ -135,47 +136,48 @@ body.duel-body {
     background: rgba(0, 255, 102, 0.08);
 }
 
-h1 {
-    font-size: clamp(1.6rem, 4vw, 2.4rem);
-    font-weight: 800;
-    color: var(--neon-green);
-    text-shadow: 0 0 12px var(--neon-green-glow);
-    letter-spacing: 1.5px;
-    margin: 0;
-    text-align: center;
-}
-
-.result-banner-wrapper {
-    min-height: 36px;
-    width: 100%;
+/* PASTILLES DE COULEURS */
+.theme-selector-wrapper {
+    padding: 8px 14px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.theme-label {
+    font-size: 0.8rem;
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.theme-dots {
+    display: flex;
     align-items: center;
-    margin-top: 6px;
+    justify-content: space-between;
+    gap: 6px;
+    margin-top: 4px;
 }
 
-.result-banner {
-    background: rgba(0, 255, 102, 0.12) !important;
-    border: 1px solid var(--neon-green) !important;
-    color: var(--neon-green) !important;
-    padding: 6px 20px !important;
-    border-radius: 20px !important;
-    text-align: center !important;
-    font-weight: 700 !important;
-    font-size: 0.92rem !important;
-    box-shadow: 0 0 12px var(--neon-green-glow) !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    max-width: 95% !important;
+.theme-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
-.result-banner.hidden {
-    visibility: hidden !important;
-    border-color: transparent !important;
-    background: transparent !important;
-    box-shadow: none !important;
+.theme-dot:hover {
+    transform: scale(1.15);
+    border-color: #ffffff;
 }
+
+.dot-green  { background-color: #00ff66; }
+.dot-cyan   { background-color: #00f0ff; }
+.dot-pink   { background-color: #ff007f; }
+.dot-orange { background-color: #ff9900; }
+.dot-purple { background-color: #b026ff; }
+.dot-yellow { background-color: #ffe600; }
 
 /* =======================================================
    3. CARTES ET TRONQUAGE STRICT TITRES/ARTISTES

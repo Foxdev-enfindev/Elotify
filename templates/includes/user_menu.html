@@ -20,14 +20,14 @@
         <div class="mode-toggle-wrapper">
             <span class="theme-label">Mode de jeu :</span>
             <button class="mode-btn {% if silent_mode %}active{% endif %}" onclick="toggleSilentMode(event)">
-                {{ '🤫 Mode Silence' if silent_mode else '🔊 Mode Spotify' }}
+                {{ '🔊 Mode Spotify' if silent_mode else '🤫 Mode Silence' }}
             </button>
         </div>
 
         <hr>
 
         <div class="theme-selector-wrapper">
-            <span class="theme-label">Couleur d'accent :</span>
+            <span class="theme-label">Couleur: </span>
             <div class="theme-dots">
                 <div class="theme-dot dot-green" onclick="setThemeColor('green')" title="Vert"></div>
                 <div class="theme-dot dot-cyan" onclick="setThemeColor('cyan')" title="Cyan"></div>
