@@ -17,7 +17,7 @@
         <div class="header-zone">
             {% include 'includes/user_menu.html' %}
 
-            <h1 class="main-title">À vous de choisir</h1>
+            <h1>À vous de choisir</h1>
 
             <div class="result-banner-wrapper">
                 <div class="result-banner {% if not dernier_resultat %}hidden{% endif %}">
@@ -29,7 +29,7 @@
         <div class="duel-zone">
             <!-- PISTE A -->
             <div class="track-slot">
-                <div class="track-card active" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
+                <div class="track-card {% if silent_mode or current_playing == 'a' %}active{% endif %}" id="card-a" onclick="onCardClick('a', '{{ track_a.uri }}')" onmouseenter="onCardHover('a', '{{ track_a.uri }}')">
                     <div class="pochette-wrapper">
                         <img src="{{ track_a.image_url }}" alt="{{ track_a.name }}" class="pochette">
                         <form action="{{ url_for('vote') }}" method="POST" id="form-a" class="vote-form" onsubmit="handleVote(event, 'a')">
@@ -71,7 +71,7 @@
 
             <!-- PISTE B -->
             <div class="track-slot">
-                <div class="track-card" id="card-b" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
+                <div class="track-card {% if silent_mode %}active{% endif %}" id="card-b" onclick="onCardClick('b', '{{ track_b.uri }}')" onmouseenter="onCardHover('b', '{{ track_b.uri }}')">
                     <div class="pochette-wrapper">
                         <img src="{{ track_b.image_url }}" alt="{{ track_b.name }}" class="pochette">
                         <form action="{{ url_for('vote') }}" method="POST" id="form-b" class="vote-form" onsubmit="handleVote(event, 'b')">
