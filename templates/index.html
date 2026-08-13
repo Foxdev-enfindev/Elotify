@@ -17,7 +17,8 @@
         <div class="header-zone">
             {% include 'includes/user_menu.html' %}
 
-            <h1>⚔️ ELOTIFY DUEL ⚔️</h1>
+            <!-- NOUVEAU TITRE -->
+            <h1>À vous de choisir</h1>
 
             <div class="result-banner-wrapper">
                 <div class="result-banner {% if not dernier_resultat %}hidden{% endif %}">
@@ -40,11 +41,13 @@
                     </div>
                     <div class="track-info">
                         <span class="track-badge">TITRE 1</span>
-                        <h2 class="track-title">{{ track_a.name }}</h2>
-                        <p class="track-artist">{{ track_a.artist }}</p>
+                        <h2 class="track-title" title="{{ track_a.name }}">{{ track_a.name }}</h2>
+                        <p class="track-artist" title="{{ track_a.artist }}">{{ track_a.artist }}</p>
                         <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
                     </div>
                 </div>
+                
+                {% if not silent_mode %}
                 <div class="seek-controls" id="seek-a">
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
@@ -52,6 +55,7 @@
                     <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, 30)">+30s</button>
                 </div>
+                {% endif %}
             </div>
 
             <!-- VS ZONE -->
@@ -79,11 +83,13 @@
                     </div>
                     <div class="track-info">
                         <span class="track-badge">TITRE 2</span>
-                        <h2 class="track-title">{{ track_b.name }}</h2>
-                        <p class="track-artist">{{ track_b.artist }}</p>
+                        <h2 class="track-title" title="{{ track_b.name }}">{{ track_b.name }}</h2>
+                        <p class="track-artist" title="{{ track_b.artist }}">{{ track_b.artist }}</p>
                         <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
                     </div>
                 </div>
+
+                {% if not silent_mode %}
                 <div class="seek-controls" id="seek-b">
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -30)">-30s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, -10)">-10s</button>
@@ -91,6 +97,7 @@
                     <button type="button" class="seek-btn" onclick="seekOffset(event, 10)">+10s</button>
                     <button type="button" class="seek-btn" onclick="seekOffset(event, 30)">+30s</button>
                 </div>
+                {% endif %}
             </div>
         </div>
 
@@ -102,15 +109,19 @@
     <script>
         let currentPlaying = 'a';
         const isDesktop = window.matchMedia('(pointer: fine)').matches;
+        const isSilentMode = {{ 'true' if silent_mode else 'false' }};
 
         window.addEventListener('DOMContentLoaded', () => {
-            fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
-                .then(res => res.json())
-                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
-                .catch(err => console.error('Erreur lecture initiale :', err));
+            if (!isSilentMode) {
+                fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
+                    .catch(err => console.error('Erreur lecture initiale :', err));
+            }
         });
 
         function showSpotifyWarning(msg) {
+            if (isSilentMode) return;
             const toast = document.getElementById('spotify-toast');
             toast.innerText = msg;
             toast.classList.remove('hidden');
@@ -130,19 +141,22 @@
             } else {
                 cardB.classList.add('active'); cardA.classList.remove('active');
             }
-            fetch('/listen/' + trackUri, { method: 'POST' })
-                .then(res => res.json())
-                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
-                .catch(err => console.error('Erreur changement piste :', err));
+            if (!isSilentMode) {
+                fetch('/listen/' + trackUri, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
+                    .catch(err => console.error('Erreur changement piste :', err));
+            }
         }
 
         function onCardHover(trackKey, trackUri) {
-            if (!isDesktop) return;
+            if (!isDesktop || isSilentMode) return;
             if (currentPlaying !== trackKey) switchActiveCard(trackKey, trackUri);
         }
 
+        /* VOTE DIRECT EN 1 CLIC SI MODE SILENCE ACTIF */
         function onCardClick(trackKey, trackUri) {
-            if (currentPlaying === trackKey) {
+            if (isSilentMode || currentPlaying === trackKey) {
                 triggerVoteAnimation(trackKey);
                 setTimeout(() => { document.getElementById('form-' + trackKey).submit(); }, 150);
             } else {
@@ -158,6 +172,7 @@
 
         function seekOffset(event, seconds) {
             event.stopPropagation();
+            if (isSilentMode) return;
             fetch('/seek_offset/' + seconds, { method: 'POST' })
                 .then(res => res.json())
                 .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
@@ -177,6 +192,7 @@
 
         function togglePause(event) {
             if (event) event.stopPropagation();
+            if (isSilentMode) return;
             fetch('/toggle-pause', { method: 'POST' })
                 .then(res => res.json())
                 .then(data => {

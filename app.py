@@ -6,7 +6,6 @@ from datetime import timedelta
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-from flask_session import Session
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.exceptions import SpotifyException
@@ -14,14 +13,11 @@ from collections import Counter
 
 app = Flask(__name__)
 
-# Clé secrète fixe (Impératif pour ne pas faire sauter la session au redémarrage Render)
+# Clé secrète fixe (Impératif pour valider le cookie de session après le réveil de Render)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify_12345')
 
-# Configuration Session locale rapide (30 jours de durée de vie)
-app.config["SESSION_TYPE"] = "filesystem"
-app.config["SESSION_PERMANENT"] = True
+# Session permanente en cookie navigateur (Persiste malgré la mise en veille de Render)
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(days=30)
-Session(app)
 
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
@@ -51,12 +47,14 @@ def init_db():
             CREATE TABLE IF NOT EXISTS user_preferences (
                 user_id VARCHAR(255) PRIMARY KEY,
                 active_playlist_id VARCHAR(255),
-                theme VARCHAR(50) DEFAULT 'green'
+                theme VARCHAR(50) DEFAULT 'green',
+                silent_mode BOOLEAN DEFAULT FALSE
             );
         """)
         cur.execute("""
             ALTER TABLE user_preferences 
-            ADD COLUMN IF NOT EXISTS theme VARCHAR(50) DEFAULT 'green';
+            ADD COLUMN IF NOT EXISTS theme VARCHAR(50) DEFAULT 'green',
+            ADD COLUMN IF NOT EXISTS silent_mode BOOLEAN DEFAULT FALSE;
         """)
         conn.commit()
         cur.close()
@@ -111,21 +109,23 @@ def get_user_profile_cached(sp):
     except Exception:
         return session.get('user_profile')
 
-# --- HELPERS PERSISTANCE BDD ---
-def get_user_active_playlist_db(user_id):
+# --- HELPERS PREFERENCES EN BDD ---
+def get_user_preferences_db(user_id):
     if not DATABASE_URL or not user_id:
-        return None
+        return None, False
     try:
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("SELECT active_playlist_id FROM user_preferences WHERE user_id = %s;", (user_id,))
+        cur.execute("SELECT active_playlist_id, silent_mode FROM user_preferences WHERE user_id = %s;", (user_id,))
         row = cur.fetchone()
         cur.close()
         conn.close()
-        return row[0] if row else None
+        if row:
+            return row[0], row[1]
+        return None, False
     except Exception as e:
-        print(f"⚠️ Erreur lecture playlist active BDD : {e}")
-        return None
+        print(f"⚠️ Erreur lecture préférences BDD : {e}")
+        return None, False
 
 def save_user_active_playlist_db(user_id, playlist_id):
     if not DATABASE_URL or not user_id or not playlist_id:
@@ -143,7 +143,25 @@ def save_user_active_playlist_db(user_id, playlist_id):
         cur.close()
         conn.close()
     except Exception as e:
-        print(f"⚠️ Erreur enregistrement playlist active BDD : {e}")
+        print(f"⚠️ Erreur enregistrement playlist BDD : {e}")
+
+def save_user_silent_mode_db(user_id, silent_mode):
+    if not DATABASE_URL or not user_id:
+        return
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO user_preferences (user_id, silent_mode)
+            VALUES (%s, %s)
+            ON CONFLICT (user_id) 
+            DO UPDATE SET silent_mode = EXCLUDED.silent_mode;
+        """, (user_id, silent_mode))
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"⚠️ Erreur enregistrement mode silence BDD : {e}")
 
 def load_local_scores():
     if 'scores_cache' in session and session['scores_cache']:
@@ -275,12 +293,15 @@ def index():
     profile = get_user_profile_cached(sp)
     user_id = profile.get('id') if profile else None
 
-    # Recouvrement playlist depuis la BDD si session vidée
+    # Recouvrement playlist et mode silence depuis la BDD si session vidée
     playlist_id = session.get('selected_playlist_id')
-    if not playlist_id and user_id:
-        playlist_id = get_user_active_playlist_db(user_id)
-        if playlist_id:
+    if user_id:
+        db_playlist, db_silent = get_user_preferences_db(user_id)
+        if not playlist_id and db_playlist:
+            playlist_id = db_playlist
             session['selected_playlist_id'] = playlist_id
+        if 'silent_mode' not in session:
+            session['silent_mode'] = db_silent
 
     if not playlist_id: 
         return redirect(url_for('liste_playlists'))
@@ -327,7 +348,9 @@ def index():
     track_b['elo'] = scores.get(track_b['id'], {}).get('elo', 1000)
 
     dernier_resultat = session.pop('dernier_resultat', None)
-    return render_template('index.html', track_a=track_a, track_b=track_b, dernier_resultat=dernier_resultat, user=profile, current_theme=session.get('theme', 'green'))
+    silent_mode = session.get('silent_mode', False)
+
+    return render_template('index.html', track_a=track_a, track_b=track_b, dernier_resultat=dernier_resultat, user=profile, current_theme=session.get('theme', 'green'), silent_mode=silent_mode)
 
 @app.route('/vote', methods=['POST'])
 def vote():
@@ -366,6 +389,9 @@ def vote():
 
 @app.route('/listen/<path:track_uri>', methods=['POST'])
 def listen(track_uri):
+    if session.get('silent_mode', False):
+        return jsonify({"status": "silent_mode_active"}), 200
+
     sp = get_spotify_client()
     if not sp: 
         return jsonify({"error": "Non authentifié"}), 401
@@ -377,6 +403,9 @@ def listen(track_uri):
 
 @app.route('/toggle-pause', methods=['POST'])
 def toggle_pause():
+    if session.get('silent_mode', False):
+        return jsonify({"status": "silent_mode_active"}), 200
+
     sp = get_spotify_client()
     if not sp: 
         return jsonify({"error": "Non authentifié"}), 401
@@ -392,6 +421,9 @@ def toggle_pause():
 
 @app.route('/seek_offset/<offset_seconds>', methods=['POST'])
 def seek_offset(offset_seconds):
+    if session.get('silent_mode', False):
+        return jsonify({"status": "silent_mode_active"}), 200
+
     sp = get_spotify_client()
     if not sp: 
         return jsonify({"error": "Non authentifié"}), 401
@@ -409,6 +441,17 @@ def seek_offset(offset_seconds):
 def set_theme_route(theme_name):
     session['theme'] = theme_name
     return jsonify({"status": "success"})
+
+@app.route('/set_silent_mode/<int:status>', methods=['POST'])
+def set_silent_mode_route(status):
+    is_silent = bool(status)
+    session['silent_mode'] = is_silent
+    sp = get_spotify_client()
+    if sp:
+        profile = get_user_profile_cached(sp)
+        if profile and profile.get('id'):
+            threading.Thread(target=save_user_silent_mode_db, args=(profile['id'], is_silent), daemon=True).start()
+    return jsonify({"status": "success", "silent_mode": is_silent})
 
 @app.route('/classement')
 def classement():
@@ -434,7 +477,7 @@ def stats():
 @app.route('/quit')
 def quit_app():
     sp = get_spotify_client()
-    if sp:
+    if sp and not session.get('silent_mode', False):
         try: 
             sp.pause_playback()
         except Exception: 

@@ -1,43 +1,53 @@
 {% if user %}
 <div class="user-profile-container">
-    <div class="profile-trigger" onclick="toggleProfileDropdown()">
+    <div class="profile-trigger" onclick="toggleProfileDropdown(event)">
         {% if user.image %}
-            <img src="{{ user.image }}" alt="Avatar" class="user-avatar">
+            <img src="{{ user.image }}" alt="{{ user.display_name }}" class="user-avatar">
         {% else %}
-            <div class="user-avatar-placeholder">👤</div>
+            <div class="user-avatar-placeholder">{{ user.display_name[0] | upper }}</div>
         {% endif %}
         <span class="user-name">{{ user.display_name }}</span>
         <span class="arrow-down">▼</span>
     </div>
-    
+
     <div class="profile-dropdown" id="profileDropdown">
-        <a href="{{ url_for('index') }}">⚔️ Duels</a>
         <a href="{{ url_for('liste_playlists') }}">🎵 Mes Playlists</a>
         <a href="{{ url_for('stats') }}">📊 Mes Statistiques</a>
         <a href="{{ url_for('classement') }}">🏆 Classement</a>
+        
         <hr>
+
         <div class="mode-toggle-wrapper">
-            <span class="theme-label">Mode d'affichage :</span>
-            <div class="mode-toggle-btns">
-                <button type="button" class="mode-btn" id="btn-mode-dark" onclick="setBgMode('dark')">🌙 Sombre</button>
-                <button type="button" class="mode-btn" id="btn-mode-light" onclick="setBgMode('light')">☀️ Clair</button>
-            </div>
+            <span class="theme-label">Mode de jeu :</span>
+            <button class="mode-btn {% if silent_mode %}active{% endif %}" onclick="toggleSilentMode(event)">
+                {{ '🤫 Mode Silence' if silent_mode else '🔊 Mode Spotify' }}
+            </button>
         </div>
+
         <hr>
-        <div class="theme-selector-wrapper">
-            <span class="theme-label">Couleur d'accent :</span>
-            <div class="theme-dots">
-                <div class="theme-dot dot-green" title="Vert" onclick="setAccentColor('green')"></div>
-                <div class="theme-dot dot-cyan" title="Cyan" onclick="setAccentColor('cyan')"></div>
-                <div class="theme-dot dot-pink" title="Rose" onclick="setAccentColor('pink')"></div>
-                <div class="theme-dot dot-orange" title="Orange" onclick="setAccentColor('orange')"></div>
-                <div class="theme-dot dot-purple" title="Violet" onclick="setAccentColor('purple')"></div>
-                <div class="theme-dot dot-yellow" title="Jaune" onclick="setAccentColor('yellow')"></div>
-                <div class="theme-dot dot-random" title="Couleur Aléatoire" onclick="setAccentColor('random')">🎲</div>
-            </div>
-        </div>
-        <hr>
+
         <a href="{{ url_for('logout') }}" style="color: var(--danger-color);">Déconnexion</a>
     </div>
 </div>
+
+<script>
+    function toggleProfileDropdown(e) {
+        e.stopPropagation();
+        document.getElementById('profileDropdown').classList.toggle('show');
+    }
+
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('profileDropdown');
+        if (dropdown && dropdown.classList.contains('show') && !e.target.closest('.user-profile-container')) {
+            dropdown.classList.remove('show');
+        }
+    });
+
+    function toggleSilentMode(e) {
+        e.stopPropagation();
+        const nextStatus = {{ '0' if silent_mode else '1' }};
+        fetch('/set_silent_mode/' + nextStatus, { method: 'POST' })
+            .then(() => location.reload());
+    }
+</script>
 {% endif %}
