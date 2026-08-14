@@ -180,26 +180,30 @@ def restore_session_if_lost():
 
                 if row and row['token_info']:
                     token_info = json.loads(row['token_info'])
+                    
+                    # Réhydratation immédiate en mémoire RAM
+                    session['user_profile'] = {
+                        'id': user_id,
+                        'display_name': 'Utilisateur',
+                        'image': None
+                    }
+                    
                     sp_oauth = get_spotify_oauth()
                     valid_token = sp_oauth.validate_token(token_info)
                     if valid_token:
                         session['token_info'] = valid_token
                         sp = spotipy.Spotify(auth=valid_token['access_token'])
-                        user_info = sp.current_user()
-                        images = user_info.get('images', [])
-                        session['user_profile'] = {
-                            'id': user_info.get('id'),
-                            'display_name': user_info.get('display_name', 'Utilisateur'),
-                            'image': images[0]['url'] if images else None
-                        }
-                        session['user_profile_timestamp'] = time.time()
-                        if row['active_playlist_id']:
-                            session['selected_playlist_id'] = row['active_playlist_id']
-                        if row['silent_mode'] is not None:
-                            session['silent_mode'] = row['silent_mode']
-                        if row['theme']:
-                            session['theme'] = row['theme']
-                        session.permanent = True
+                        profile = get_user_profile_cached(sp)
+                        if profile:
+                            session['user_profile'] = profile
+                    
+                    if row['active_playlist_id']:
+                        session['selected_playlist_id'] = row['active_playlist_id']
+                    if row['silent_mode'] is not None:
+                        session['silent_mode'] = row['silent_mode']
+                    if row['theme']:
+                        session['theme'] = row['theme']
+                    session.permanent = True
             except Exception as e:
                 print(f"⚠️ Restauration session ignorée/échouée : {e}")
 
@@ -208,7 +212,7 @@ def save_user_cookie(response):
     user_profile = session.get('user_profile')
     if user_profile and user_profile.get('id'):
         signed_id = serializer.dumps(user_profile['id'])
-        response.set_cookie('elotify_user', signed_id, max_age=30*86400, httponly=True, samesite='Lax')
+        response.set_cookie('elotify_user', signed_id, max_age=30*86400, httponly=True, samesite='Lax', path='/')
     return response
 
 # --- HELPERS PREFERENCES EN BDD ---
@@ -400,7 +404,7 @@ def select_playlist(playlist_id):
 def index():
     profile = session.get('user_profile')
     
-    # Si le profil n'est pas encore en session RAM, on instancie le client Spotipy en secours
+    # Si le profil n'est pas encore en session RAM, on instancie Spotipy en secours
     if not profile:
         sp = get_spotify_client()
         if not sp: 
@@ -424,7 +428,7 @@ def index():
 
     scores = load_local_scores()
 
-    # Seul moment où Spotipy est requis : si la liste des pistes n'est pas encore en cache locale
+    # Seul moment où Spotipy est requis : si la liste des pistes n'est pas en cache RAM
     if 'tracks_cache' not in session or not session['tracks_cache']:
         sp = get_spotify_client()
         if not sp:
