@@ -114,21 +114,46 @@
             if (!isSilentMode) {
                 fetch('/listen/{{ track_a.uri }}', { method: 'POST' })
                     .then(res => res.json())
-                    .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
+                    .then(data => { 
+                        if (data.warning) showSpotifyWarning("⚠️ " + data.warning, data.can_switch_silent); 
+                    })
                     .catch(err => console.error('Erreur lecture initiale :', err));
             }
         });
 
-        function showSpotifyWarning(msg) {
+        function showSpotifyWarning(msg, canSwitch = false) {
             if (isSilentMode) return;
+
             const toast = document.getElementById('spotify-toast');
-            toast.innerText = msg;
+            if (canSwitch) {
+                toast.innerHTML = `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
+                        <span>${msg}</span>
+                        <button type="button" 
+                                onclick="enableSilentMode()" 
+                                style="background: #0d0d0d; color: #ff9900; border: none; padding: 6px 14px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.8rem;">
+                            🤫 Passer en Mode Silence
+                        </button>
+                    </div>
+                `;
+            } else {
+                toast.innerText = msg;
+            }
+
             toast.classList.remove('hidden');
             toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.classList.add('hidden'), 300);
-            }, 4000);
+        }
+
+        function enableSilentMode() {
+            fetch('/set_silent_mode/1', { method: 'POST' })
+                .then(res => res.json())
+                .then(data => {
+                    window.location.reload();
+                })
+                .catch(err => {
+                    console.error('Erreur bascule mode silence:', err);
+                    window.location.reload();
+                });
         }
 
         function switchActiveCard(trackKey, trackUri) {
@@ -143,7 +168,9 @@
             if (!isSilentMode) {
                 fetch('/listen/' + trackUri, { method: 'POST' })
                     .then(res => res.json())
-                    .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
+                    .then(data => { 
+                        if (data.warning) showSpotifyWarning("⚠️ " + data.warning, data.can_switch_silent); 
+                    })
                     .catch(err => console.error('Erreur changement piste :', err));
             }
         }
@@ -173,7 +200,7 @@
             if (isSilentMode) return;
             fetch('/seek_offset/' + seconds, { method: 'POST' })
                 .then(res => res.json())
-                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning); })
+                .then(data => { if (data.warning) showSpotifyWarning("⚠️ " + data.warning, data.can_switch_silent); })
                 .catch(err => console.error('Erreur timecode :', err));
         }
 
@@ -195,7 +222,7 @@
                 .then(res => res.json())
                 .then(data => {
                     const btns = document.querySelectorAll('.pause-btn-inline');
-                    if (data.warning) showSpotifyWarning("⚠️ " + data.warning);
+                    if (data.warning) showSpotifyWarning("⚠️ " + data.warning, data.can_switch_silent);
                     else btns.forEach(btn => btn.innerText = (data.status === 'paused') ? '▶' : '⏸');
                 })
                 .catch(err => console.error('Erreur pause :', err));

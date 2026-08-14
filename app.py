@@ -590,7 +590,11 @@ def listen(track_uri):
         sp.start_playback(uris=[track_uri])
         return jsonify({"status": "playing"})
     except Exception:
-        return jsonify({"warning": "Ouvre Spotify sur ton appareil."}), 200
+        # On renvoie la suggestion de passer en mode silence
+        return jsonify({
+            "warning": "Aucun lecteur Spotify actif détecté.",
+            "can_switch_silent": True
+        }), 200
 
 @app.route('/toggle-pause', methods=['POST'])
 def toggle_pause():

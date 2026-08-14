@@ -1022,5 +1022,9 @@ body.playlists-body, body.classement-body, body.quit-body {
     max-width: 90vw;
 }
 
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.show { 
+    opacity: 1; 
+    transform: translateX(-50%) translateY(0); 
+    pointer-events: auto !important; /* <--- AJOUTER CETTE LIGNE */
+}
 .toast.hidden { display: none; }
