@@ -135,9 +135,26 @@ def get_spotify_oauth(show_dialog=False):
 
 def get_spotify_client():
     sp_oauth = get_spotify_oauth()
-    token_info = sp_oauth.validate_token(sp_oauth.get_cached_token())
+    token_info = sp_oauth.get_cached_token()
+    
     if not token_info:
         return None
+
+    # Si le jeton est expiré, force le rafraîchissement via le refresh_token
+    if sp_oauth.is_token_expired(token_info):
+        try:
+            refresh_token = token_info.get('refresh_token')
+            if refresh_token:
+                token_info = sp_oauth.refresh_access_token(refresh_token)
+            else:
+                token_info = sp_oauth.validate_token(token_info)
+        except Exception as e:
+            print(f"⚠️ Échec du rafraîchissement du jeton : {e}")
+            return None
+
+    if not token_info:
+        return None
+
     return spotipy.Spotify(auth=token_info['access_token'])
 
 def get_user_profile_cached(sp):
@@ -181,18 +198,16 @@ def restore_session_if_lost():
                 if row and row['token_info']:
                     token_info = json.loads(row['token_info'])
                     
-                    # Réhydratation immédiate en mémoire RAM
+                    # Pré-réhydratation temporaire pour autoriser save_token_to_cache
                     session['user_profile'] = {
                         'id': user_id,
                         'display_name': 'Utilisateur',
                         'image': None
                     }
-                    
-                    sp_oauth = get_spotify_oauth()
-                    valid_token = sp_oauth.validate_token(token_info)
-                    if valid_token:
-                        session['token_info'] = valid_token
-                        sp = spotipy.Spotify(auth=valid_token['access_token'])
+                    session['token_info'] = token_info
+
+                    sp = get_spotify_client()
+                    if sp:
                         profile = get_user_profile_cached(sp)
                         if profile:
                             session['user_profile'] = profile
@@ -404,7 +419,6 @@ def select_playlist(playlist_id):
 def index():
     profile = session.get('user_profile')
     
-    # Si le profil n'est pas encore en session RAM, on instancie Spotipy en secours
     if not profile:
         sp = get_spotify_client()
         if not sp: 
@@ -413,7 +427,6 @@ def index():
 
     user_id = profile.get('id') if profile else None
 
-    # Recouvrement playlist et mode silence depuis la BDD si session vidée
     playlist_id = session.get('selected_playlist_id')
     if user_id and not playlist_id:
         db_playlist, db_silent = get_user_preferences_db(user_id)
@@ -428,7 +441,6 @@ def index():
 
     scores = load_local_scores()
 
-    # Seul moment où Spotipy est requis : si la liste des pistes n'est pas en cache RAM
     if 'tracks_cache' not in session or not session['tracks_cache']:
         sp = get_spotify_client()
         if not sp:
