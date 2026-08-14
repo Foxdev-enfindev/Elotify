@@ -398,17 +398,22 @@ def select_playlist(playlist_id):
 
 @app.route('/')
 def index():
-    sp = get_spotify_client()
-    if not sp: 
-        return redirect(url_for('login'))
-    profile = get_user_profile_cached(sp)
+    profile = session.get('user_profile')
+    
+    # Si le profil n'est pas encore en session RAM, on instancie le client Spotipy en secours
+    if not profile:
+        sp = get_spotify_client()
+        if not sp: 
+            return redirect(url_for('login'))
+        profile = get_user_profile_cached(sp)
+
     user_id = profile.get('id') if profile else None
 
     # Recouvrement playlist et mode silence depuis la BDD si session vidée
     playlist_id = session.get('selected_playlist_id')
-    if user_id:
+    if user_id and not playlist_id:
         db_playlist, db_silent = get_user_preferences_db(user_id)
-        if not playlist_id and db_playlist:
+        if db_playlist:
             playlist_id = db_playlist
             session['selected_playlist_id'] = playlist_id
         if 'silent_mode' not in session:
@@ -419,7 +424,11 @@ def index():
 
     scores = load_local_scores()
 
+    # Seul moment où Spotipy est requis : si la liste des pistes n'est pas encore en cache locale
     if 'tracks_cache' not in session or not session['tracks_cache']:
+        sp = get_spotify_client()
+        if not sp:
+            return redirect(url_for('login'))
         try:
             raw_items, offset = [], 0
             while True:
