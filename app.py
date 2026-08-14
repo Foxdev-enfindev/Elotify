@@ -78,6 +78,27 @@ SPOTIPY_CLIENT_SECRET = os.environ.get('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = os.environ.get('SPOTIPY_REDIRECT_URI', 'https://elotify.onrender.com/callback')
 SCOPE = 'playlist-read-private playlist-read-collaborative user-read-playback-state user-modify-playback-state'
 
+def save_token_to_db_explicit(user_id, token_info):
+    if not DATABASE_URL or not user_id or not token_info:
+        return
+    def _async_save(u_id, t_info):
+        try:
+            conn = get_db_connection()
+            cur = conn.cursor()
+            cur.execute("""
+                INSERT INTO user_preferences (user_id, token_info)
+                VALUES (%s, %s)
+                ON CONFLICT (user_id) 
+                DO UPDATE SET token_info = EXCLUDED.token_info;
+            """, (u_id, json.dumps(t_info)))
+            conn.commit()
+            cur.close()
+            conn.close()
+        except Exception as e:
+            print(f"⚠️ Erreur sauvegarde token BDD : {e}")
+    
+    threading.Thread(target=_async_save, args=(user_id, token_info), daemon=True).start()
+
 # --- CACHE HANDLER HYBRIDE ---
 class DBTokenCacheHandler(spotipy.cache_handler.CacheHandler):
     def get_cached_token(self):
@@ -104,24 +125,8 @@ class DBTokenCacheHandler(spotipy.cache_handler.CacheHandler):
     def save_token_to_cache(self, token_info):
         session['token_info'] = token_info
         user_profile = session.get('user_profile')
-        if user_profile and user_profile.get('id') and DATABASE_URL:
-            def _async_save(u_id, t_info):
-                try:
-                    conn = get_db_connection()
-                    cur = conn.cursor()
-                    cur.execute("""
-                        INSERT INTO user_preferences (user_id, token_info)
-                        VALUES (%s, %s)
-                        ON CONFLICT (user_id) 
-                        DO UPDATE SET token_info = EXCLUDED.token_info;
-                    """, (u_id, json.dumps(t_info)))
-                    conn.commit()
-                    cur.close()
-                    conn.close()
-                except Exception as e:
-                    print(f"⚠️ Erreur sauvegarde token BDD : {e}")
-            
-            threading.Thread(target=_async_save, args=(user_profile['id'], token_info), daemon=True).start()
+        if user_profile and user_profile.get('id'):
+            save_token_to_db_explicit(user_profile['id'], token_info)
 
 def get_spotify_oauth(show_dialog=False):
     return SpotifyOAuth(
@@ -140,7 +145,6 @@ def get_spotify_client():
     if not token_info:
         return None
 
-    # Si le jeton est expiré, force le rafraîchissement via le refresh_token
     if sp_oauth.is_token_expired(token_info):
         try:
             refresh_token = token_info.get('refresh_token')
@@ -176,6 +180,10 @@ def get_user_profile_cached(sp):
         session['user_profile'] = profile
         session['user_profile_timestamp'] = now
         session.modified = True
+
+        if session.get('token_info') and profile.get('id'):
+            save_token_to_db_explicit(profile['id'], session['token_info'])
+
         return profile
     except Exception:
         return session.get('user_profile')
@@ -198,7 +206,6 @@ def restore_session_if_lost():
                 if row and row['token_info']:
                     token_info = json.loads(row['token_info'])
                     
-                    # Pré-réhydratation temporaire pour autoriser save_token_to_cache
                     session['user_profile'] = {
                         'id': user_id,
                         'display_name': 'Utilisateur',
@@ -354,6 +361,13 @@ def callback():
     token_info = sp_oauth.get_access_token(request.args.get('code'))
     if token_info:
         session.permanent = True
+        session['token_info'] = token_info
+        
+        sp = spotipy.Spotify(auth=token_info['access_token'])
+        profile = get_user_profile_cached(sp)
+        if profile and profile.get('id'):
+            save_token_to_db_explicit(profile['id'], token_info)
+
         return redirect(url_for('index'))
     return redirect(url_for('login'))
 
