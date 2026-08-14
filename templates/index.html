@@ -43,6 +43,10 @@
                         <h2 class="track-title" title="{{ track_a.name }}">{{ track_a.name }}</h2>
                         <p class="track-artist" title="{{ track_a.artist }}">{{ track_a.artist }}</p>
                         <div class="elo-display">Elo actuel: <strong>{{ track_a.elo }}</strong></div>
+                        <div class="match-count">
+			    {% set current_match_a = (track_a.matches_count or 0) + 1 %}
+			    {{ current_match_a }}{% if current_match_a == 1 %}er{% else %}e{% endif %} duel
+			</div>
                     </div>
                 </div>
                 
@@ -85,6 +89,10 @@
                         <h2 class="track-title" title="{{ track_b.name }}">{{ track_b.name }}</h2>
                         <p class="track-artist" title="{{ track_b.artist }}">{{ track_b.artist }}</p>
                         <div class="elo-display">Elo actuel: <strong>{{ track_b.elo }}</strong></div>
+                        <div class="match-count">
+			    {% set current_match_b = (track_b.matches_count or 0) + 1 %}
+			    {{ current_match_b }}{% if current_match_b == 1 %}er{% else %}e{% endif %} duel
+			</div>
                     </div>
                 </div>
 

@@ -53,6 +53,7 @@ def init_db():
                 artist TEXT,
                 image_url TEXT,
                 elo INT,
+                matches_count INT DEFAULT 0,
                 PRIMARY KEY (playlist_id, track_id)
             );
         """)
@@ -65,11 +66,16 @@ def init_db():
                 token_info TEXT
             );
         """)
+        # Mises à jour de structure rétrocompatibles
         cur.execute("""
             ALTER TABLE user_preferences 
             ADD COLUMN IF NOT EXISTS theme VARCHAR(50) DEFAULT 'green',
             ADD COLUMN IF NOT EXISTS silent_mode BOOLEAN DEFAULT FALSE,
             ADD COLUMN IF NOT EXISTS token_info TEXT;
+        """)
+        cur.execute("""
+            ALTER TABLE tracks_scores 
+            ADD COLUMN IF NOT EXISTS matches_count INT DEFAULT 0;
         """)
         conn.commit()
         cur.close()
@@ -308,12 +314,17 @@ def load_local_scores():
     try:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute("SELECT track_id, name, artist, image_url, elo FROM tracks_scores WHERE playlist_id = %s;", (playlist_id,))
+        cur.execute("SELECT track_id, name, artist, image_url, elo, matches_count FROM tracks_scores WHERE playlist_id = %s;", (playlist_id,))
         rows = cur.fetchall()
         cur.close()
         conn.close()
 
-        scores = {row['track_id']: dict(row) for row in rows}
+        scores = {}
+        for row in rows:
+            r_dict = dict(row)
+            r_dict['matches_count'] = r_dict.get('matches_count') or 0
+            scores[row['track_id']] = r_dict
+
         session['scores_cache'] = scores
         session.modified = True
         return scores
@@ -329,11 +340,24 @@ def _save_to_db_async(playlist_id, scores_to_update):
         cur = conn.cursor()
         for track_id, data in scores_to_update.items():
             cur.execute("""
-                INSERT INTO tracks_scores (playlist_id, track_id, name, artist, image_url, elo)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO tracks_scores (playlist_id, track_id, name, artist, image_url, elo, matches_count)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 ON CONFLICT (playlist_id, track_id) 
-                DO UPDATE SET elo = EXCLUDED.elo, name = EXCLUDED.name, artist = EXCLUDED.artist, image_url = EXCLUDED.image_url;
-            """, (playlist_id, track_id, data.get('name', ''), data.get('artist', ''), data.get('image_url', ''), data.get('elo', 1000)))
+                DO UPDATE SET 
+                    elo = EXCLUDED.elo, 
+                    matches_count = EXCLUDED.matches_count,
+                    name = EXCLUDED.name, 
+                    artist = EXCLUDED.artist, 
+                    image_url = EXCLUDED.image_url;
+            """, (
+                playlist_id, 
+                track_id, 
+                data.get('name', ''), 
+                data.get('artist', ''), 
+                data.get('image_url', ''), 
+                data.get('elo', 1000), 
+                data.get('matches_count', 0)
+            ))
         conn.commit()
         cur.close()
         conn.close()
@@ -350,12 +374,60 @@ def save_local_scores(scores_to_update):
     if DATABASE_URL and playlist_id:
         threading.Thread(target=_save_to_db_async, args=(playlist_id, scores_to_update), daemon=True).start()
 
-def calculate_elo(elo_a, elo_b, outcome_a, k=32):
+# --- LOGIQUE ELO DYNAMIQUE & MATCHMAKING (HYBRIDE 80/20) ---
+def get_k_factor(matches_count):
+    if matches_count < 10:
+        return 50
+    elif matches_count <= 30:
+        return 32
+    else:
+        return 16
+
+def calculate_elo(elo_a, elo_b, outcome_a, k_a=32, k_b=32):
     expected_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
     expected_b = 1 - expected_a
-    new_elo_a = round(elo_a + k * (outcome_a - expected_a))
-    new_elo_b = round(elo_b + k * ((1.0 - outcome_a) - expected_b))
+    new_elo_a = round(elo_a + k_a * (outcome_a - expected_a))
+    new_elo_b = round(elo_b + k_b * ((1.0 - outcome_a) - expected_b))
     return new_elo_a, new_elo_b
+
+def select_duel(tracks, scores):
+    """Sélectionne 2 pistes : 80% duels ciblés (+/- 150 pts), 20% aléatoires."""
+    if len(tracks) < 2:
+        return None, None
+
+    # 20% de tirage 100% aléatoire (Anti-bulle de filtres)
+    if random.random() < 0.20:
+        return random.sample(tracks, 2)
+
+    # 80% Matchmaking Intelligent :
+    # 1. Trouver Piste A en donnant la priorité aux pistes avec le moins de matchs
+    sorted_by_matches = sorted(
+        tracks, 
+        key=lambda t: scores.get(t['id'], {}).get('matches_count', 0)
+    )
+    # On tire dans le quart (25%) des pistes les moins jouées pour garder de la variété
+    pool_a_size = max(1, len(tracks) // 4)
+    track_a = random.choice(sorted_by_matches[:pool_a_size])
+    elo_a = scores.get(track_a['id'], {}).get('elo', 1000)
+
+    # 2. Chercher Piste B avec un Elo proche (+/- 150 points)
+    candidates_b = [
+        t for t in tracks 
+        if t['id'] != track_a['id'] and abs(scores.get(t['id'], {}).get('elo', 1000) - elo_a) <= 150
+    ]
+
+    if candidates_b:
+        # Priorité à celle qui a aussi le moins de matchs joués
+        candidates_b.sort(key=lambda t: scores.get(t['id'], {}).get('matches_count', 0))
+        pool_b_size = max(1, len(candidates_b) // 2)
+        track_b = random.choice(candidates_b[:pool_b_size])
+    else:
+        # Repli : Prendre la plus proche en Elo globalement
+        remaining = [t for t in tracks if t['id'] != track_a['id']]
+        remaining.sort(key=lambda t: abs(scores.get(t['id'], {}).get('elo', 1000) - elo_a))
+        track_b = remaining[0]
+
+    return track_a, track_b
 
 @app.route('/login')
 def login():
@@ -373,13 +445,11 @@ def callback():
 
     sp_oauth = get_spotify_oauth()
     try:
-        # On force la récupération du token directement avec le code reçu de l'URL
         token_info = sp_oauth.get_access_token(code, check_cache=False)
         if token_info:
             session.permanent = True
             session['token_info'] = token_info
             
-            # Instanciation temporaire pour récupérer l'ID utilisateur
             sp = spotipy.Spotify(auth=token_info['access_token'])
             user_info = sp.current_user()
             
@@ -392,7 +462,6 @@ def callback():
                 session['user_profile'] = profile
                 session['user_profile_timestamp'] = time.time()
                 
-                # Sauvegarde en BDD
                 save_token_to_db_explicit(profile['id'], token_info)
 
             return redirect(url_for('index'))
@@ -531,11 +600,13 @@ def index():
         track_b = next((t for t in tracks if t['id'] == current_duel[1]), None)
 
     if not track_a or not track_b or track_a['id'] == track_b['id']:
-        track_a, track_b = random.sample(tracks, 2)
+        track_a, track_b = select_duel(tracks, scores)
         session['current_duel'] = (track_a['id'], track_b['id'])
 
     track_a['elo'] = scores.get(track_a['id'], {}).get('elo', 1000)
     track_b['elo'] = scores.get(track_b['id'], {}).get('elo', 1000)
+    track_a['matches_count'] = scores.get(track_a['id'], {}).get('matches_count', 0)
+    track_b['matches_count'] = scores.get(track_b['id'], {}).get('matches_count', 0)
 
     dernier_resultat = session.pop('dernier_resultat', None)
     silent_mode = session.get('silent_mode', False)
@@ -554,15 +625,38 @@ def vote():
 
     if track_a and track_b:
         scores = load_local_scores()
-        elo_a = scores.get(id_a, {}).get('elo', 1000)
-        elo_b = scores.get(id_b, {}).get('elo', 1000)
+        
+        # On récupère l'Elo et le nombre de matchs actuels
+        data_a = scores.get(id_a, {})
+        data_b = scores.get(id_b, {})
+        
+        elo_a, matches_a = data_a.get('elo', 1000), data_a.get('matches_count', 0)
+        elo_b, matches_b = data_b.get('elo', 1000), data_b.get('matches_count', 0)
 
-        new_elo_a, new_elo_b = calculate_elo(elo_a, elo_b, outcome)
+        # Calcul des facteurs K respectifs
+        k_a = get_k_factor(matches_a)
+        k_b = get_k_factor(matches_b)
+
+        # Nouveau calcul Elo dynamique
+        new_elo_a, new_elo_b = calculate_elo(elo_a, elo_b, outcome, k_a=k_a, k_b=k_b)
         delta_a, delta_b = new_elo_a - elo_a, new_elo_b - elo_b
 
+        # Mise à jour avec incrémentation du compteur de matchs
         updated = {
-            id_a: {'name': track_a['name'], 'artist': track_a['artist'], 'image_url': track_a['image_url'], 'elo': new_elo_a},
-            id_b: {'name': track_b['name'], 'artist': track_b['artist'], 'image_url': track_b['image_url'], 'elo': new_elo_b}
+            id_a: {
+                'name': track_a['name'], 
+                'artist': track_a['artist'], 
+                'image_url': track_a['image_url'], 
+                'elo': new_elo_a,
+                'matches_count': matches_a + 1
+            },
+            id_b: {
+                'name': track_b['name'], 
+                'artist': track_b['artist'], 
+                'image_url': track_b['image_url'], 
+                'elo': new_elo_b,
+                'matches_count': matches_b + 1
+            }
         }
         save_local_scores(updated)
 
@@ -590,7 +684,6 @@ def listen(track_uri):
         sp.start_playback(uris=[track_uri])
         return jsonify({"status": "playing"})
     except Exception:
-        # On renvoie la suggestion de passer en mode silence
         return jsonify({
             "warning": "Aucun lecteur Spotify actif détecté.",
             "can_switch_silent": True
@@ -671,7 +764,7 @@ def classement(playlist_id=None):
             conn = get_db_connection()
             cur = conn.cursor(cursor_factory=RealDictCursor)
             cur.execute("""
-                SELECT track_id, name, artist, image_url, elo 
+                SELECT track_id, name, artist, image_url, elo, matches_count 
                 FROM tracks_scores 
                 WHERE playlist_id = %s 
                 ORDER BY elo DESC;

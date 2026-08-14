@@ -45,7 +45,10 @@
                         <span class="ranking-name">{{ track.name }}</span>
                         <span class="ranking-artist">{{ track.artist }}</span>
                     </div>
-                    <span class="ranking-elo">{{ track.elo }} pts</span>
+                    <div class="ranking-score-box">
+                        <span class="ranking-elo">{{ track.elo }} pts</span>
+                        <span class="ranking-matches">{{ track.matches_count or 0 }} duel{% if track.matches_count and track.matches_count > 1 %}s{% endif %}</span>
+                    </div>
                 </div>
                 {% endfor %}
             {% else %}
