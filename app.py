@@ -8,6 +8,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_session import Session
+from itsdangerous import URLSafeTimedSerializer
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.exceptions import SpotifyException
@@ -17,6 +18,7 @@ app = Flask(__name__)
 
 # Clé secrète fixe
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'une_cle_secrete_super_securisee_elotify_12345')
+serializer = URLSafeTimedSerializer(app.secret_key)
 
 # Configuration Session sur système de fichiers
 app.config["SESSION_TYPE"] = "filesystem"
@@ -76,14 +78,12 @@ SPOTIPY_CLIENT_SECRET = os.environ.get('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = os.environ.get('SPOTIPY_REDIRECT_URI', 'https://elotify.onrender.com/callback')
 SCOPE = 'playlist-read-private playlist-read-collaborative user-read-playback-state user-modify-playback-state'
 
-# --- CACHE HANDLER HYBRIDE (RAM / SESSION D'ABORD -> BDD EN SECOURS) ---
+# --- CACHE HANDLER HYBRIDE ---
 class DBTokenCacheHandler(spotipy.cache_handler.CacheHandler):
     def get_cached_token(self):
-        # 1. Priorité ABSOLUE à la session locale (0ms de latence)
         if session.get('token_info'):
             return session.get('token_info')
         
-        # 2. Si la session est vide (ex: après un redémarrage Render), on cherche en BDD
         user_profile = session.get('user_profile')
         if user_profile and user_profile.get('id') and DATABASE_URL:
             try:
@@ -95,7 +95,7 @@ class DBTokenCacheHandler(spotipy.cache_handler.CacheHandler):
                 conn.close()
                 if row and row[0]:
                     token_info = json.loads(row[0])
-                    session['token_info'] = token_info # Re-remplit le cache rapide !
+                    session['token_info'] = token_info
                     return token_info
             except Exception as e:
                 print(f"⚠️ Erreur lecture token BDD : {e}")
@@ -105,7 +105,6 @@ class DBTokenCacheHandler(spotipy.cache_handler.CacheHandler):
         session['token_info'] = token_info
         user_profile = session.get('user_profile')
         if user_profile and user_profile.get('id') and DATABASE_URL:
-            # Sauvegarde en arrière-plan pour ne pas bloquer le clic
             def _async_save(u_id, t_info):
                 try:
                     conn = get_db_connection()
@@ -163,6 +162,54 @@ def get_user_profile_cached(sp):
         return profile
     except Exception:
         return session.get('user_profile')
+
+# --- HOOKS DE RESTAURATION DE SESSION INTERNE ---
+@app.before_request
+def restore_session_if_lost():
+    if 'user_profile' not in session:
+        cookie_val = request.cookies.get('elotify_user')
+        if cookie_val and DATABASE_URL:
+            try:
+                user_id = serializer.loads(cookie_val, max_age=30*86400)
+                conn = get_db_connection()
+                cur = conn.cursor(cursor_factory=RealDictCursor)
+                cur.execute("SELECT active_playlist_id, silent_mode, theme, token_info FROM user_preferences WHERE user_id = %s;", (user_id,))
+                row = cur.fetchone()
+                cur.close()
+                conn.close()
+
+                if row and row['token_info']:
+                    token_info = json.loads(row['token_info'])
+                    sp_oauth = get_spotify_oauth()
+                    valid_token = sp_oauth.validate_token(token_info)
+                    if valid_token:
+                        session['token_info'] = valid_token
+                        sp = spotipy.Spotify(auth=valid_token['access_token'])
+                        user_info = sp.current_user()
+                        images = user_info.get('images', [])
+                        session['user_profile'] = {
+                            'id': user_info.get('id'),
+                            'display_name': user_info.get('display_name', 'Utilisateur'),
+                            'image': images[0]['url'] if images else None
+                        }
+                        session['user_profile_timestamp'] = time.time()
+                        if row['active_playlist_id']:
+                            session['selected_playlist_id'] = row['active_playlist_id']
+                        if row['silent_mode'] is not None:
+                            session['silent_mode'] = row['silent_mode']
+                        if row['theme']:
+                            session['theme'] = row['theme']
+                        session.permanent = True
+            except Exception as e:
+                print(f"⚠️ Restauration session ignorée/échouée : {e}")
+
+@app.after_request
+def save_user_cookie(response):
+    user_profile = session.get('user_profile')
+    if user_profile and user_profile.get('id'):
+        signed_id = serializer.dumps(user_profile['id'])
+        response.set_cookie('elotify_user', signed_id, max_age=30*86400, httponly=True, samesite='Lax')
+    return response
 
 # --- HELPERS PREFERENCES EN BDD ---
 def get_user_preferences_db(user_id):
@@ -294,7 +341,9 @@ def callback():
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('login'))
+    resp = redirect(url_for('login'))
+    resp.delete_cookie('elotify_user')
+    return resp
 
 @app.route('/playlists')
 def liste_playlists():
@@ -569,7 +618,6 @@ def classement(playlist_id=None):
     user_profile = session.get('user_profile')
     owner_name = user_profile.get('display_name') if user_profile else None
 
-    # Si le nom n'est pas encore en cache ou si la playlist ne correspond pas à celle de la session active
     if not playlist_name or playlist_id != session.get('selected_playlist_id'):
         sp = get_spotify_client()
         if sp:
