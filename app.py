@@ -13,6 +13,9 @@ import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from spotipy.exceptions import SpotifyException
 from collections import Counter
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 
@@ -353,22 +356,46 @@ def calculate_elo(elo_a, elo_b, outcome_a, k=32):
 
 @app.route('/login')
 def login():
-    return render_template('login.html', auth_url=get_spotify_oauth(show_dialog=True).get_authorize_url())
+    sp_oauth = get_spotify_oauth(show_dialog=True)
+    return render_template('login.html', auth_url=sp_oauth.get_authorize_url())
 
 @app.route('/callback')
 def callback():
-    sp_oauth = get_spotify_oauth()
-    token_info = sp_oauth.get_access_token(request.args.get('code'))
-    if token_info:
-        session.permanent = True
-        session['token_info'] = token_info
-        
-        sp = spotipy.Spotify(auth=token_info['access_token'])
-        profile = get_user_profile_cached(sp)
-        if profile and profile.get('id'):
-            save_token_to_db_explicit(profile['id'], token_info)
+    error = request.args.get('error')
+    code = request.args.get('code')
 
-        return redirect(url_for('index'))
+    if error or not code:
+        print(f"⚠️ Erreur reçue lors du callback Spotify : {error}")
+        return redirect(url_for('login'))
+
+    sp_oauth = get_spotify_oauth()
+    try:
+        # On force la récupération du token directement avec le code reçu de l'URL
+        token_info = sp_oauth.get_access_token(code, check_cache=False)
+        if token_info:
+            session.permanent = True
+            session['token_info'] = token_info
+            
+            # Instanciation temporaire pour récupérer l'ID utilisateur
+            sp = spotipy.Spotify(auth=token_info['access_token'])
+            user_info = sp.current_user()
+            
+            if user_info and user_info.get('id'):
+                profile = {
+                    'id': user_info.get('id'),
+                    'display_name': user_info.get('display_name', 'Utilisateur'),
+                    'image': user_info['images'][0]['url'] if user_info.get('images') else None
+                }
+                session['user_profile'] = profile
+                session['user_profile_timestamp'] = time.time()
+                
+                # Sauvegarde en BDD
+                save_token_to_db_explicit(profile['id'], token_info)
+
+            return redirect(url_for('index'))
+    except Exception as e:
+        print(f"⚠️ Erreur lors de la récupération du token : {e}")
+
     return redirect(url_for('login'))
 
 @app.route('/logout')
